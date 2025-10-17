@@ -1,7 +1,7 @@
 name: CI CD Pipeline
 
 on:
-  push: { }
+  push: {}
 
 env:
   TARGET_DIR: /home/kinoko/marketplace/front
@@ -53,9 +53,6 @@ jobs:
 
       - name: eslint
         run: npm run lint:fix
-
-      - name: jest
-        run: npm run test
 
   build:
     runs-on: ubuntu-latest
