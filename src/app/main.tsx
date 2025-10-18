@@ -4,12 +4,11 @@ import { Provider } from 'react-redux';
 import { RouterProvider } from 'react-router-dom';
 import { CustomProvider } from 'rsuite';
 
-import { router } from './router';
-import './index.css'; // если используешь scss
 import 'normalize.css';
 import 'rsuite/dist/rsuite-no-reset.min.css';
-
-import { store } from '../redux-rtk/store';
+import './index.css'; // если используешь scss
+import { router } from './router';
+import { store } from '../redux-rtk';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

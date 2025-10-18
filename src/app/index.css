@@ -1,6 +1,9 @@
 :root {
   --grey-borderline: #d2d2d7;
 
+  --orange-hover: rgba(230, 84, 0, 0.6);
+  --orange: #e65400;
+
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
