@@ -55,7 +55,7 @@
     width: 100%;
     justify-content: center;
   }
-  * > .SideBar__gr2 > .row:hover {
+  :where(.row:hover) {
     background-color: var(--orange-hover);
   }
 
@@ -76,9 +76,6 @@
     padding-left: 12px;
     padding-right: 12px;
     gap: 12px;
-    &:hover {
-      background-color: var(--orange-hover);
-    }
     transition: 0.3s ease-in;
     border-radius: 8px;
   }
@@ -93,4 +90,7 @@
 
 .active {
   background-color: var(--orange);
+}
+:where(.row:hover) {
+  background: var(--orange-hover);
 }

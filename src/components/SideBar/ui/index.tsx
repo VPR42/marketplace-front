@@ -1,41 +1,25 @@
 import { motion } from 'framer-motion';
-import {
-  BotMessageSquare,
-  ChartNetwork,
-  ChevronRightSquare,
-  LineChartIcon,
-  NotepadText,
-} from 'lucide-react';
+import { ChevronRightSquare } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import { changeActivePage, type activePageType } from '@/redux-rtk/store/active-page';
+
+import type { Rows } from '../types';
 import './side-bar.scss';
 
-export const SideBar: React.FC = () => {
-  const navigationRoutes = {
-    home: '/',
-    scenarioPage: 'scenario',
-    aiChatbotPage: 'ai',
-    paymentsPage: 'payments',
-  };
+interface props {
+  rows: Rows;
+}
+export const SideBar: React.FC<props> = ({ rows }: props) => {
+  const dispatch = useAppDispatch();
 
-  const ROWS = [
-    { icon: LineChartIcon, label: 'Аналитика', url: navigationRoutes.home },
-    {
-      icon: ChartNetwork,
-      label: 'Сценарная аналитика',
-      url: navigationRoutes.scenarioPage,
-    },
-    {
-      icon: BotMessageSquare,
-      label: 'ИИ-ассистент',
-      url: navigationRoutes.aiChatbotPage,
-    },
-    { icon: NotepadText, label: 'Платежи', url: navigationRoutes.paymentsPage },
-  ];
-
+  const { activePage } = useAppSelector((state) => state.activePageReducer);
   const navigate = useNavigate();
 
-  const go = (path: string) => {
+  const go = (path: string, active: activePageType) => {
+    dispatch(changeActivePage({ activePage: active }));
     navigate(path);
   };
 
@@ -85,8 +69,12 @@ export const SideBar: React.FC = () => {
 
         {/* Нижние пункты — фиксированная высота строк, без прыжков */}
         <div className="SideBar__gr2">
-          {ROWS.map(({ icon: Icon, label, url }) => (
-            <div className={'row'} key={label} onClick={() => go(url)}>
+          {rows.map(({ icon: Icon, label, url }, index) => (
+            <div
+              className={index === activePage ? 'active row ' : 'row'}
+              key={label}
+              onClick={() => go(url, index)}
+            >
               <Icon />
               <span className="row__label">{label}</span>
             </div>
