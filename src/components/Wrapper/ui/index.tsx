@@ -1,14 +1,18 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 
-import './wrapper.scss';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { SideBar } from '@/components/SideBar';
+import './wrapper.scss';
 
 export const Wrapper: React.FC = () => (
   <div className="wrapper">
-    <Header />
-    <Outlet />
-    <Footer />
+    <SideBar />
+    <div className="wrapper__maincont">
+      <Header />
+      <Outlet />
+      <Footer />
+    </div>
   </div>
 );
