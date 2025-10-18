@@ -1,14 +1,16 @@
 import { Button, Heading } from 'rsuite';
 
 import { Ivan } from '@/shared/icons/ivan/Ivan';
+
 import './header.scss';
+import { Link } from 'react-router-dom';
 
 export const Header = () => (
   <header className="header">
-    <div className="header__logo">
+    <Link to="/" className="header__logo">
       <Ivan width={32} height={32} />
       <Heading level={4}>ServiGO</Heading>
-    </div>
+    </Link>
     <div className="header__buttons">
       <Button title="Услуги">
         <Heading level={4} className="servs">
