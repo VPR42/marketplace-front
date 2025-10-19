@@ -27,6 +27,9 @@
     > * input:focus {
       border-color: var(--orange-hover) !important;
     }
+    > * input::placeholder {
+      font-family: 'PT Sans Caption', sans-serif;
+    }
     border-bottom: 1px solid var(--grey-borderline);
   }
   &__footer {

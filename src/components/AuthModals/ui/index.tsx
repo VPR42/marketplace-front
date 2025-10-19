@@ -1,7 +1,7 @@
-/* eslint-disable prettier/prettier */
-
 import { Link } from 'react-router-dom';
-import { Button, Checkbox, Input, Modal } from 'rsuite';
+import { Button, Checkbox, Modal } from 'rsuite';
+
+import { InputField } from '@/shared/InputField';
 import './auth-modals.scss';
 
 interface AuthModalProps {
@@ -15,19 +15,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => (
       <Modal.Title>Вход в аккаунт</Modal.Title>
     </Modal.Header>
     <Modal.Body className="auth-modal__body">
-      <div className="input-block">
-        <label className="input-label" htmlFor="email">
-          Электронная почта
-        </label>
-        <Input id="email" placeholder="Ваш email..." className="input" />
-      </div>
+      <InputField name={'email'} label={'Электронная почта'} placeholder="Ваша почта..." />
 
-      <div className="input-block">
-        <label className="input-label" htmlFor="password">
-          Пароль
-        </label>
-        <Input placeholder="Ваш пароль..." type="password" />
-      </div>
+      <InputField name={'password'} label={'Пароль'} placeholder="Ваш пароль..." isPassword />
 
       <div className="remember">
         <Checkbox>
@@ -56,41 +46,27 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => (
     </Modal.Header>
     <Modal.Body className="auth-modal__body">
       <div className="fio-block">
-        <div className="input-block">
-          <label className="input-label" htmlFor="name">
-            Имя
-          </label>
-          <Input id="name" placeholder="Ваше имя" className="input" />
-        </div>
+        <InputField name={'name'} label={'Имя'} placeholder="Иван" />
 
-        <div className="input-block">
-          <label className="input-label" htmlFor="surname">
-            Фамилия
-          </label>
-          <Input id="surname" placeholder="Ваша фамилия" className="input" />
-        </div>
+        <InputField name={'surname'} label={'Фамилия'} placeholder="Говнов" />
       </div>
 
-      <div className="input-block">
-        <label className="input-label" htmlFor="email">
-          Электронная почта
-        </label>
-        <Input id="email" placeholder="Ваш email..." className="input" />
-      </div>
+      <InputField name={'email'} label={'Электронная почта'} placeholder="tutuvania2004@zov.ru" />
 
-      <div className="input-block">
-        <label className="input-label" htmlFor="password">
-          Пароль
-        </label>
-        <Input id="password" placeholder="Ваш пароль..." type="password" />
-      </div>
+      <InputField
+        name={'password'}
+        label={'Пароль'}
+        placeholder="IvanSexyBeast2004Vpr12Pasholko!!!"
+        isPassword
+        showStrengthBar
+      />
 
-      <div className="input-block">
-        <label className="input-label" htmlFor="password-repeat">
-          Повторите пароль
-        </label>
-        <Input id="password-repeat" placeholder="Ваш пароль..." type="password" />
-      </div>
+      <InputField
+        name={'password'}
+        label={'Повторите пароль'}
+        placeholder="IvanSexyBeast2004Vpr12Pasholko!!!"
+        isPassword
+      />
 
       <div className="remember">
         <Checkbox>
