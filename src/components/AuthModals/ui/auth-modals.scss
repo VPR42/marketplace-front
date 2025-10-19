@@ -18,10 +18,14 @@
   &__body {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     > * input {
       border: 2px solid var(--grey-borderline);
       border-radius: 10px;
+    }
+    > * input:hover,
+    > * input:focus {
+      border-color: var(--orange-hover) !important;
     }
     border-bottom: 1px solid var(--grey-borderline);
   }
@@ -67,4 +71,12 @@
 .rs-checkbox-checked > * .rs-checkbox-inner::before {
   background-color: var(--orange) !important;
   border-color: var(--orange) !important;
+}
+.fio-block {
+  display: flex;
+  gap: 12px;
+}
+.sogl {
+  margin-top: -12px;
+  font-weight: 500;
 }

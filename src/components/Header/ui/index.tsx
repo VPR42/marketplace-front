@@ -2,17 +2,20 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Heading } from 'rsuite';
 
-import { AuthModal } from '@/components/AuthModals';
+import { AuthModal, RegisterModal } from '@/components/AuthModals';
 import { Ivan } from '@/shared/icons/ivan/Ivan';
 
 import './header.scss';
 
 export const Header = () => {
-  const [isModalOpen, setModalOpen] = useState(false);
-  const handleClose = () => setModalOpen(false);
+  const [isAuthModalOpen, setAuthModalOpen] = useState(false);
+  const [isRegModalOpen, setRegModalOpen] = useState(false);
+  const handleAuthClose = () => setAuthModalOpen(false);
+  const handleRegClose = () => setRegModalOpen(false);
   return (
     <>
-      <AuthModal open={isModalOpen} onClose={handleClose} />
+      <AuthModal open={isAuthModalOpen} onClose={handleAuthClose} />
+      <RegisterModal open={isRegModalOpen} onClose={handleRegClose} />
       <header className="header">
         <Link to="/" className="header__logo">
           <Ivan width={32} height={32} />
@@ -25,11 +28,11 @@ export const Header = () => {
             </Heading>
           </Button>
           <div className="header__buttons__login">
-            <Button title="Вход" onClick={() => setModalOpen(true)}>
+            <Button title="Вход" onClick={() => setAuthModalOpen(true)}>
               <Heading level={4}>Вход</Heading>
             </Button>
             <Heading level={4}>/</Heading>
-            <Button title="Регистрация">
+            <Button title="Регистрация" onClick={() => setRegModalOpen(true)}>
               <Heading level={4}>Регистрация</Heading>
             </Button>
           </div>
