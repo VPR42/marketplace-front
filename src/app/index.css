@@ -1,7 +1,7 @@
 :root {
   --grey-borderline: #d2d2d7;
 
-  --orange-hover: rgba(230, 84, 0, 0.6);
+  --orange-hover: rgba(230, 84, 0, 0.71);
   --orange: #e65400;
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -38,6 +38,15 @@ h6 {
   color: var(--rs-gray-600);
 }
 
+.input-label {
+  font-family: 'Roboto', sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-variation-settings: 'wdth' 100;
+  font-size: 12px;
+}
+
 p,
 .maintext {
   font-family: 'Noto Sans', sans-serif;
@@ -61,6 +70,15 @@ a {
   text-decoration: inherit;
 }
 
+.link {
+  font-weight: 600;
+  color: var(--orange);
+  text-decoration: inherit;
+}
+.link:hover {
+  color: var(--orange-hover);
+}
+
 a:hover {
   color: #535bf2;
 }
@@ -79,6 +97,12 @@ body {
   flex-direction: column;
   min-width: 0;
   /* критично для flex-контейнеров */
+}
+
+.input-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 h1 {
