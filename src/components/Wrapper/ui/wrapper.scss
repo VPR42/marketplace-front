@@ -1,0 +1,12 @@
+.wrapper {
+  display: flex;
+  &__maincont {
+    margin: 0;
+    margin-left: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    width: 100dvw;
+    height: 100dvh;
+  }
+}
