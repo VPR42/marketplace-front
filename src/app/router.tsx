@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom';
 
-import { navigationRoutes } from '@/components/SideBar/entities';
+import { NAV_ITEMS } from '@/components/SideBar/entities';
 import { Wrapper } from '@/components/Wrapper';
 import { MyServicesPage } from '@/pages/MyServicesPage';
 
@@ -12,10 +12,10 @@ export const router = createBrowserRouter([
     element: <Wrapper />, // общая обёртка с меню
     children: [
       { index: true, element: <HomePage /> },
-      { path: navigationRoutes[0].name, element: <MyServicesPage /> },
-      { path: navigationRoutes[1].name, element: <MyServicesPage /> },
-      { path: navigationRoutes[2].name, element: <MyServicesPage /> },
-      { path: navigationRoutes[3].name, element: <MyServicesPage /> },
+      { path: NAV_ITEMS[0].url, element: <MyServicesPage /> },
+      { path: NAV_ITEMS[1].url, element: <MyServicesPage /> },
+      { path: NAV_ITEMS[2].url, element: <MyServicesPage /> },
+      { path: NAV_ITEMS[3].url, element: <MyServicesPage /> },
     ],
   },
 ]);

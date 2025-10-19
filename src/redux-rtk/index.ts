@@ -1,12 +1,10 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
-import activePageReducer from './store/active-page/activePageSlice';
-
 // сюда импортируешь редьюсеры
 // import todosReducer from './todos/slice';
 
 export const rootReducer = combineReducers({
-  activePageReducer,
+  // activePageReducer,
 });
 
 export const store = configureStore({

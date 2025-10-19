@@ -1,28 +1,12 @@
 import { motion } from 'framer-motion';
 import { ChevronRightSquare } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 
-import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
-import { changeActivePage, type activePageType } from '@/redux-rtk/store/active-page';
-
-import type { Rows } from '../types';
+import { NAV_ITEMS } from '../entities';
 import './side-bar.scss';
 
-interface props {
-  rows: Rows;
-}
-export const SideBar: React.FC<props> = ({ rows }: props) => {
-  const dispatch = useAppDispatch();
-
-  const { activePage } = useAppSelector((state) => state.activePageReducer);
-  const navigate = useNavigate();
-
-  const go = (path: string, active: activePageType) => {
-    dispatch(changeActivePage({ activePage: active }));
-    navigate(path);
-  };
-
+export const SideBar: React.FC = () => {
   const [isCollapsed, setCollapsed] = useState(true);
 
   const cls = useMemo(
@@ -69,15 +53,15 @@ export const SideBar: React.FC<props> = ({ rows }: props) => {
 
         {/* Нижние пункты — фиксированная высота строк, без прыжков */}
         <div className="SideBar__gr2">
-          {rows.map(({ icon: Icon, label, url }, index) => (
-            <div
-              className={index === activePage ? 'active row ' : 'row'}
+          {NAV_ITEMS.map(({ icon: Icon, label, url }) => (
+            <NavLink
+              className={({ isActive }) => (isActive ? 'active row ' : 'row')}
               key={label}
-              onClick={() => go(url, index)}
+              to={url}
             >
               <Icon />
               <span className="row__label">{label}</span>
-            </div>
+            </NavLink>
           ))}
         </div>
       </div>

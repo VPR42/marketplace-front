@@ -40,6 +40,11 @@
   height: 40px; /* фиксируем высоту строки */
   border-radius: 8px;
   line-height: 40px; /* и baseline выравниваем */
+  text-decoration: none; /* для <a> */
+  color: inherit; /* для <a> */
+}
+.row:hover {
+  color: inherit;
 }
 
 /* Подпись рядом с иконкой */
@@ -85,6 +90,10 @@
     transition:
       opacity 0.18s ease,
       width 0.18s ease;
+  }
+  :where(.row:hover) {
+    color: inherit;
+    background-color: var(--orange-hover);
   }
 }
 

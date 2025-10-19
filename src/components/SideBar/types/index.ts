@@ -1,13 +1,8 @@
-export interface NavigationRoute {
-  name: string;
-  path: string;
-}
-export type NavigationRoutes = NavigationRoute[];
+import type { LucideIcon } from 'lucide-react';
 
-export interface Row {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  icon: any;
+export interface NavItem {
+  icon: LucideIcon;
   label: string;
   url: string;
 }
-export type Rows = Row[];
+export type NavItems = NavItem[];

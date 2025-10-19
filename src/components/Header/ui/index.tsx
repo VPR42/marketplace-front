@@ -1,9 +1,9 @@
+import { Link } from 'react-router-dom';
 import { Button, Heading } from 'rsuite';
 
 import { Ivan } from '@/shared/icons/ivan/Ivan';
 
 import './header.scss';
-import { Link } from 'react-router-dom';
 
 export const Header = () => (
   <header className="header">
