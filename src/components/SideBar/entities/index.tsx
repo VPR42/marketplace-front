@@ -1,9 +1,10 @@
-import { CardSim, Diff, MessageCircle, UserRound } from 'lucide-react';
+import { CardSim, MessageCircle, UserRound, LayoutDashboard, ClipboardList } from 'lucide-react';
 
 import type { NavItems } from '../types';
 
 export const NAV_ITEMS: NavItems = [
-  { icon: Diff, label: 'Мои заказы', url: 'my-orders' },
+  { icon: LayoutDashboard, label: 'Лента', url: 'feed' },
+  { icon: ClipboardList, label: 'Мои заказы', url: 'my-orders' },
   {
     icon: UserRound,
     label: 'Профиль',
