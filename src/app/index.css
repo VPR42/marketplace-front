@@ -1,8 +1,25 @@
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: inherit;
+  /*Борис тоже почекай как будем делать */
+}
+
 :root {
   --grey-borderline: #d2d2d7;
 
   --orange-hover: rgba(230, 84, 0, 0.71);
   --orange: #e65400;
+
+  --yellow: #f59e0b;
+
+  --white: #fff;
+
+  --text-gray: #525252;
 
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -75,6 +92,7 @@ a {
   color: var(--orange);
   text-decoration: underline;
 }
+
 .link:hover {
   color: var(--orange-hover);
 }
