@@ -11,7 +11,11 @@ export const Wrapper: React.FC = () => (
     <SideBar />
     <div className="wrapper__maincont">
       <Header />
-      <Outlet />
+      <main className="wrapper__content">
+        {' '}
+        {/* чтобы футер прижать добавил тут да */}
+        <Outlet />
+      </main>
       <Footer />
     </div>
   </div>
