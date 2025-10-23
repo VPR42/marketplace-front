@@ -1,0 +1,77 @@
+.ServiceCatalog {
+  padding: 0 48px;
+  background-color: #f5f5f5;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  &__title {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  &__add-btn {
+    padding: 10px 16px;
+    background-color: var(--orange);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &:hover {
+      background-color: var(--orange-hover);
+    }
+  }
+
+  &__categories {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+
+    .ServiceCatalog__category {
+      padding: 11px 21px;
+      border: 1px solid var(--grey-borderline);
+      border-radius: 20px;
+      font-size: 14px;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: color 0.2s ease;
+
+      &--active {
+        background-color: var(--orange);
+        /*тут мб интереснее оранжевый чем черный на макете просто черный*/
+        color: white;
+        border-color: var(--orange);
+      }
+
+      &:not(.ServiceCatalog__category--active):hover {
+        background-color: var(--orange);
+        color: white;
+        border-color: var(--orange);
+      }
+    }
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px 24px;
+  }
+
+  &__card-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+}

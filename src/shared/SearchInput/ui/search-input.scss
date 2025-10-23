@@ -1,0 +1,32 @@
+.SearchInput {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border: 1px solid var(--grey-borderline);
+  border-radius: 8px;
+  padding: 16px 12px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  margin-bottom: 28px;
+
+  &.focused {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 2px rgba(255, 122, 0, 0.2);
+  }
+
+  svg {
+    color: var(--text-secondary);
+    margin-right: 13px;
+  }
+
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+
+    &::placeholder {
+      color: var(--text-gray);
+    }
+  }
+}
