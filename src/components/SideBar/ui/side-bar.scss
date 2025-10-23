@@ -45,6 +45,7 @@
 }
 .row:hover {
   color: inherit;
+  // color: var(--white); // тож мб попробовать
 }
 
 /* Подпись рядом с иконкой */
@@ -94,14 +95,15 @@
       width 0.18s ease;
   }
   :where(.row:hover) {
-    color: inherit;
     background-color: var(--orange-hover);
   }
 }
 
 .active {
   background-color: var(--orange);
+  color: var(--white); // свой нос сую куда не надо мб но белый возможно круче крч да
 }
+
 :where(.row:hover) {
   background: var(--orange-hover);
 }
