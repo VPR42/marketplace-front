@@ -3,7 +3,7 @@ import './footer.scss';
 export const Footer = () => (
   <footer className="footer">
     <div className="paragraph">
-      <p className="greytext smalltext">Средство для чистки посуды ServiGO IDA</p>
+      <p className="greytext smalltext">Политика конфиденциальности</p>
     </div>
     <div className="paragraph center">
       <p className="smalltext">
