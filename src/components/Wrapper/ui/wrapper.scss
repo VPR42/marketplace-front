@@ -1,0 +1,19 @@
+.wrapper {
+  display: flex;
+  &__maincont {
+    margin: 0;
+    margin-left: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    width: 100dvw;
+    height: 100dvh;
+  }
+  &__content {
+    flex: 1; // прижал футер
+    max-width: 1280px; // не знаю Борис посмотри как тут лучше вот подобрать да
+    padding: 0 20px; // не знаю Борис посмотри как тут лучше вот подобрать да
+    width: 100%;
+    margin: 0 auto;
+  }
+}

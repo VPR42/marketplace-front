@@ -1,0 +1,98 @@
+export const services = [
+  {
+    id: 1,
+    title: 'Ремонт стиральных машин',
+    description: 'Диагностика и ремонт всех видов стиральных машин.',
+    price: '2000',
+    orders: 156,
+    gradient: 'linear-gradient(135deg, #6e45e2, #88d3ce)',
+    workerName: 'Алексей С.',
+    workerRating: '4.9',
+    workerAvatar:
+      'https://sun9-38.userapi.com/s/v1/ig2/O_n9fwqhc6ctMwJNzSoUqrtJf3Ux8g3blHJzygBp4VW6cmcHgPQ9mdBnjBUWjLTrXkt3v-SVjdFjWDdx5-4WuECr.jpg?quality=95&as=32x48,48x72,72x108,108x162,160x240,240x360,360x540,480x720,540x810,640x960,720x1080,1080x1620,1280x1920,1440x2160,1707x2560&from=bu&cs=1280x0',
+  },
+  {
+    id: 2,
+    title: 'Генеральная уборка',
+    description: 'Качественная уборка квартир и офисов.',
+    price: '3500',
+    orders: 89,
+    gradient: 'linear-gradient(135deg, #ff6ec4, #7c4dff)',
+    workerName: 'Дмитрий К.',
+    workerRating: '4.8',
+    workerAvatar:
+      'https://sun9-38.userapi.com/s/v1/ig2/O_n9fwqhc6ctMwJNzSoUqrtJf3Ux8g3blHJzygBp4VW6cmcHgPQ9mdBnjBUWjLTrXkt3v-SVjdFjWDdx5-4WuECr.jpg?quality=95&as=32x48,48x72,72x108,108x162,160x240,240x360,360x540,480x720,540x810,640x960,720x1080,1080x1620,1280x1920,1440x2160,1707x2560&from=bu&cs=1280x0',
+  },
+  {
+    id: 3,
+    title: 'Установка ПО',
+    description: 'Установка и настройка программного обеспечения.',
+    price: '1500',
+    orders: 234,
+    gradient: 'linear-gradient(135deg, #00c6ff, #0072ff)',
+    workerName: 'Алексей С.',
+    workerRating: '4.9',
+    workerAvatar:
+      'https://sun9-38.userapi.com/s/v1/ig2/O_n9fwqhc6ctMwJNzSoUqrtJf3Ux8g3blHJzygBp4VW6cmcHgPQ9mdBnjBUWjLTrXkt3v-SVjdFjWDdx5-4WuECr.jpg?quality=95&as=32x48,48x72,72x108,108x162,160x240,240x360,360x540,480x720,540x810,640x960,720x1080,1080x1620,1280x1920,1440x2160,1707x2560&from=bu&cs=1280x0',
+  },
+  {
+    id: 4,
+    title: 'Сантехнические работы',
+    description: 'Установка и ремонт сантехники',
+    price: '2500',
+    orders: 127,
+    gradient: 'linear-gradient(135deg, green, #abffab)',
+    workerName: 'Алексей С.',
+    workerRating: '4.9',
+    workerAvatar:
+      'https://sun9-38.userapi.com/s/v1/ig2/O_n9fwqhc6ctMwJNzSoUqrtJf3Ux8g3blHJzygBp4VW6cmcHgPQ9mdBnjBUWjLTrXkt3v-SVjdFjWDdx5-4WuECr.jpg?quality=95&as=32x48,48x72,72x108,108x162,160x240,240x360,360x540,480x720,540x810,640x960,720x1080,1080x1620,1280x1920,1440x2160,1707x2560&from=bu&cs=1280x0',
+  },
+  {
+    id: 5,
+    title: 'Электромонтажные работы',
+    description: 'Установка и настройка программного обеспечения.',
+    price: '1500',
+    orders: 234,
+    gradient: 'linear-gradient(135deg, #00c6ff, #0072ff)',
+    workerName: 'Алексей С.',
+    workerRating: '4.9',
+    workerAvatar:
+      'https://sun9-38.userapi.com/s/v1/ig2/O_n9fwqhc6ctMwJNzSoUqrtJf3Ux8g3blHJzygBp4VW6cmcHgPQ9mdBnjBUWjLTrXkt3v-SVjdFjWDdx5-4WuECr.jpg?quality=95&as=32x48,48x72,72x108,108x162,160x240,240x360,360x540,480x720,540x810,640x960,720x1080,1080x1620,1280x1920,1440x2160,1707x2560&from=bu&cs=1280x0',
+  },
+  {
+    id: 6,
+    title: 'Установка ПО',
+    description: 'Установка и настройка программного обеспечения.',
+    price: '1500',
+    orders: 234,
+    gradient: 'linear-gradient(135deg, #00c6ff, #0072ff)',
+    workerName: 'Алексей С.',
+    workerRating: '4.9',
+    workerAvatar:
+      'https://sun9-38.userapi.com/s/v1/ig2/O_n9fwqhc6ctMwJNzSoUqrtJf3Ux8g3blHJzygBp4VW6cmcHgPQ9mdBnjBUWjLTrXkt3v-SVjdFjWDdx5-4WuECr.jpg?quality=95&as=32x48,48x72,72x108,108x162,160x240,240x360,360x540,480x720,540x810,640x960,720x1080,1080x1620,1280x1920,1440x2160,1707x2560&from=bu&cs=1280x0',
+  },
+  {
+    id: 7,
+    title: 'Установка ПО',
+    description: 'Установка и настройка программного обеспечения.',
+    price: '1500',
+    orders: 234,
+    gradient: 'linear-gradient(135deg, #00c6ff, #0072ff)',
+    workerName: 'Алексей С.',
+    workerRating: '4.9',
+    workerAvatar:
+      'https://sun9-38.userapi.com/s/v1/ig2/O_n9fwqhc6ctMwJNzSoUqrtJf3Ux8g3blHJzygBp4VW6cmcHgPQ9mdBnjBUWjLTrXkt3v-SVjdFjWDdx5-4WuECr.jpg?quality=95&as=32x48,48x72,72x108,108x162,160x240,240x360,360x540,480x720,540x810,640x960,720x1080,1080x1620,1280x1920,1440x2160,1707x2560&from=bu&cs=1280x0',
+  },
+  {
+    id: 8,
+    title: 'Установка ПО',
+    description: 'Установка и настройка программного обеспечения.',
+    price: '1500',
+    orders: 234,
+    gradient: 'linear-gradient(135deg, #00c6ff, #0072ff)',
+    workerName: 'Алексей С.',
+    workerRating: '4.9',
+    workerAvatar:
+      'https://sun9-38.userapi.com/s/v1/ig2/O_n9fwqhc6ctMwJNzSoUqrtJf3Ux8g3blHJzygBp4VW6cmcHgPQ9mdBnjBUWjLTrXkt3v-SVjdFjWDdx5-4WuECr.jpg?quality=95&as=32x48,48x72,72x108,108x162,160x240,240x360,360x540,480x720,540x810,640x960,720x1080,1080x1620,1280x1920,1440x2160,1707x2560&from=bu&cs=1280x0',
+  },
+];
