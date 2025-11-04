@@ -1,14 +1,16 @@
 import './service-catalog.scss';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from 'rsuite';
 
 import { services } from '@/shared/data/services';
 import { FilterGroup } from '@/shared/FilterGroup';
+import { CategoryTabs } from '@/shared/FilterTabs';
 import { SearchInput } from '@/shared/SearchInput';
-import { ServiceCard } from '@/shared/ServiceCard/ServiceCard';
+import { ServiceCard } from '@/shared/ServiceCard/ui';
 
-export const ServiceCatalog: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState('Все');
+export const ServiceCatalogPage: React.FC = () => {
+  const [activeFilter, setActiveFilter] = useState('Все');
 
   const filters = [
     { name: 'Стоимость', options: ['По убыванию', 'По возрастанию'] },
@@ -19,10 +21,10 @@ export const ServiceCatalog: React.FC = () => {
   return (
     <div className="ServiceCatalog">
       <div className="ServiceCatalog__header">
-        <h1 className="ServiceCatalog__title">Каталог услуг</h1>
-        <button className="ServiceCatalog__add-btn" title="Разместить услугу">
+        <h2 className="ServiceCatalog__title">Каталог услуг</h2>
+        <Button className="ServiceCatalog__add-btn" title="Разместить услугу">
           <Plus /> Разместить услугу
-        </button>
+        </Button>
       </div>
 
       <SearchInput
@@ -30,19 +32,11 @@ export const ServiceCatalog: React.FC = () => {
         onSearch={(value) => console.log('Ищем типа:', value)}
       />
 
-      <div className="ServiceCatalog__categories">
-        {['Все', 'Ремонт', 'Уборка', 'Сантехника', 'IT услуги', 'Электрика'].map((category) => (
-          <button
-            key={category}
-            className={`ServiceCatalog__category ${
-              category === activeCategory ? 'ServiceCatalog__category--active' : ''
-            }`}
-            onClick={() => setActiveCategory(category)}
-          >
-            {category}
-          </button>
-        ))}
-      </div>
+      <CategoryTabs
+        categories={['Все', 'Ремонт', 'Уборка', 'Сантехника', 'IT услуги', 'Электрика']}
+        active={activeFilter}
+        onChange={setActiveFilter}
+      />
 
       <FilterGroup filters={filters} />
 
