@@ -16,4 +16,5 @@ export const NAV_ITEMS: NavItems = [
     url: 'my-services',
   },
   { icon: MessageCircle, label: 'Чаты', url: 'my-chats' },
+  { icon: MessageCircle, label: 'избранное(временно)', url: 'favorites' },
 ];

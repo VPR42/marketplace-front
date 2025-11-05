@@ -1,0 +1,162 @@
+.MyServices {
+  &__top {
+    display: flex;
+    flex-direction: row;
+  }
+
+  &__title {
+    font-weight: 700;
+    font-size: 28px;
+  }
+
+  &__topBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  &__createBtn {
+    padding: 10px 16px;
+    background-color: var(--orange);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &:hover {
+      background-color: var(--orange-hover);
+    }
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.MyServiceCard {
+  display: flex;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #dee2e6;
+  gap: 16px;
+
+  &__photo {
+    height: 120px;
+    width: 180px;
+    border-radius: 8px;
+    background: #e9ecef;
+    border: 1px solid #dee2e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+  }
+
+  &__content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title {
+    font-weight: 600;
+    margin: 0;
+  }
+
+  &__status {
+    padding: 2px 8px;
+    border-radius: 6px;
+  }
+
+  &__created {
+    margin: 0;
+    font-size: 12px;
+    color: #525252;
+  }
+
+  &__description {
+    margin-top: 6px;
+    font-size: 14px;
+    margin-bottom: 0;
+    color: #525252;
+  }
+
+  &__info {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+    font-size: 14px;
+
+    > * {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &-label {
+      color: #525252;
+    }
+  }
+
+  &__stats {
+    display: flex;
+    gap: 16px;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 10px;
+
+    .rs-btn {
+      border-radius: 8px;
+    }
+  }
+
+  &__statBtn {
+    padding: 10px 16px;
+    background-color: var(--orange);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &:hover {
+      background-color: var(--orange-hover);
+    }
+  }
+
+  &__editBtn,
+  &__deleteBtn {
+    border: 1px solid #dee2e6;
+  }
+
+  &__deleteBtn {
+    color: #dc3545;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 21px;
+  }
+}
