@@ -17,6 +17,7 @@ export const MyServiceCard: React.FC<MyService> = ({
   createdAt,
   category,
   status,
+  onEdit,
 }) => (
   <div className="MyServiceCard">
     <img src={image} className="MyServiceCard__photo" alt="Фото услуги" />
@@ -71,7 +72,9 @@ export const MyServiceCard: React.FC<MyService> = ({
         </div>
 
         <div className="MyServiceCard__actions">
-          <Button className="MyServiceCard__editBtn">Редактировать</Button>
+          <Button className="MyServiceCard__editBtn" onClick={onEdit}>
+            Редактировать
+          </Button>
           <Button className="MyServiceCard__statBtn">Статистика</Button>
           <Button className="MyServiceCard__deleteBtn">Удалить</Button>
         </div>
