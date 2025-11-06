@@ -8,9 +8,11 @@ import { FilterGroup } from '@/shared/FilterGroup';
 import { CategoryTabs } from '@/shared/FilterTabs';
 import { SearchInput } from '@/shared/SearchInput';
 import { ServiceCard } from '@/shared/ServiceCard/ui';
+import { ServiceOrderModal } from '@/shared/ServiceModal/ui';
 
 export const ServiceCatalogPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState('Все');
+    const [openServiceModal, setOpenServiceModal] = useState(false);
 
   const filters = [
     { name: 'Стоимость', options: ['По убыванию', 'По возрастанию'] },
@@ -22,7 +24,7 @@ export const ServiceCatalogPage: React.FC = () => {
     <div className="ServiceCatalog">
       <div className="ServiceCatalog__header">
         <h2 className="ServiceCatalog__title">Каталог услуг</h2>
-        <Button className="ServiceCatalog__add-btn" title="Разместить услугу">
+        <Button className="ServiceCatalog__add-btn" title="Разместить услугу" onClick={() => setOpenServiceModal(true)}>
           <Plus /> Разместить услугу
         </Button>
       </div>
@@ -57,6 +59,17 @@ export const ServiceCatalogPage: React.FC = () => {
           </div>
         ))}
       </div>
+      {openServiceModal && (
+        /*крч вот тут я для тестов оставил чтобы открыть модалку создания услуги сделайте mode = "create" и удалите onDelete
+          а для вызова модалки редактирования укажите mode = "edit" и прокиньте onDelete чтобы кнопка удаления услуги срабатывала как нада.
+          onSubmit ето действие, что будет происходить при нажатии на голубую кнопку (в разных режимах она будет называться по разному)*/
+        <ServiceOrderModal
+          open={openServiceModal}
+          onClose={() => setOpenServiceModal(false)}
+          mode="create"
+          onSubmit={() => {}}
+        />
+      )}
     </div>
   );
 };

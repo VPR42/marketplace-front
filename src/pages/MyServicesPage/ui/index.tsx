@@ -5,11 +5,13 @@ import './my-services.scss';
 import { MyServiceCard } from '@/pages/MyServicesPage/ui/MyServiceCard';
 import { myServices } from '@/shared/data/myServices';
 import { CategoryTabs } from '@/shared/FilterTabs';
+import { ServiceOrderModal } from '@/shared/ServiceModal/ui';
 
 import { Plus } from 'lucide-react';
 
 export const MyServicesPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState('Все категории');
+  const [openServiceModal, setOpenServiceModal] = useState(false);
 
   return (
     <div className="MyServices">
@@ -35,9 +37,25 @@ export const MyServicesPage: React.FC = () => {
 
       <div className="MyServices__list">
         {myServices.map((service) => (
-          <MyServiceCard key={service.id} {...service} />
+          <MyServiceCard
+            key={service.id}
+            {...service}
+            onEdit={() => {
+              setOpenServiceModal(true);
+            }}
+          />
         ))}
       </div>
+
+      {openServiceModal && (
+        <ServiceOrderModal
+          open={openServiceModal}
+          onClose={() => setOpenServiceModal(false)}
+          mode="edit"
+          onSubmit={() => setOpenServiceModal(false)}
+          onDelete={() => {}}
+        />
+      )}
     </div>
   );
 };

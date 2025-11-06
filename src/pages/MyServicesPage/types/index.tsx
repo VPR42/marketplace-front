@@ -11,4 +11,6 @@ export interface MyService {
   createdAt: string;
   category: string;
   status: string;
+  onEdit?: () => void;
+  onSubmit?: () => void;
 }
