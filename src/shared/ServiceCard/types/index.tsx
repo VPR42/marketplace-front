@@ -7,4 +7,5 @@ export interface ServiceCardProps {
   workerName: string;
   workerRating: string;
   workerAvatar: string;
+  onClick?: () => void;
 }
