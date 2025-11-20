@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { Modal, Button, Form, Uploader, RadioGroup, Radio } from 'rsuite';
+import React, { useState, useEffect } from 'react';
+import { Modal, Button, Form, Uploader, TagPicker, SelectPicker } from 'rsuite';
 import type { FileType } from 'rsuite/Uploader';
 
 import './service-modal.scss';
 import { ServiceIcon } from '@/shared/icons/ServiceModal/ServiceModalDownloadIcon';
 
 import type { ServiceFormValue, ServiceOrderModalProps } from '../types';
+
+import { Edit2 } from 'lucide-react';
 
 export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
   open,
@@ -14,22 +16,40 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
   onSubmit,
   onDelete,
   initialValues = {},
+  coverUrl = '',
 }) => {
   const [formValue, setFormValue] = useState<ServiceFormValue>({
     serviceName: initialValues.serviceName || '',
     description: initialValues.description || '',
-    category: initialValues.category || '',
     cost: initialValues.cost || '',
-    city: initialValues.city || '',
-    district: initialValues.district || '',
-    workFormat: initialValues.workFormat || '',
-    experience: initialValues.experience || '',
+    category: initialValues.category || '',
+    tags: initialValues.tags || [],
   });
 
   const [files, setFiles] = useState<FileType[]>([]);
 
+  useEffect(() => {
+    if (coverUrl && mode === 'edit') {
+      setFiles([
+        {
+          name: 'cover.jpg',
+          url: coverUrl,
+        } as FileType,
+      ]);
+    } else {
+      setFiles([]);
+    }
+  }, [open, coverUrl, mode]);
+
   const handleFileChange = (fileList: FileType[]): void => {
-    setFiles(fileList);
+    if (fileList.length > 0) {
+      const file = fileList[0];
+      if (file.blobFile && !file.blobFile.type.startsWith('image/')) {
+        alert('Пожалуйста, загрузите картинку!');
+        return;
+      }
+      setFiles(fileList);
+    }
   };
 
   const handleChange = (value: Partial<ServiceFormValue>) => {
@@ -37,6 +57,34 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
   };
 
   const handleSubmit = () => onSubmit(formValue);
+
+  const tagData = [
+    { label: 'Экологичная химия', value: 'eco_chemistry' },
+    { label: 'Мытьё окон', value: 'window_cleaning' },
+    { label: 'Своё оборудование', value: 'own_equipment' },
+    { label: 'Гарантия', value: 'warranty' },
+    { label: 'Срочный вызов', value: 'urgent_call' },
+    { label: '24/7', value: '24_7' },
+    { label: 'После ремонта', value: 'after_repair' },
+    { label: 'Химчистка', value: 'dry_cleaning' },
+    { label: 'Безнал', value: 'cashless' },
+    { label: 'Наличные', value: 'cash' },
+    { label: 'Выезд сегодня', value: 'today_visit' },
+    { label: 'Чек и договор', value: 'check_contract' },
+  ];
+
+  const categoryData = [
+    { label: 'Электроника', value: 'electronics' },
+    { label: 'Уборка', value: 'cleaning' },
+    { label: 'Мелкий ремонт', value: 'small_repair' },
+    { label: 'Сантехника', value: 'plumbing' },
+    { label: 'IT-услуги', value: 'it_services' },
+    { label: 'Кондиционеры', value: 'air_conditioning' },
+    { label: 'Сборка мебели', value: 'furniture_assembly' },
+    { label: 'Монтажные работы', value: 'installation_works' },
+    { label: 'Ремонт', value: 'repair' },
+    { label: 'Автомобили', value: 'automobiles' },
+  ];
 
   return (
     <Modal size="lg" open={open} onClose={onClose} className="ServiceOrderModal">
@@ -54,26 +102,69 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
         >
           <Form.Group className="ServiceOrderModal__formGroup">
             <Form.ControlLabel className="ServiceOrderModal__label">Фото услуги</Form.ControlLabel>
-            <Uploader
-              className="ServiceOrderModal__uploader"
-              listType="picture-text"
-              autoUpload={false}
-              fileList={files}
-              onChange={handleFileChange}
-              action="#"
-            >
-              <div style={{ textAlign: 'center', width: '100%' }}>
-                <div style={{ fontSize: 24, color: '#b8bdc7', marginBottom: 8 }}>
-                  <ServiceIcon width={34} height={34} />
-                </div>
-                <div className="ServiceOrderModal__upload-label">
-                  {mode === 'edit' ? 'Изменить фото' : 'Загрузить фото'}
-                </div>
-                <div className="ServiceOrderModal__upload-tip">
-                  Рекомендуется: 1200x600px, JPG или PNG
-                </div>
+            {files.length > 0 ? (
+              <div className="ServiceOrderModal__uploader-preview">
+                {files.map((file, index) => (
+                  <div key={index} className="ServiceOrderModal__preview-item">
+                    <img
+                      src={file.blobFile ? URL.createObjectURL(file.blobFile) : file.url}
+                      alt="preview"
+                      className="ServiceOrderModal__preview-image"
+                    />
+                    <div className="ServiceOrderModal__preview-info">
+                      <span className="ServiceOrderModal__preview-name">{file.name}</span>
+                      <label className="ServiceOrderModal__preview-edit">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const newFile = e.target.files?.[0];
+                            if (newFile) {
+                              if (!newFile.type.startsWith('image/')) {
+                                alert('Только картинки! Допустимые форматы: JPG, PNG, WebP и т.д.');
+                                return;
+                              }
+                              const maxSize = 5 * 1024 * 1024;
+                              if (newFile.size > maxSize) {
+                                alert('Файл слишком большой! Максимум 5MB.');
+                                return;
+                              }
+
+                              const file: FileType = {
+                                blobFile: newFile,
+                                name: newFile.name,
+                              };
+                              setFiles([file]);
+                            }
+                          }}
+                          style={{ display: 'none' }}
+                        />
+                        <Edit2 size={16} />
+                      </label>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </Uploader>
+            ) : (
+              <Uploader
+                className="ServiceOrderModal__uploader"
+                listType="picture-text"
+                autoUpload={false}
+                fileList={files}
+                onChange={handleFileChange}
+                action="#"
+              >
+                <div style={{ textAlign: 'center', width: '100%' }}>
+                  <div style={{ fontSize: 24, color: '#b8bdc7', marginBottom: 8 }}>
+                    <ServiceIcon width={34} height={34} />
+                  </div>
+                  <div className="ServiceOrderModal__upload-label">Загрузить фото</div>
+                  <div className="ServiceOrderModal__upload-tip">
+                    Рекомендуется: 1200x600px, JPG или PNG
+                  </div>
+                </div>
+              </Uploader>
+            )}
           </Form.Group>
 
           <Form.Group className="ServiceOrderModal__formGroup">
@@ -93,104 +184,39 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
               onChange={(e) => handleChange({ description: e.target.value })}
             />
           </Form.Group>
-          {mode === 'create' && (
-            <Form.ControlLabel className="ServiceOrderModal__tip">
-              💡 Подробное описание повышает доверие клиентов
-            </Form.ControlLabel>
-          )}
 
-          <div className="ServiceOrderModal__form-wrapper">
-            <Form.Group className="ServiceOrderModal__formGroup">
-              <Form.ControlLabel className="ServiceOrderModal__label">
-                Категория *
-              </Form.ControlLabel>
-              <Form.Control className="ServiceOrderModal__input" name="category" />
-            </Form.Group>
-            <Form.Group className="ServiceOrderModal__formGroup">
-              <Form.ControlLabel className="ServiceOrderModal__label">
-                Стоимость (₽) *
-              </Form.ControlLabel>
-              <Form.Control className="ServiceOrderModal__input" name="cost" type="number" />
-            </Form.Group>
-            <Form.Group className="ServiceOrderModal__formGroup">
-              <Form.ControlLabel className="ServiceOrderModal__label">Город *</Form.ControlLabel>
-              <Form.Control className="ServiceOrderModal__input" name="city" />
-            </Form.Group>
-            <Form.Group className="ServiceOrderModal__formGroup">
-              <Form.ControlLabel className="ServiceOrderModal__label">Район *</Form.ControlLabel>
-              <Form.Control className="ServiceOrderModal__input" name="district" />
-            </Form.Group>
-          </div>
+          <Form.ControlLabel className="ServiceOrderModal__tip">
+            💡 Подробное описание повышает доверие клиентов
+          </Form.ControlLabel>
+
           <Form.Group className="ServiceOrderModal__formGroup">
-            <Form.ControlLabel className="ServiceOrderModal__label">
-              Формат работы *
-            </Form.ControlLabel>
-            <RadioGroup className="ServiceOrderModal__radioGroup" name="workFormat">
-              <Radio className="ServiceOrderModal__radio" value="client">
-                🏠 У клиента
-              </Radio>
-              <Radio className="ServiceOrderModal__radio" value="master">
-                🏢 У мастера
-              </Radio>
-              <Radio className="ServiceOrderModal__radio" value="online">
-                💻 Онлайн
-              </Radio>
-            </RadioGroup>
+            <Form.ControlLabel className="ServiceOrderModal__label">Цена (₽) *</Form.ControlLabel>
+            <Form.Control className="ServiceOrderModal__input" name="cost" type="number" />
           </Form.Group>
+
           <Form.Group className="ServiceOrderModal__formGroup">
-            <Form.ControlLabel className="ServiceOrderModal__label">
-              Опыт работы *
-            </Form.ControlLabel>
-            <Form.Control className="ServiceOrderModal__input" name="experience" />
+            <Form.ControlLabel className="ServiceOrderModal__label">Категория *</Form.ControlLabel>
+            <SelectPicker
+              className="ServiceOrderModal__input"
+              data={categoryData}
+              value={formValue.category}
+              onChange={(value) => handleChange({ category: value || '' })}
+              placeholder="Выбери категорию"
+              searchable
+            />
+          </Form.Group>
+
+          <Form.Group className="ServiceOrderModal__formGroup">
+            <Form.ControlLabel className="ServiceOrderModal__label">Теги *</Form.ControlLabel>
+            <TagPicker
+              className="ServiceOrderModal__input"
+              data={tagData}
+              value={formValue.tags}
+              onChange={(value) => handleChange({ tags: value })}
+              placeholder="Выбери теги"
+            />
           </Form.Group>
         </Form>
-        <Form.Group className="ServiceOrderModal__statistics">
-          {mode === 'edit' ? (
-            <>
-              <Form.ControlLabel>📊 Статистика после публикации</Form.ControlLabel>
-              <div className="ServiceOrderModal__statisticsRow">
-                <Form.Group className="ServiceOrderModal__statisticsItem">
-                  <Form.ControlLabel className="ServiceOrderModal__statisticsValue ServiceOrderModal__statisticsValue--blue">
-                    312
-                  </Form.ControlLabel>
-                  <Form.HelpText className="ServiceOrderModal__statisticsLabel">
-                    Просмотров
-                  </Form.HelpText>
-                </Form.Group>
-
-                <Form.Group className="ServiceOrderModal__statisticsItem">
-                  <Form.ControlLabel className="ServiceOrderModal__statisticsValue ServiceOrderModal__statisticsValue--green">
-                    18
-                  </Form.ControlLabel>
-                  <Form.HelpText className="ServiceOrderModal__statisticsLabel">
-                    Запросов
-                  </Form.HelpText>
-                </Form.Group>
-
-                <Form.Group className="ServiceOrderModal__statisticsItem">
-                  <Form.ControlLabel className="ServiceOrderModal__statisticsValue ServiceOrderModal__statisticsValue--yellow">
-                    3
-                  </Form.ControlLabel>
-                  <Form.HelpText className="ServiceOrderModal__statisticsLabel">
-                    Активных
-                  </Form.HelpText>
-                </Form.Group>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="ServiceOrderModal__statisticsInfo">
-                <Form.ControlLabel className="ServiceOrderModal__statisticsInfoTitle">
-                  📊 Статистика после публикации
-                </Form.ControlLabel>
-                <Form.HelpText className="ServiceOrderModal__statisticsInfoDesc">
-                  После публикации вы сможете отслеживать просмотры, запросы клиентов и активные
-                  заказы
-                </Form.HelpText>
-              </div>
-            </>
-          )}
-        </Form.Group>
       </Modal.Body>
       <Modal.Footer className="ServiceOrderModal__footer">
         {mode === 'edit' && (
