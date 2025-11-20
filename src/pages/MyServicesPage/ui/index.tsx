@@ -54,6 +54,14 @@ export const MyServicesPage: React.FC = () => {
           mode="edit"
           onSubmit={() => setOpenServiceModal(false)}
           onDelete={() => {}}
+          initialValues={{
+            serviceName: 'Уборка квартиры',
+            description: 'Профессиональная уборка квартир в центре города',
+            cost: '5000',
+            category: 'cleaning',
+            tags: ['eco_chemistry', 'window_cleaning'],
+          }}
+          coverUrl="https://example.com/image.jpg"
         />
       )}
     </div>

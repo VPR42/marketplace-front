@@ -1,12 +1,9 @@
 export interface ServiceFormValue {
   serviceName: string;
   description: string;
-  category: string;
   cost: string;
-  city: string;
-  district: string;
-  workFormat: string;
-  experience: string;
+  category: string;
+  tags: string[];
 }
 
 export interface ServiceOrderModalProps {
@@ -17,4 +14,5 @@ export interface ServiceOrderModalProps {
   onDelete?: () => void;
   showDelete?: boolean;
   initialValues?: Partial<ServiceFormValue>;
+  coverUrl?: string;
 }
