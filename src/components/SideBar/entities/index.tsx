@@ -3,6 +3,7 @@ import { CardSim, MessageCircle, UserRound, LayoutDashboard, ClipboardList } fro
 import type { NavItems } from '../types';
 
 export const NAV_ITEMS: NavItems = [
+  { icon: LayoutDashboard, label: 'Главная (new)', url: 'landing' },
   { icon: LayoutDashboard, label: 'Лента', url: 'feed' },
   { icon: ClipboardList, label: 'Мои заказы', url: 'my-orders' },
   {
