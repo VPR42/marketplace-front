@@ -1,9 +1,13 @@
+.rs-modal-wrapper {
+  overflow: hidden;
+}
 .ServiceOrderModal {
   width: 720px;
   border-radius: 18px;
   background: #fff;
   box-shadow: 0 8px 32px 0 rgba(56, 115, 255, 0.08);
   margin: 0 auto;
+  padding: 0;
 
   &__header {
     display: flex;
@@ -11,7 +15,7 @@
     justify-content: space-between;
     background: transparent;
     border-radius: 18px 18px 0 0;
-    padding: 18px 24px 0 24px;
+    padding: 16px 8px;
     min-height: 56px;
     font-size: 20px;
     font-weight: 600;
@@ -25,8 +29,9 @@
   }
 
   &__body {
-    padding: 0 24px 22px 24px;
+    padding: 0 16px;
     background: transparent;
+    margin: 0;
   }
 
   &__form {
@@ -225,7 +230,7 @@
     align-items: center;
     justify-content: flex-end;
     gap: 12px;
-    padding: 18px 24px 18px 24px;
+    padding-top: 16px;
     background: transparent;
     border-radius: 0 0 18px 18px;
     border-top: none;
@@ -396,4 +401,11 @@
   &:active {
     transform: scale(0.95);
   }
+}
+
+.required {
+  color: #c93038;
+}
+.category-tag-picker {
+  padding: 0;
 }

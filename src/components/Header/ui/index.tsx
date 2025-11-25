@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Heading } from 'rsuite';
 
 import { AuthModal, RegisterModal } from '@/components/AuthModals';
@@ -12,6 +12,7 @@ export const Header = () => {
   const [isRegModalOpen, setRegModalOpen] = useState(false);
   const handleAuthClose = () => setAuthModalOpen(false);
   const handleRegClose = () => setRegModalOpen(false);
+  const navigate = useNavigate();
   return (
     <>
       <AuthModal open={isAuthModalOpen} onClose={handleAuthClose} />
@@ -23,7 +24,7 @@ export const Header = () => {
         </Link>
         <div className="header__buttons">
           <Button title="Услуги">
-            <Heading level={4} className="servs">
+            <Heading level={4} className="servs" onClick={() => navigate('/feed')}>
               Услуги
             </Heading>
           </Button>

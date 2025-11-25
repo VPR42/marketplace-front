@@ -72,9 +72,6 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => (
         <Checkbox>
           <span>Запомнить меня</span>
         </Checkbox>
-        <Link to="/" aria-label="Забыли пароль?" className="link">
-          Забыли пароль?
-        </Link>
       </div>
 
       <div className="sogl">

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Uploader, TagPicker, SelectPicker } from 'rsuite';
+import React, { useEffect, useState } from 'react';
+import { Button, Form, Modal, SelectPicker, TagPicker, Uploader } from 'rsuite';
 import type { FileType } from 'rsuite/Uploader';
 
-import './service-modal.scss';
 import { ServiceIcon } from '@/shared/icons/ServiceModal/ServiceModalDownloadIcon';
+import './service-modal.scss';
 
 import type { ServiceFormValue, ServiceOrderModalProps } from '../types';
 
@@ -160,7 +160,7 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
                   </div>
                   <div className="ServiceOrderModal__upload-label">Загрузить фото</div>
                   <div className="ServiceOrderModal__upload-tip">
-                    Рекомендуется: 1200x600px, JPG или PNG
+                    Рекомендуется: Формат - 16:9, JPG или PNG
                   </div>
                 </div>
               </Uploader>
@@ -169,13 +169,15 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
 
           <Form.Group className="ServiceOrderModal__formGroup">
             <Form.ControlLabel className="ServiceOrderModal__label">
-              Название услуги *
+              Название услуги <b className="required">*</b>
             </Form.ControlLabel>
             <Form.Control className="ServiceOrderModal__input" name="serviceName" />
           </Form.Group>
 
           <Form.Group className="ServiceOrderModal__formGroup">
-            <Form.ControlLabel className="ServiceOrderModal__label">Описание *</Form.ControlLabel>
+            <Form.ControlLabel className="ServiceOrderModal__label">
+              Описание <b className="required">*</b>
+            </Form.ControlLabel>
             <textarea
               className="ServiceOrderModal__textarea"
               name="description"
@@ -190,14 +192,18 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
           </Form.ControlLabel>
 
           <Form.Group className="ServiceOrderModal__formGroup">
-            <Form.ControlLabel className="ServiceOrderModal__label">Цена (₽) *</Form.ControlLabel>
+            <Form.ControlLabel className="ServiceOrderModal__label">
+              Цена (₽) <b className="required">*</b>
+            </Form.ControlLabel>
             <Form.Control className="ServiceOrderModal__input" name="cost" type="number" />
           </Form.Group>
 
           <Form.Group className="ServiceOrderModal__formGroup">
-            <Form.ControlLabel className="ServiceOrderModal__label">Категория *</Form.ControlLabel>
+            <Form.ControlLabel className="ServiceOrderModal__label">
+              Категория <b className="required">*</b>
+            </Form.ControlLabel>
             <SelectPicker
-              className="ServiceOrderModal__input"
+              className="ServiceOrderModal__input category-tag-picker"
               data={categoryData}
               value={formValue.category}
               onChange={(value) => handleChange({ category: value || '' })}
@@ -206,10 +212,12 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
             />
           </Form.Group>
 
-          <Form.Group className="ServiceOrderModal__formGroup">
-            <Form.ControlLabel className="ServiceOrderModal__label">Теги *</Form.ControlLabel>
+          <Form.Group className="ServiceOrderModal__formGroup ">
+            <Form.ControlLabel className="ServiceOrderModal__label">
+              Теги <b className="required">*</b>
+            </Form.ControlLabel>
             <TagPicker
-              className="ServiceOrderModal__input"
+              className="ServiceOrderModal__input category-tag-picker"
               data={tagData}
               value={formValue.tags}
               onChange={(value) => handleChange({ tags: value })}
