@@ -39,8 +39,11 @@ const getStoredToken = () => {
 
 const getErrorMessage = (error: unknown) => {
   if (isAxiosError(error)) {
+    if (error.response?.status === 401) {
+      return 'Ошибка соединения с сервером';
+    }
     const message = (error.response?.data as { message?: string })?.message;
-    return message ?? error.message ?? 'Request failed';
+    return message ?? 'Ошибка соединения с сервером';
   }
   return 'Unknown error';
 };
@@ -68,10 +71,13 @@ export const loginUser = createAsyncThunk<AuthResponse, LoginRequest, { rejectVa
   'auth/login',
   async (payload, { rejectWithValue }) => {
     try {
-      const { data } = await api.post<LoginResponse>('/auth/login', payload);
+      const { data } = await api.post<LoginResponse>('/auth/authorization', payload);
       setAuthToken(data.token);
       return data;
     } catch (error) {
+      if (isAxiosError(error) && error.response?.status === 401) {
+        return rejectWithValue('Неправильный пароль');
+      }
       return rejectWithValue(getErrorMessage(error));
     }
   },
@@ -109,7 +115,7 @@ export const fetchWhoAmI = createAsyncThunk<WhoAmIResponse, void, { rejectValue:
   'auth/whoami',
   async (_payload, { rejectWithValue }) => {
     try {
-      const { data } = await api.get<WhoAmIResponse>('/auth/whoami');
+      const { data } = await api.get<WhoAmIResponse>('/auth/who-am-i');
       return data;
     } catch (error) {
       return rejectWithValue(getErrorMessage(error));

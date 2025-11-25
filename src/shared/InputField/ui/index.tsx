@@ -43,7 +43,7 @@ export const InputField: React.FC<InputFieldProps> = ({
         <PasswordStrengthBar
           password={displayValue}
           shortScoreWord="Password is too short"
-          scoreWords={['Очень слабый', 'Слабый', 'Нормальный', 'Сильный', 'Очень сильный']}
+          scoreWords={['Very weak', 'Weak', 'Normal', 'Good', 'Strong']}
           className="sb"
         />
       )}

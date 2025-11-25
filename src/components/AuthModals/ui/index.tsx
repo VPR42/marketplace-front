@@ -1,4 +1,4 @@
-﻿import { useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Checkbox, Modal, SelectPicker } from 'rsuite';
 import zxcvbn from 'zxcvbn';
@@ -15,13 +15,25 @@ interface AuthModalProps {
   onClose: () => void;
 }
 
+const authInitialState = { email: '', password: '' };
+const registerInitialState = {
+  name: '',
+  surname: '',
+  patronymic: '',
+  email: '',
+  city: null as number | null,
+  password: '',
+  confirmPassword: '',
+  agree: false,
+};
+
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 
 export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
   const dispatch = useAppDispatch();
   const { status } = useAppSelector(selectAuthState);
 
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState(authInitialState);
   const [errors, setErrors] = useState<{ email?: string; password?: string; submit?: string }>({});
 
   const clearFieldError = (field: keyof typeof errors) => {
@@ -33,6 +45,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
       }));
     }
   };
+
+  useEffect(() => {
+    if (!open) {
+      setForm(authInitialState);
+      setErrors({});
+    }
+  }, [open]);
 
   const validate = () => {
     const newErrors: typeof errors = {};
@@ -56,16 +75,22 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
     setErrors({});
     try {
       await dispatch(loginUser({ email: form.email, password: form.password })).unwrap();
-      onClose();
+      handleClose();
     } catch (error) {
       setErrors({ submit: (error as string) || 'Не удалось войти' });
     }
   };
 
+  const handleClose = () => {
+    setForm(authInitialState);
+    setErrors({});
+    onClose();
+  };
+
   const isLoading = status === 'loading';
 
   return (
-    <Modal open={open} onClose={onClose} className="auth-modal">
+    <Modal open={open} onClose={handleClose} className="auth-modal">
       <Modal.Header className="auth-modal__header">
         <Modal.Title>Вход в аккаунт</Modal.Title>
       </Modal.Header>
@@ -106,7 +131,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
         {errors.submit ? <div className="form-error">{errors.submit}</div> : null}
       </Modal.Body>
       <Modal.Footer className="auth-modal__footer">
-        <Button appearance="subtle" onClick={onClose} disabled={isLoading}>
+        <Button appearance="subtle" onClick={handleClose} disabled={isLoading}>
           Отмена
         </Button>
         <Button
@@ -139,16 +164,7 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
   const dispatch = useAppDispatch();
   const { status } = useAppSelector(selectAuthState);
 
-  const [form, setForm] = useState({
-    name: '',
-    surname: '',
-    patronymic: '',
-    email: '',
-    city: null as number | null,
-    password: '',
-    confirmPassword: '',
-    agree: false,
-  });
+  const [form, setForm] = useState(registerInitialState);
   const [errors, setErrors] = useState<RegisterErrors>({});
 
   const passwordScore = useMemo(() => zxcvbn(form.password).score, [form.password]);
@@ -162,6 +178,13 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
       }));
     }
   };
+
+  useEffect(() => {
+    if (!open) {
+      setForm(registerInitialState);
+      setErrors({});
+    }
+  }, [open]);
 
   const validate = (): RegisterErrors => {
     const newErrors: RegisterErrors = {};
@@ -216,16 +239,22 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
           city: form.city ?? 0,
         }),
       ).unwrap();
-      onClose();
+      handleClose();
     } catch (error) {
       setErrors({ submit: (error as string) || 'Не удалось зарегистрироваться' });
     }
   };
 
+  const handleClose = () => {
+    setForm(registerInitialState);
+    setErrors({});
+    onClose();
+  };
+
   const isLoading = status === 'loading';
 
   return (
-    <Modal open={open} onClose={onClose} className="auth-modal" overflow={false}>
+    <Modal open={open} onClose={handleClose} className="auth-modal" overflow={false}>
       <Modal.Header className="auth-modal__header">
         <Modal.Title>Регистрация</Modal.Title>
       </Modal.Header>
@@ -343,7 +372,7 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
         {errors.submit ? <div className="form-error">{errors.submit}</div> : null}
       </Modal.Body>
       <Modal.Footer className="auth-modal__footer">
-        <Button appearance="subtle" onClick={onClose} disabled={isLoading}>
+        <Button appearance="subtle" onClick={handleClose} disabled={isLoading}>
           Отмена
         </Button>
         <Button
