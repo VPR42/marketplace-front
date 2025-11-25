@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 
 import { SearchInput } from '@/shared/SearchInput';
+import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 
 import type { OrderItem, OrderStatus } from '../types';
 import { MyOrderCard } from './MyOrderCard';
@@ -91,6 +92,8 @@ const mockOrders: OrderItem[] = [
 export const MyOrdersPage: React.FC = () => {
   const [activeStatus, setActiveStatus] = useState<StatusFilter>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
 
   const filteredOrders = useMemo(() => {
     const normalized = searchTerm.trim().toLowerCase();
@@ -134,11 +137,51 @@ export const MyOrdersPage: React.FC = () => {
 
       <div className="MyOrders__list">
         {filteredOrders.length > 0 ? (
-          filteredOrders.map((order) => <MyOrderCard key={order.id} {...order} />)
+          filteredOrders.map((order) => (
+            <MyOrderCard
+              key={order.id}
+              {...order}
+              onClick={() => {
+                setSelectedOrder(order);
+                setIsDetailOpen(true);
+              }}
+            />
+          ))
         ) : (
           <div className="MyOrders__empty">Заказы не найдены</div>
         )}
       </div>
+
+      {selectedOrder && (
+        <ServiceDetailModal
+          open={isDetailOpen}
+          onClose={() => {
+            setIsDetailOpen(false);
+            setSelectedOrder(null);
+          }}
+          service={{
+            id: selectedOrder.id,
+            title: selectedOrder.title,
+            description: selectedOrder.description,
+            price: selectedOrder.budget.toString(),
+            orders: 0,
+            gradient: 'linear-gradient(135deg, #ff7a45, #ffb347)',
+            workerName: selectedOrder.master,
+            workerRating: '5.0',
+            workerAvatar: selectedOrder.image || '',
+            category: selectedOrder.categoryLabel,
+            tags: [
+              `Статус: ${selectedOrder.status}`,
+              `Клиент #${selectedOrder.clientId}`,
+              selectedOrder.location,
+            ].filter(Boolean),
+            location: selectedOrder.location,
+          }}
+          onOrder={() => setIsDetailOpen(false)}
+          onMessage={() => {}}
+          onFavorite={() => {}}
+        />
+      )}
     </div>
   );
 };

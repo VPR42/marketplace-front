@@ -7,7 +7,11 @@ const statusToBadge = {
   canceled: { label: 'Отменён', className: 'OrderCard__badge--canceled' },
 } as const;
 
-export const MyOrderCard: React.FC<OrderItem> = ({
+interface MyOrderCardProps extends OrderItem {
+  onClick?: () => void;
+}
+
+export const MyOrderCard: React.FC<MyOrderCardProps> = ({
   id,
   master,
   title,
@@ -20,11 +24,12 @@ export const MyOrderCard: React.FC<OrderItem> = ({
   location,
   clientId,
   image,
+  onClick,
 }) => {
   const badge = statusToBadge[status];
 
   return (
-    <article className="OrderCard">
+    <article className="OrderCard" onClick={onClick} role="button">
       <div className="OrderCard__row">
         <div
           className={`OrderCard__thumb ${image ? '' : 'OrderCard__thumb--empty'}`}
