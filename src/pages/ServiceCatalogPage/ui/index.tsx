@@ -1,6 +1,7 @@
 import './service-catalog.scss';
 import { Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from 'rsuite';
 
 import { services } from '@/shared/data/services';
@@ -13,7 +14,12 @@ import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 import { ServiceOrderModal } from '@/shared/ServiceModal/ui';
 
 export const ServiceCatalogPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') ?? '';
+  const shouldOpenCreate = searchParams.get('create') === 'service';
+
   const [activeFilter, setActiveFilter] = useState('Все');
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [openServiceModal, setOpenServiceModal] = useState(false);
   const [selectedService, setSelectedService] = useState<(typeof services)[0] | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
@@ -24,6 +30,29 @@ export const ServiceCatalogPage: React.FC = () => {
     { name: 'Опыт', options: ['Больше 5 лет', '3–5 лет', 'Менее 3 лет'] },
     { name: 'Рейтинг', options: ['4.9 и выше', '4.5 и выше', '4.0 и выше'] },
   ];
+
+  const filteredServices = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) {
+      return services;
+    }
+    return services.filter(
+      (s) =>
+        s.title.toLowerCase().includes(term) ||
+        s.description.toLowerCase().includes(term) ||
+        s.workerName.toLowerCase().includes(term),
+    );
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (shouldOpenCreate) {
+      setOpenServiceModal(true);
+    }
+  }, [shouldOpenCreate]);
+
+  useEffect(() => {
+    setSearchTerm(initialSearch);
+  }, [initialSearch]);
 
   return (
     <div className="ServiceCatalog">
@@ -40,7 +69,8 @@ export const ServiceCatalogPage: React.FC = () => {
 
       <SearchInput
         placeholder="Поиск услуг и мастеров..."
-        onSearch={(value) => console.log('Ищем типа:', value)}
+        defaultValue={initialSearch}
+        onSearch={(value) => setSearchTerm(value)}
       />
 
       <CategoryTabs
@@ -52,7 +82,7 @@ export const ServiceCatalogPage: React.FC = () => {
       <FilterGroup filters={filters} />
 
       <div className="ServiceCatalog__grid">
-        {services.map((service) => (
+        {filteredServices.map((service) => (
           <div className="ServiceCatalog__card-wrapper" key={service.id}>
             <ServiceCard
               key={service.id}
