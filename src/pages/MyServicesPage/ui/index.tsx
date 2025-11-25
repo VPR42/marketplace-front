@@ -53,7 +53,7 @@ export const MyServicesPage: React.FC = () => {
             key={service.id}
             {...service}
             onEdit={() => {
-              setOpenServiceModal(true);
+              handleModalOpen('edit');
             }}
           />
         ))}
