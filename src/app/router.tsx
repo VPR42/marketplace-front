@@ -1,4 +1,5 @@
-﻿import { createBrowserRouter } from 'react-router-dom';
+
+import { createBrowserRouter } from 'react-router-dom';
 
 import { Wrapper } from '@/components/Wrapper';
 import { ChatsPage } from '@/pages/ChatsPage';
@@ -16,7 +17,7 @@ export const router = createBrowserRouter([
     path: '/',
     element: <Wrapper />, // общая обёртка с меню
     children: [
-      { index: true, element: <HomePage /> },
+      { index: true, element: <LandingPage /> },
       { path: '/feed', element: <ServiceCatalogPage /> },
       { path: '/favorites', element: <FavoritesPage /> },
       { path: '/my-services', element: <MyServicesPage /> },
@@ -27,3 +28,4 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
+
