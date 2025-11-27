@@ -1,4 +1,3 @@
-
 import { Home, LayoutDashboard, MessageCircle } from 'lucide-react';
 
 import type { NavItems } from '../types';
