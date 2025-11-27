@@ -1,21 +1,19 @@
-
 import { createBrowserRouter } from 'react-router-dom';
 
 import { Wrapper } from '@/components/Wrapper';
 import { ChatsPage } from '@/pages/ChatsPage';
 import { FavoritesPage } from '@/pages/FavoritesPage';
+import { LandingPage } from '@/pages/LandingPage';
 import { MyOrdersPage } from '@/pages/MyOrdersPage';
 import { MyReviewsPage } from '@/pages/MyReviewsPage';
 import { MyServicesPage } from '@/pages/MyServicesPage';
 import { ProfilePage } from '@/pages/ProfilePage';
-import { ServiceCatalogPage } from '@/pages/ServiceCatalogPage/ui';
-
-import { HomePage } from '../pages/HomePage';
+import { ServiceCatalogPage } from '@/pages/ServiceCatalogPage';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Wrapper />, // общая обёртка с меню
+    element: <Wrapper />,
     children: [
       { index: true, element: <LandingPage /> },
       { path: '/feed', element: <ServiceCatalogPage /> },
@@ -28,4 +26,3 @@ export const router = createBrowserRouter([
     ],
   },
 ]);
-
