@@ -1,4 +1,4 @@
-export interface ServiceCardProps {
+﻿export interface ServiceCardProps {
   title: string;
   description: string;
   price: string;
@@ -7,5 +7,5 @@ export interface ServiceCardProps {
   workerName: string;
   workerRating: string;
   workerAvatar: string;
-  onClick?: () => void;
+  favorite?: boolean;
 }

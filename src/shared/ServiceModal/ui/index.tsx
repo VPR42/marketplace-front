@@ -18,7 +18,7 @@ import { Edit2 } from 'lucide-react';
 const PLACEHOLDER_COVER = 'https://placehold.co/800x450';
 
 const validate = (values: ServiceFormValue) => {
-  const errors: Partial<Record<keyof ServiceFormValue, string>> = {};
+  const errors: Partial<Record<keyof ServiceFormValue | 'submit', string>> = {};
   if (!values.name || values.name.trim().length < 5) {
     errors.name = 'Название от 5 символов';
   } else if (values.name.trim().length > 60) {
@@ -155,7 +155,7 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
     [categories],
   );
 
-  const tagOptions = useMemo(() => tags.map((t) => ({ label: t.name, value: t.name })), [tags]);
+  const tagOptions = useMemo(() => tags.map((t) => ({ label: t.name, value: t.id })), [tags]);
 
   return (
     <Modal size="lg" open={open} onClose={onClose} className="ServiceOrderModal">
@@ -306,7 +306,7 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
               className="ServiceOrderModal__input category-tag-picker service-tag-picker"
               data={tagOptions}
               value={formValue.tags}
-              onChange={(value) => handleChange({ tags: value as string[] })}
+              onChange={(value) => handleChange({ tags: (value as number[]) ?? [] })}
               placeholder="Выбери теги"
               block
             />

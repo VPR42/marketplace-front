@@ -1,10 +1,10 @@
-import { Button } from 'rsuite';
+﻿import { Button } from 'rsuite';
 
 import type { CategoryTabsProps } from '@/shared/FilterTabs/types';
 import './filter-tabs.scss';
 
 export const CategoryTabs: React.FC<CategoryTabsProps> = ({ categories, active, onChange }) => (
-  <div className="CategoryTabs">
+  <div className="CategoryTabs CategoryTabs--twoRows">
     {categories.map((category) => (
       <Button
         key={category}

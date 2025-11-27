@@ -3,7 +3,7 @@
   description: string;
   price: number | '';
   categoryId: number | null;
-  tags: string[];
+  tags: number[];
   coverUrl?: string;
 }
 

@@ -28,8 +28,8 @@ const registerInitialState = {
 };
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
-const MAX_NAME = 50;
-const MAX_EMAIL = 100;
+const MAX_NAME = 20;
+const MAX_EMAIL = 50;
 const MAX_PASSWORD = 64;
 
 export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {

@@ -1,7 +1,7 @@
 ﻿import { Plus } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, Pagination } from 'rsuite';
+import { Button, Loader, Pagination } from 'rsuite';
 
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
 import { selectServicesState } from '@/redux-rtk/store/services/selectors';
@@ -11,6 +11,7 @@ import { fetchCategories } from '@/redux-rtk/store/utils/utilsThunks';
 import { CategoryTabs } from '@/shared/FilterTabs';
 import { SearchInput } from '@/shared/SearchInput';
 import { ServiceCard } from '@/shared/ServiceCard/ui';
+import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 import { ServiceOrderModal } from '@/shared/ServiceModal/ui';
 
 import './service-catalog.scss';
@@ -26,8 +27,10 @@ export const ServiceCatalogPage: React.FC = () => {
 
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [openServiceModal, setOpenServiceModal] = useState(false);
+  const [openDetailModal, setOpenDetailModal] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState<number | null>(null);
-  const [pageSize] = useState(12);
+  const [pageSize] = useState(9);
   const [pageNumber, setPageNumber] = useState(0);
 
   useEffect(() => {
@@ -83,6 +86,10 @@ export const ServiceCatalogPage: React.FC = () => {
     setPageNumber(0);
   };
 
+  const isLoading = status === 'loading';
+  const isEmpty = !isLoading && items.length === 0;
+  const selectedService = items.find((s) => s.id === selectedServiceId) || null;
+
   return (
     <div className="ServiceCatalog">
       <div className="ServiceCatalog__header">
@@ -112,25 +119,32 @@ export const ServiceCatalogPage: React.FC = () => {
               description={service.description}
               price={service.price.toString()}
               orders={service.ordersCount}
-              gradient="linear-gradient(135deg, #ff7a18, #af002d 70%)"
+              gradient="linear-gradient(135deg, #4facfe, #00f2fe)"
               workerName={
                 service.user.master?.pseudonym || `${service.user.name} ${service.user.surname}`
               }
-              workerRating={'—'}
               workerAvatar={service.user.avatarPath}
-              onClick={() => {}}
+              onClick={() => {
+                setSelectedServiceId(service.id);
+                setOpenDetailModal(true);
+              }}
             />
           </div>
         ))}
-        {status === 'loading' && <div className="ServiceCatalog__loading">Загрузка...</div>}
+        {isLoading && (
+          <div className="ServiceCatalog__loader">
+            <Loader size="md" content="" />
+          </div>
+        )}
+        {isEmpty && <div className="ServiceCatalog__empty">Нет подходящих услуг</div>}
       </div>
 
-      {totalPages > 1 && (
+      {!isLoading && !isEmpty && (
         <div className="ServiceCatalog__pagination">
           <Pagination
             prev
             next
-            total={totalPages * pageSize}
+            total={Math.max(1, totalPages) * pageSize}
             limit={pageSize}
             activePage={pageNumber + 1}
             onChangePage={(p) => setPageNumber(p - 1)}
@@ -144,6 +158,36 @@ export const ServiceCatalogPage: React.FC = () => {
           onClose={() => setOpenServiceModal(false)}
           mode="create"
           onSubmit={() => setOpenServiceModal(false)}
+        />
+      )}
+
+      {selectedService && (
+        <ServiceDetailModal
+          open={openDetailModal}
+          onClose={() => setOpenDetailModal(false)}
+          service={{
+            id: selectedService.id,
+            title: selectedService.name,
+            description: selectedService.description,
+            price: selectedService.price,
+            orders: selectedService.ordersCount,
+            gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)',
+            workerName:
+              selectedService.user.master?.pseudonym ||
+              `${selectedService.user.name} ${selectedService.user.surname}`,
+            workerRating: '—',
+            workerAvatar: selectedService.user.avatarPath,
+            category: selectedService.category.name,
+            tags: selectedService.tags.map(String),
+            experience: selectedService.user.master?.experience
+              ? `${selectedService.user.master.experience} лет опыта`
+              : undefined,
+            location: selectedService.user.city.name,
+          }}
+          onOrder={() => {}}
+          onMessage={() => {}}
+          onFavorite={() => {}}
+          isFavorite={false}
         />
       )}
     </div>

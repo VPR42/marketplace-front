@@ -10,7 +10,7 @@ export interface Service {
   createdAt: string;
   user: UserExtended;
   category: Category;
-  tags: string[];
+  tags: number[];
   ordersCount: number;
 }
 
@@ -32,7 +32,7 @@ export interface ServiceQueryParams {
   query?: string;
   categoryId?: number;
   skills?: string[];
-  tags?: string[];
+  tags?: number[];
   minPrice?: number;
   maxPrice?: number;
   experience?: number;
