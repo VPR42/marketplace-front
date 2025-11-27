@@ -1,11 +1,11 @@
-export interface ServiceDetailModalProps {
+﻿export interface ServiceDetailModalProps {
   open: boolean;
   onClose: () => void;
   service: {
-    id: number;
+    id: string;
     title: string;
     description: string;
-    price: string;
+    price: number;
     orders: number;
     gradient: string;
     workerName: string;

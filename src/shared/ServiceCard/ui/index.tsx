@@ -23,18 +23,24 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
   }, [workerName]);
 
   const [avatarSrc, setAvatarSrc] = useState(workerAvatar);
-  const [fallback, setFallback] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     setAvatarSrc(workerAvatar);
-    setFallback(false);
-    const timer = setTimeout(() => setFallback(true), 5000);
-    return () => clearTimeout(timer);
+    setLoaded(false);
+    setError(false);
   }, [workerAvatar]);
 
   const handleError = () => {
-    setFallback(true);
+    setError(true);
   };
+
+  const handleLoad = () => {
+    setLoaded(true);
+  };
+
+  const showPlaceholder = !avatarSrc || error || !loaded;
 
   return (
     <div className="ServiceCard" onClick={onClick}>
@@ -47,16 +53,19 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
           <h3 className="ServiceCard__title">{title}</h3>
 
           <div className="ServiceCard__worker">
-            {fallback || !avatarSrc ? (
+            {showPlaceholder ? (
               <div className="ServiceCard__worker-placeholder">{initials}</div>
-            ) : (
+            ) : null}
+            {!error && avatarSrc ? (
               <img
                 className="ServiceCard__worker-img"
                 src={avatarSrc}
                 alt={workerName}
                 onError={handleError}
+                onLoad={handleLoad}
+                style={{ display: showPlaceholder ? 'none' : 'block' }}
               />
-            )}
+            ) : null}
             <span className="ServiceCard__worker-name">{workerName}</span>
           </div>
 
