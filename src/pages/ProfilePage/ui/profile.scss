@@ -1,7 +1,487 @@
-﻿.PagePlaceholder {
+﻿.ProfilePage {
+  width: 100%;
   padding: 24px;
 }
 
-.PagePlaceholder h2 {
-  margin-bottom: 12px;
+.ProfilePage__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.ProfilePage__main {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ProfilePage__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky;
+  top: 24px;
+}
+
+.ProfileHeader {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ProfileHeader__content {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.ProfileHeader__avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #6e45e2, #88d3ce);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ProfileHeader__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ProfileHeader__avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.ProfileHeader__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ProfileHeader__name {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.ProfileHeader__meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  color: #666;
+  font-size: 14px;
+}
+
+.ProfileHeader__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ProfileHeader__stats {
+  display: flex;
+  gap: 24px;
+  margin-top: 8px;
+}
+
+.ProfileHeader__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ProfileHeader__stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e65400;
+}
+
+.ProfileHeader__stat-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.ProfileHeader__actions {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ProfileHeader__share-btn,
+.ProfileHeader__edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+// AboutSection
+.AboutSection {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.AboutSection__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.AboutSection__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.AboutSection__edit-btn {
+  padding: 4px 8px;
+}
+
+.AboutSection__content {
+  color: #333;
+  line-height: 1.6;
+}
+
+.AboutSection__text {
+  margin: 0;
+  font-size: 14px;
+}
+
+.AboutSection__placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.AboutSection__placeholder-text {
+  margin: 0;
+  color: #999;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+// SkillsSection
+.SkillsSection {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.SkillsSection__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.SkillsSection__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.SkillsSection__edit-btn {
+  padding: 4px 8px;
+}
+
+.SkillsSection__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.SkillsSection__tag {
+  padding: 8px 16px;
+  background: #f5f5f5;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #333;
+}
+
+.SkillsSection__placeholder {
+  color: #999;
+}
+
+.SkillsSection__placeholder-text {
+  margin: 0;
+  font-size: 14px;
+}
+
+// ServicesSection
+.ServicesSection {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ServicesSection__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.ServicesSection__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.ServicesSection__add-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ServicesSection__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.ServicesSection__card-wrapper {
+  width: 100%;
+}
+
+.ServicesSection__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+  color: #999;
+}
+
+.ServicesSection__placeholder-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  color: #999;
+}
+
+.ServicesSection__placeholder-text {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.ServicesSection__placeholder-hint {
+  margin: 0;
+  font-size: 14px;
+  color: #999;
+  max-width: 400px;
+}
+
+// ContactSection
+.ContactSection {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ContactSection__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.ContactSection__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.ContactSection__edit-btn {
+  padding: 4px 8px;
+}
+
+.ContactSection__content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ContactSection__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: #333;
+}
+
+.ContactSection__icon {
+  color: #666;
+  flex-shrink: 0;
+}
+
+.ContactSection__text {
+  flex: 1;
+}
+
+.ContactSection__message-btn {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+// RecentOrdersSection
+.RecentOrdersSection {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.RecentOrdersSection__header {
+  margin-bottom: 16px;
+}
+
+.RecentOrdersSection__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.RecentOrdersSection__list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.RecentOrdersSection__item {
+  padding: 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+}
+
+.RecentOrdersSection__item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.RecentOrdersSection__item-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.RecentOrdersSection__item-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+}
+
+.RecentOrdersSection__item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.RecentOrdersSection__item-date {
+  font-size: 12px;
+  color: #999;
+}
+
+.RecentOrdersSection__status {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.RecentOrdersSection__status--completed {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.RecentOrdersSection__status--cancelled {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.RecentOrdersSection__status--in-progress {
+  background: #fff3e0;
+  color: #ef6c00;
+}
+
+.RecentOrdersSection__placeholder {
+  padding: 24px;
+  text-align: center;
+}
+
+.RecentOrdersSection__placeholder-text {
+  margin: 0;
+  font-size: 14px;
+  color: #999;
+  line-height: 1.6;
+}
+
+// Адаптивность
+@media (max-width: 968px) {
+  .ProfilePage__container {
+    grid-template-columns: 1fr;
+  }
+
+  .ProfilePage__sidebar {
+    position: static;
+  }
+
+  .ServicesSection__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .ProfilePage {
+    padding: 16px;
+  }
+
+  .ProfileHeader__content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .ProfileHeader__actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ProfileHeader__stats {
+    justify-content: center;
+  }
 }
