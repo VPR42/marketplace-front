@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import { Input } from 'rsuite';
 
@@ -11,8 +11,20 @@ export const InputField: React.FC<InputFieldProps> = ({
   placeholder,
   isPassword,
   showStrengthBar = false,
+  value,
+  onChange,
+  error,
 }: InputFieldProps) => {
-  const [value, setValue] = useState('');
+  const [innerValue, setInnerValue] = useState(value);
+
+  const handleChange = (v: string | number) => {
+    const str = String(v);
+    setInnerValue(str);
+    onChange(str);
+  };
+
+  const displayValue = typeof value === 'string' ? value : innerValue;
+
   return (
     <div className="input-block">
       <label className="input-label" htmlFor={name}>
@@ -22,14 +34,16 @@ export const InputField: React.FC<InputFieldProps> = ({
         id={name}
         placeholder={placeholder}
         type={isPassword ? 'password' : 'text'}
-        value={value}
-        onChange={(v) => setValue(String(v))}
+        value={displayValue}
+        onChange={handleChange}
+        className={error ? 'input-error' : undefined}
       />
+      {error ? <span className="input-error-text">{error}</span> : null}
       {isPassword && showStrengthBar && (
         <PasswordStrengthBar
-          password={value}
-          shortScoreWord="Слишком короткий"
-          scoreWords={['Очень слабый', 'Слабый', 'Средний', 'Хороший', 'Отличный']}
+          password={displayValue}
+          shortScoreWord="Password is too short"
+          scoreWords={['Very weak', 'Weak', 'Normal', 'Good', 'Strong']}
           className="sb"
         />
       )}

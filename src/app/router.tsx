@@ -1,12 +1,16 @@
+
 import { createBrowserRouter } from 'react-router-dom';
 
-import { NAV_ITEMS } from '@/components/SideBar/entities';
 import { Wrapper } from '@/components/Wrapper';
+import { ChatsPage } from '@/pages/ChatsPage';
 import { FavoritesPage } from '@/pages/FavoritesPage';
-import { LandingPage } from '@/pages/LandingPage';
 import { MyOrdersPage } from '@/pages/MyOrdersPage';
+import { MyReviewsPage } from '@/pages/MyReviewsPage';
 import { MyServicesPage } from '@/pages/MyServicesPage';
+import { ProfilePage } from '@/pages/ProfilePage';
 import { ServiceCatalogPage } from '@/pages/ServiceCatalogPage/ui';
+
+import { HomePage } from '../pages/HomePage';
 
 export const router = createBrowserRouter([
   {
@@ -14,12 +18,14 @@ export const router = createBrowserRouter([
     element: <Wrapper />, // общая обёртка с меню
     children: [
       { index: true, element: <LandingPage /> },
-      { path: NAV_ITEMS[0].url, element: <ServiceCatalogPage /> },
-      { path: NAV_ITEMS[1].url, element: <MyOrdersPage /> },
-      { path: NAV_ITEMS[2].url, element: <MyServicesPage /> },
-      { path: NAV_ITEMS[3].url, element: <MyServicesPage /> },
-      { path: NAV_ITEMS[4].url, element: <MyServicesPage /> },
-      { path: NAV_ITEMS[5].url, element: <FavoritesPage /> },
+      { path: '/feed', element: <ServiceCatalogPage /> },
+      { path: '/favorites', element: <FavoritesPage /> },
+      { path: '/my-services', element: <MyServicesPage /> },
+      { path: '/my-orders', element: <MyOrdersPage /> },
+      { path: '/my-reviews', element: <MyReviewsPage /> },
+      { path: '/profile', element: <ProfilePage /> },
+      { path: '/chats', element: <ChatsPage /> },
     ],
   },
 ]);
+

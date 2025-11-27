@@ -1,4 +1,4 @@
-.auth-modal {
+﻿.auth-modal {
   max-width: 400px;
   width: 100%;
   border-bottom: 1px solid var(--grey-borderline);
@@ -78,8 +78,38 @@
 .fio-block {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
+  > * {
+    flex: 1 1 45%;
+    min-width: 140px;
+  }
 }
 .sogl {
   margin-top: -12px;
   font-weight: 500;
+}
+.city-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.city-picker {
+  width: 100%;
+  .rs-picker-toggle {
+    width: 100%;
+    border: 2px solid var(--grey-borderline);
+    border-radius: 10px;
+  }
+  .rs-picker-toggle:hover,
+  .rs-picker-toggle:focus {
+    border-color: var(--orange-hover);
+  }
+}
+.picker-error .rs-picker-toggle {
+  border-color: #dc2626;
+}
+.form-error {
+  color: #dc2626;
+  font-size: 13px;
 }

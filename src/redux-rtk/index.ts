@@ -1,17 +1,14 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
+﻿import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
-// сюда импортируешь редьюсеры
-// import todosReducer from './todos/slice';
+import authReducer from './store/auth/authSlice';
 
 export const rootReducer = combineReducers({
-  // activePageReducer,
+  auth: authReducer,
 });
 
 export const store = configureStore({
   reducer: rootReducer,
-  // middleware: (getDefault) => getDefault().concat(api.middleware), // если потом подключишь RTK Query
 });
 
-// типы для хуков
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
