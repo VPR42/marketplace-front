@@ -35,6 +35,7 @@ applyToken(getToken());
 api.interceptors.request.use((config) => {
   const token = getToken();
   if (token) {
+    // @ts-ignore
     config.headers = {
       ...config.headers,
       Authorization: `Bearer ${token}`,
