@@ -18,7 +18,7 @@ export const FavoritesPage: React.FC = () => {
         </Header>
         <Content className="FavoritesPage__content">
           <CategoryTabs
-            categories={['Все', 'Услуги', 'Мастера']}
+            categories={['Все', 'Ремонт', 'Уборка', 'Сантехника', 'IT услуги', 'Электрика']}
             active={activeFilter}
             onChange={setActiveFilter}
           />
