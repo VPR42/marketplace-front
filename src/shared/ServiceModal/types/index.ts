@@ -1,9 +1,10 @@
-export interface ServiceFormValue {
-  serviceName: string;
+﻿export interface ServiceFormValue {
+  name: string;
   description: string;
-  cost: string;
-  category: string;
+  price: number | '';
+  categoryId: number | null;
   tags: string[];
+  coverUrl?: string;
 }
 
 export interface ServiceOrderModalProps {
@@ -15,4 +16,5 @@ export interface ServiceOrderModalProps {
   showDelete?: boolean;
   initialValues?: Partial<ServiceFormValue>;
   coverUrl?: string;
+  serviceId?: string;
 }

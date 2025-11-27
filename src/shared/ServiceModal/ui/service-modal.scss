@@ -1,4 +1,4 @@
-.rs-modal-wrapper {
+﻿.rs-modal-wrapper {
   overflow: hidden;
 }
 .ServiceOrderModal {
@@ -408,4 +408,8 @@
 }
 .category-tag-picker {
   padding: 0;
+}
+
+.service-tag-picker .rs-picker-tag-wrapper {
+  min-height: 42px;
 }

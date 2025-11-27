@@ -1,48 +1,49 @@
-import './service-catalog.scss';
-import { Plus } from 'lucide-react';
+﻿import { Plus } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button } from 'rsuite';
+import { Button, Pagination } from 'rsuite';
 
-import { services } from '@/shared/data/services';
-import { FilterGroup } from '@/shared/FilterGroup';
+import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import { selectServicesState } from '@/redux-rtk/store/services/selectors';
+import { fetchServices } from '@/redux-rtk/store/services/servicesThunks';
+import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
+import { fetchCategories } from '@/redux-rtk/store/utils/utilsThunks';
 import { CategoryTabs } from '@/shared/FilterTabs';
-import { OrderPlacementModal } from '@/shared/OrderPlacementModal';
 import { SearchInput } from '@/shared/SearchInput';
 import { ServiceCard } from '@/shared/ServiceCard/ui';
-import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 import { ServiceOrderModal } from '@/shared/ServiceModal/ui';
 
+import './service-catalog.scss';
+
 export const ServiceCatalogPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { items, totalPages, status } = useAppSelector(selectServicesState);
+  const { categories } = useAppSelector(selectUtilsState);
+
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get('search') ?? '';
   const shouldOpenCreate = searchParams.get('create') === 'service';
 
-  const [activeFilter, setActiveFilter] = useState('Все');
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [openServiceModal, setOpenServiceModal] = useState(false);
-  const [selectedService, setSelectedService] = useState<(typeof services)[0] | null>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [pageSize] = useState(12);
+  const [pageNumber, setPageNumber] = useState(0);
 
-  const filters = [
-    { name: 'Стоимость', options: ['По убыванию', 'По возрастанию'] },
-    { name: 'Опыт', options: ['Больше 5 лет', '3–5 лет', 'Менее 3 лет'] },
-    { name: 'Рейтинг', options: ['4.9 и выше', '4.5 и выше', '4.0 и выше'] },
-  ];
+  useEffect(() => {
+    dispatch(fetchCategories({ jobsCountSort: 'DESC', query: null }));
+  }, [dispatch]);
 
-  const filteredServices = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-    if (!term) {
-      return services;
-    }
-    return services.filter(
-      (s) =>
-        s.title.toLowerCase().includes(term) ||
-        s.description.toLowerCase().includes(term) ||
-        s.workerName.toLowerCase().includes(term),
+  useEffect(() => {
+    dispatch(
+      fetchServices({
+        page: pageNumber,
+        pageSize,
+        query: searchTerm || undefined,
+        categoryId: categoryId ?? undefined,
+      }),
     );
-  }, [searchTerm]);
+  }, [dispatch, pageNumber, pageSize, searchTerm, categoryId]);
 
   useEffect(() => {
     if (shouldOpenCreate) {
@@ -54,122 +55,95 @@ export const ServiceCatalogPage: React.FC = () => {
     setSearchTerm(initialSearch);
   }, [initialSearch]);
 
+  const categoryTabs = useMemo(
+    () => ['Все', ...categories.map((c) => c.category.name)],
+    [categories],
+  );
+  const activeTab = useMemo(() => {
+    if (categoryId === null) {
+      return 'Все';
+    }
+    const found = categories.find((c) => c.category.id === categoryId);
+    return found?.category.name ?? 'Все';
+  }, [categories, categoryId]);
+
+  const handleCategoryChange = (label: string) => {
+    if (label === 'Все') {
+      setCategoryId(null);
+      setPageNumber(0);
+      return;
+    }
+    const found = categories.find((c) => c.category.name === label);
+    setCategoryId(found?.category.id ?? null);
+    setPageNumber(0);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setPageNumber(0);
+  };
+
   return (
     <div className="ServiceCatalog">
       <div className="ServiceCatalog__header">
         <h2 className="ServiceCatalog__title">Каталог услуг</h2>
         <Button
           className="ServiceCatalog__add-btn"
-          title="Разместить услугу"
+          title="Создать услугу"
           onClick={() => setOpenServiceModal(true)}
         >
-          <Plus /> Разместить услугу
+          <Plus /> Создать услугу
         </Button>
       </div>
 
       <SearchInput
-        placeholder="Поиск услуг и мастеров..."
+        placeholder="Ищи услуги по названию или описанию..."
         defaultValue={initialSearch}
-        onSearch={(value) => setSearchTerm(value)}
+        onSearch={handleSearch}
       />
 
-      <CategoryTabs
-        categories={['Все', 'Ремонт', 'Уборка', 'Сантехника', 'IT услуги', 'Электрика']}
-        active={activeFilter}
-        onChange={setActiveFilter}
-      />
-
-      <FilterGroup filters={filters} />
+      <CategoryTabs categories={categoryTabs} active={activeTab} onChange={handleCategoryChange} />
 
       <div className="ServiceCatalog__grid">
-        {filteredServices.map((service) => (
+        {items.map((service) => (
           <div className="ServiceCatalog__card-wrapper" key={service.id}>
             <ServiceCard
-              key={service.id}
-              title={service.title}
+              title={service.name}
               description={service.description}
-              price={service.price}
-              orders={service.orders}
-              gradient={service.gradient}
-              workerAvatar={service.workerAvatar}
-              workerName={service.workerName}
-              workerRating={service.workerRating}
-              onClick={() => {
-                setSelectedService(service);
-                setIsDetailModalOpen(true);
-              }}
+              price={service.price.toString()}
+              orders={service.ordersCount}
+              gradient="linear-gradient(135deg, #ff7a18, #af002d 70%)"
+              workerName={
+                service.user.master?.pseudonym || `${service.user.name} ${service.user.surname}`
+              }
+              workerRating={'—'}
+              workerAvatar={service.user.avatarPath}
+              onClick={() => {}}
             />
           </div>
         ))}
+        {status === 'loading' && <div className="ServiceCatalog__loading">Загрузка...</div>}
       </div>
+
+      {totalPages > 1 && (
+        <div className="ServiceCatalog__pagination">
+          <Pagination
+            prev
+            next
+            total={totalPages * pageSize}
+            limit={pageSize}
+            activePage={pageNumber + 1}
+            onChangePage={(p) => setPageNumber(p - 1)}
+          />
+        </div>
+      )}
+
       {openServiceModal && (
-        /*крч вот тут я для тестов оставил чтобы открыть модалку создания услуги сделайте mode = "create" и удалите onDelete
-          а для вызова модалки редактирования укажите mode = "edit" и прокиньте onDelete чтобы кнопка удаления услуги срабатывала как нада.
-          onSubmit ето действие, что будет происходить при нажатии на голубую кнопку (в разных режимах она будет называться по разному)*/
         <ServiceOrderModal
           open={openServiceModal}
           onClose={() => setOpenServiceModal(false)}
           mode="create"
-          onSubmit={() => {}}
-        />
-      )}
-
-      {selectedService && (
-        <ServiceDetailModal
-          open={isDetailModalOpen}
-          onClose={() => {
-            setIsDetailModalOpen(false);
-            setSelectedService(null);
-          }}
-          service={{
-            id: selectedService.id,
-            title: selectedService.title,
-            description: selectedService.description,
-            price: selectedService.price,
-            orders: selectedService.orders,
-            gradient: selectedService.gradient,
-            workerName: selectedService.workerName,
-            workerRating: selectedService.workerRating,
-            workerAvatar: selectedService.workerAvatar,
-            category: 'Сантехника', // можно будет получать из данных
-            tags: ['Гарантия 6 месяцев', 'Чек и договор', 'Безнал/Наличные', 'Выезд сегодня'],
-            experience: '7 лет опыта',
-            location: 'Москва, СВО',
-          }}
-          onOrder={() => {
-            setIsDetailModalOpen(false);
-            setIsOrderModalOpen(true);
-          }}
-          onMessage={() => {
-            console.log('Написать мастеру');
-          }}
-          onFavorite={() => {
-            console.log('Добавить в избранное');
-          }}
-        />
-      )}
-
-      {selectedService && (
-        <OrderPlacementModal
-          open={isOrderModalOpen}
-          onClose={() => {
-            setIsOrderModalOpen(false);
-            // Возвращаемся к модальному окну с деталями услуги
-            if (selectedService) {
-              setIsDetailModalOpen(true);
-            }
-          }}
-          service={{
-            id: selectedService.id,
-            title: selectedService.title,
-            workerName: selectedService.workerName,
-            category: 'Сантехника',
-            tags: ['Гарантия 6 месяцев', 'Чек и договор'],
-            price: selectedService.price,
-          }}
-          onSubmit={(data) => {
-            console.log('Данные заказа:', data);
-          }}
+          onSubmit={() => setOpenServiceModal(false)}
         />
       )}
     </div>
