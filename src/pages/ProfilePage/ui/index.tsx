@@ -1,5 +1,7 @@
-﻿import { useParams } from 'react-router-dom';
+﻿import { useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
+import { EditUserProfileModal } from '@/components/EditUserProfile';
 import { useAppSelector } from '@/redux-rtk/hooks';
 import { selectAuthState } from '@/redux-rtk/store/auth/authSlice';
 import { myServices } from '@/shared/data/myServices';
@@ -17,6 +19,7 @@ import './profile.scss';
 export const ProfilePage = () => {
   const { userId } = useParams<{ userId?: string }>();
   const { user: currentUser, isAuthenticated } = useAppSelector(selectAuthState);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
 
   // Определяем, чей профиль смотрим
   const profileUserId = userId || currentUser?.id;
@@ -24,7 +27,10 @@ export const ProfilePage = () => {
 
   // Определяем, является ли пользователь мастером (по наличию услуг)
   // Для своего профиля проверяем myServices, для чужого - services
-  const rawServices = isOwner ? myServices : services.filter((s) => s.workerName);
+  const rawServices = useMemo(
+    () => (isOwner ? myServices : services.filter((s) => s.workerName)),
+    [isOwner],
+  );
   const isMaster = rawServices.length > 0;
 
   const userServices = rawServices.map((service) => ({
@@ -42,6 +48,8 @@ export const ProfilePage = () => {
 
   // Флаг редактирования
   const canEdit = isOwner && isAuthenticated;
+  const previewEditMode = !isAuthenticated;
+  const canShowEditButton = canEdit || previewEditMode;
 
   // Моковые данные профиля (в реальном приложении будут загружаться с API)
   const profileAbout = isMaster
@@ -96,7 +104,7 @@ export const ProfilePage = () => {
   const successRate = isMaster ? 98 : undefined;
 
   const handleEditProfile = () => {
-    console.log('Редактирование профиля');
+    setEditModalOpen(true);
   };
 
   const handleEditAbout = () => {
@@ -133,6 +141,23 @@ export const ProfilePage = () => {
     console.log('Написать сообщение');
   };
 
+  const editInitialValues = {
+    name: currentUser?.name ?? '',
+    surname: currentUser?.surname ?? '',
+    patronymic: currentUser?.patronymic ?? '',
+    nickname: currentUser ? `${currentUser.name} ${currentUser.surname}` : '',
+    phone: currentUser ? '+7 (999) 123-45-67' : '',
+    city: currentUser?.city ?? null,
+    about: profileAbout ?? '',
+    workingHours: isMaster ? 'Пн-Пт 09:00-20:00' : '',
+    skills: profileSkills ?? [],
+    avatarUrl: currentUser?.avatarPath,
+  };
+
+  const handleProfileSubmit = (values: typeof editInitialValues) => {
+    console.log('Сохранение профиля', values);
+  };
+
   return (
     <div className="ProfilePage">
       <div className="ProfilePage__container">
@@ -141,7 +166,7 @@ export const ProfilePage = () => {
             user={currentUser}
             ordersCount={ordersCount}
             successRate={successRate}
-            canEdit={canEdit}
+            canEdit={canShowEditButton}
             onEdit={handleEditProfile}
             onShare={handleShare}
           />
@@ -176,6 +201,15 @@ export const ProfilePage = () => {
           {isMaster && <RecentOrdersSection orders={profileOrders} />}
         </div>
       </div>
+
+      {(isOwner || previewEditMode) && (
+        <EditUserProfileModal
+          open={isEditModalOpen}
+          onClose={() => setEditModalOpen(false)}
+          initialValues={editInitialValues}
+          onSubmit={handleProfileSubmit}
+        />
+      )}
     </div>
   );
 };
