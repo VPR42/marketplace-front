@@ -16,32 +16,31 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
   <div className="ServiceDetailModal__action-bar">
     {/* 1. Блок стоимости и избранного */}
     <div className="ServiceDetailModal__price-and-favorite">
-      <div className="ServiceDetailModal__price">
-        <div className="ServiceDetailModal__price-label">Стоимость</div>
-        <div className="ServiceDetailModal__price-value ServiceDetailModal__price-value--dark">
-          от {service.price} ₽
+      <div className="ServiceDetailModal__price-top">
+        <div className="ServiceDetailModal__price">
+          <div className="ServiceDetailModal__price-label">Стоимость</div>
+          <div className="ServiceDetailModal__price-value ServiceDetailModal__price-value--dark">
+            от {service.price} ₽
+          </div>
         </div>
+
+        <button
+          className={`ServiceDetailModal__favorite-btn ${isFavorite ? 'ServiceDetailModal__favorite-btn--active' : ''}`}
+          onClick={onFavorite}
+        >
+          <Heart size={16} fill={isFavorite ? '#fff' : 'transparent'} />
+          {isFavorite ? 'В избранном' : 'В избранное'}
+        </button>
       </div>
 
-      <button
-        className={`ServiceDetailModal__favorite-btn ${isFavorite ? 'ServiceDetailModal__favorite-btn--active' : ''}`}
-        onClick={onFavorite}
-      >
-        {/* Цвет иконки зависит от состояния isFavorite */}
-        <Heart size={18} fill={isFavorite ? '#fff' : 'currentColor'} />
-        {/* Текст кнопки зависит от состояния isFavorite */}
-        {isFavorite ? 'В избранном' : 'В избранное'}
-      </button>
-    </div>
-
-    {/* 2. Кнопки действий */}
-    <div className="ServiceDetailModal__actions">
-      <button className="ServiceDetailModal__message-btn" onClick={onMessage}>
-        Написать мастеру
-      </button>
-      <button className="ServiceDetailModal__order-btn" onClick={onOrder}>
-        Заказать
-      </button>
+      <div className="ServiceDetailModal__actions">
+        <button className="ServiceDetailModal__message-btn" onClick={onMessage}>
+          Написать мастеру
+        </button>
+        <button className="ServiceDetailModal__order-btn" onClick={onOrder}>
+          Заказать
+        </button>
+      </div>
     </div>
 
     {/* 3. Информация о мастере */}
@@ -95,72 +94,51 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
       </Modal.Header>
 
       <Modal.Body className="ServiceDetailModal__body">
-        {/* ЛЕВЫЙ БЛОК - Основной контент */}
-        <div className="ServiceDetailModal__main-content">
-          {/* Изображение услуги */}
-          <div
-            className="ServiceDetailModal__image"
-            style={{
-              background: service.gradient,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              fontSize: '18px',
-              fontWeight: 600,
-            }}
-          >
-            {/* Здесь должен быть компонент слайдера/галереи, если потребуется */}
+        <div className="ServiceDetailModal__top">
+          {/* ЛЕВАЯ КОЛОНКА */}
+          <div className="ServiceDetailModal__main-content">
+            <div className="ServiceDetailModal__image" />
           </div>
 
-          {/* Миниатюры (добавлены для имитации галереи) */}
-          <div className="ServiceDetailModal__thumbnails">
-            {[...Array(5)].map((_, index) => (
-              <div key={index} className="ServiceDetailModal__thumbnail" />
-            ))}
-          </div>
+          {/* ПРАВАЯ КОЛОНКА */}
+          <ActionBar
+            service={service}
+            onOrder={onOrder}
+            onMessage={onMessage}
+            onFavorite={onFavorite}
+            isFavorite={isFavorite}
+            getInitials={getInitials}
+            open={open}
+            onClose={onClose}
+          />
+        </div>
 
-          {/* Статистика */}
-          <div className="ServiceDetailModal__stats">
+        {/* НИЖНИЙ БЛОК */}
+        <div className="ServiceDetailModal__bottom">
+          <div className="ServiceDetailModal__description-grid">
             <div className="ServiceDetailModal__stat-item">
-              <div className="ServiceDetailModal__stat-label">Заказы</div>
-              <div className="ServiceDetailModal__stat-value">{service.orders} за 12 мес.</div>
+              <div className="ServiceDetailModal__stat-label">Выполнено</div>
+              <div className="ServiceDetailModal__stat-value">312 заказов</div>
             </div>
-            {service.location && (
-              <div className="ServiceDetailModal__stat-item">
-                <div className="ServiceDetailModal__stat-label">Район</div>
-                <div className="ServiceDetailModal__stat-value">{service.location}</div>
+            <div className="ServiceDetailModal__stat-item">
+              <div className="ServiceDetailModal__stat-label">Район</div>
+              <div className="ServiceDetailModal__stat-value">
+                {service.location || 'Москва, весь город'}
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Описание */}
-          <div className="ServiceDetailModal__description">
-            <div className="ServiceDetailModal__description-title">Описание</div>
-            <div className="ServiceDetailModal__description-text">{service.description}</div>
-          </div>
+          <div className="ServiceDetailModal__description-title">Описание</div>
+          <div className="ServiceDetailModal__description-text">{service.description}</div>
 
-          {/* Теги-шильдики */}
           <div className="ServiceDetailModal__master-tags">
-            {masterTags.map((tag, index) => (
-              <span key={index} className="ServiceDetailModal__master-tag">
+            {masterTags.map((tag) => (
+              <span key={tag} className="ServiceDetailModal__master-tag">
                 {tag}
               </span>
             ))}
           </div>
         </div>
-
-        {/* ПРАВЫЙ БЛОК - Action Bar */}
-        <ActionBar
-          service={service}
-          onOrder={onOrder}
-          onMessage={onMessage}
-          onFavorite={onFavorite}
-          isFavorite={isFavorite}
-          getInitials={getInitials}
-          open={open}
-          onClose={onClose}
-        />
       </Modal.Body>
     </Modal>
   );
