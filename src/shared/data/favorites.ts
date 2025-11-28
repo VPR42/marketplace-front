@@ -1,6 +1,6 @@
 export const favorites = [
   {
-    id: 1,
+    id: '1',
     title: 'Генеральная уборка квартиры',
     description: 'Профессиональная уборка любой сложности. Эко-химия, выезд по городу.',
     category: 'Уборка',
@@ -17,7 +17,7 @@ export const favorites = [
     gradient: 'linear-gradient(90deg, #e0f7fa, #b2ebf2)',
   },
   {
-    id: 2,
+    id: '2',
     title: 'Сантехнические работы',
     description: 'Прочистка канализации, установка и ремонт сантехники. Гарантия 1 год.',
     category: 'Уборка',
@@ -34,7 +34,7 @@ export const favorites = [
     gradient: 'linear-gradient(90deg, #e0f7fa, #b2ebf2)',
   },
   {
-    id: 3,
+    id: '3',
     title: 'Сантехнические работы',
     description: 'Прочистка канализации, установка и ремонт сантехники. Гарантия 1 год.',
     category: 'Уборка',
