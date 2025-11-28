@@ -1,0 +1,59 @@
+.OrderActionModal {
+  &.rs-modal {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    min-height: 75vh;
+    box-sizing: border-box;
+  }
+
+  .rs-modal-dialog {
+    position: relative;
+    top: 0 !important;
+    left: 0;
+    transform: none;
+    margin: 0;
+  }
+}
+
+.OrderActionModal__desc {
+  margin: 0 0 12px;
+  color: var(--text-gray, #5c5c5c);
+}
+
+.OrderActionModal__btn {
+  border-radius: 8px;
+
+  &--start {
+    background: var(--orange);
+    color: #fff;
+    &:hover {
+      background: var(--orange);
+    }
+  }
+
+  &--complete {
+    background: #16a34a;
+    color: #fff;
+    &:hover {
+      background: #16a34a;
+    }
+  }
+
+  &--complete-worker {
+    background: #ef4444;
+    color: #fff;
+    &:hover {
+      background: #ef4444;
+    }
+  }
+
+  &--cancel {
+    background: #ff4b55;
+    color: #fff;
+    &:hover {
+      background: #ff4b55;
+    }
+  }
+}

@@ -1,4 +1,4 @@
-export type OrderStatus = 'new' | 'in_progress' | 'done' | 'canceled';
+export type OrderStatus = 'created' | 'working' | 'completed' | 'cancelled' | 'rejected';
 
 export interface OrderItem {
   id: number;

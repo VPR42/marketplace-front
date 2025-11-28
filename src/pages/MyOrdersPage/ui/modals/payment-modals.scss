@@ -1,0 +1,102 @@
+.PaymentModal {
+  --pm-border: var(--grey-borderline, #d2d2d7);
+  --pm-muted: #5c5c5c;
+}
+
+.PaymentModal__summary {
+  border: 1px solid var(--pm-border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: #fff;
+}
+
+.PaymentModal__summary-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.PaymentModal__summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.PaymentModal__summary-row--total {
+  font-weight: 700;
+}
+
+.PaymentModal__methods {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.PaymentModal__label {
+  font-weight: 600;
+}
+
+.PaymentModal__card {
+  display: block;
+  border: 1px solid var(--pm-border) !important;
+  border-radius: 10px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+
+.PaymentModal__card-brand {
+  font-weight: 700;
+}
+
+.PaymentModal__card-expire {
+  color: var(--pm-muted);
+}
+
+.PaymentModal__info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  background: #fff4ec;
+  color: #b45309;
+}
+
+.PaymentModal__btn {
+  background: var(--orange);
+  color: #fff;
+}
+
+.PaymentModal__result {
+  border: 1px solid var(--pm-border);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.PaymentModal__result-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.PaymentModal__hint {
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.PaymentModal__hint--success {
+  background: #ecfdf3;
+  border: 1px solid #16a34a;
+  color: #166534;
+}
+
+.PaymentModal__hint--error {
+  background: #fef2f2;
+  border: 1px solid #ef4444;
+  color: #991b1b;
+}
