@@ -2,6 +2,7 @@
 import { useParams } from 'react-router-dom';
 
 import { EditUserProfileModal } from '@/components/EditUserProfile';
+import type { EditUserProfileForm } from '@/components/EditUserProfile';
 import { useAppSelector } from '@/redux-rtk/hooks';
 import { selectAuthState } from '@/redux-rtk/store/auth/authSlice';
 import { myServices } from '@/shared/data/myServices';
@@ -154,7 +155,7 @@ export const ProfilePage = () => {
     avatarUrl: currentUser?.avatarPath,
   };
 
-  const handleProfileSubmit = (values: typeof editInitialValues) => {
+  const handleProfileSubmit = (values: EditUserProfileForm) => {
     console.log('Сохранение профиля', values);
   };
 
