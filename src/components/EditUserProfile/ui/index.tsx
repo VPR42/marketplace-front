@@ -164,6 +164,7 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
               autoUpload={false}
               multiple={false}
               onChange={handleAvatarUpload}
+              action="#"
             >
               <Button appearance="primary" size="sm">
                 Загрузить фото
