@@ -1,8 +1,8 @@
 ﻿import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { EditUserProfileModal } from '@/components/EditUserProfile';
 import type { EditUserProfileForm } from '@/components/EditUserProfile';
+import { EditUserProfileModal } from '@/components/EditUserProfile';
 import { useAppSelector } from '@/redux-rtk/hooks';
 import { selectAuthState } from '@/redux-rtk/store/auth/authSlice';
 import { myServices } from '@/shared/data/myServices';
@@ -17,146 +17,175 @@ import { SkillsSection } from './SkillsSection';
 
 import './profile.scss';
 
+type BasicService = {
+  id: string | number;
+
+  title: string;
+
+  description: string;
+
+  price: string | number;
+
+  orders?: number;
+
+  gradient?: string;
+
+  workerName?: string;
+
+  workerRating?: string;
+
+  workerAvatar?: string;
+};
+
 export const ProfilePage = () => {
   const { userId } = useParams<{ userId?: string }>();
+
   const { user: currentUser, isAuthenticated } = useAppSelector(selectAuthState);
+
   const [isEditModalOpen, setEditModalOpen] = useState(false);
 
-  // Определяем, чей профиль смотрим
   const profileUserId = userId || currentUser?.id;
+
   const isOwner = currentUser?.id === profileUserId;
 
-  // Определяем, является ли пользователь мастером (по наличию услуг)
-  // Для своего профиля проверяем myServices, для чужого - services
-  const rawServices = useMemo(
+  const rawServices: BasicService[] = useMemo(
     () => (isOwner ? myServices : services.filter((s) => s.workerName)),
+
     [isOwner],
   );
+
   const isMaster = rawServices.length > 0;
 
   const userServices = rawServices.map((service) => ({
-    id: service.id,
+    id: String(service.id),
+
     title: service.title,
+
     description: service.description,
+
     price: typeof service.price === 'number' ? service.price : parseInt(service.price) || 0,
-    orders: 'orders' in service ? service.orders : 0,
-    gradient:
-      'gradient' in service ? service.gradient : 'linear-gradient(135deg, #6e45e2, #88d3ce)',
-    workerName: 'workerName' in service ? service.workerName : undefined,
-    workerRating: 'workerRating' in service ? service.workerRating : undefined,
-    workerAvatar: 'workerAvatar' in service ? service.workerAvatar : undefined,
+
+    orders: service.orders ? Number(service.orders) : 0,
+
+    gradient: service.gradient || 'linear-gradient(135deg, #6e45e2, #88d3ce)',
+
+    workerName: service.workerName,
+
+    workerRating: service.workerRating,
+
+    workerAvatar: service.workerAvatar,
   }));
 
-  // Флаг редактирования
   const canEdit = isOwner && isAuthenticated;
+
   const previewEditMode = !isAuthenticated;
+
   const canShowEditButton = canEdit || previewEditMode;
 
-  // Моковые данные профиля (в реальном приложении будут загружаться с API)
   const profileAbout = isMaster
-    ? 'Профессиональный мастер по ремонту бытовой техники с опытом работы более 8 лет. Специализируюсь на ремонте стиральных машин, холодильников, посудомоечных машин и другой крупной бытовой техники. Работаю только с оригинальными запчастями, предоставляю гарантию на все виды работ. Выезжаю на дом в любое удобное для клиента время.'
+    ? 'Специалист работаю с техникой и мебелью более 8 лет. Провожу настройку, ремонт, сборку мебели, электромонтажные работы и мелкий бытовой ремонт. Работал на крупных производственных объектах, умею работать по ГОСТ и выполнять работу в срок. Сотрудничаю с частными заказчиками и организациями.'
     : undefined;
 
   const profileSkills = isMaster
-    ? [
-        'Ремонт стиральных машин',
-        'Ремонт холодильников',
-        'Ремонт посудомоечных машин',
-        'Диагностика техники',
-        'Замена запчастей',
-        'Профилактическое обслуживание',
-      ]
+    ? ['Сборка мебели', 'Ремонт бытовой техники', 'Электромонтаж', 'Мелкий ремонт']
     : undefined;
 
   const profileOrders = isMaster
     ? [
         {
           id: 1,
-          title: 'Ремонт стиральной машины',
+
+          title: 'Монтаж проводки',
+
           price: 6500,
+
           date: '18.01.2025',
+
           status: 'cancelled' as const,
         },
+
         {
           id: 2,
-          title: 'Ремонт стиральной машины',
-          price: 6500,
-          date: '18.01.2025',
+
+          title: 'Сборка мебели',
+
+          price: 4500,
+
+          date: '12.01.2025',
+
           status: 'cancelled' as const,
         },
+
         {
           id: 3,
-          title: 'Чистка стиральной машины',
+
+          title: 'Установка техники',
+
           price: 2300,
+
           date: '10.01.2025',
+
           status: 'completed' as const,
         },
+
         {
           id: 4,
-          title: 'Диагностика посудомойки',
+
+          title: 'Установка розеток',
+
           price: 1200,
+
           date: '05.01.2025',
+
           status: 'completed' as const,
         },
       ]
     : undefined;
 
   const ordersCount = isMaster ? 127 : 0;
+
   const successRate = isMaster ? 98 : undefined;
 
-  const handleEditProfile = () => {
-    setEditModalOpen(true);
-  };
+  const handleEditProfile = () => setEditModalOpen(true);
 
-  const handleEditAbout = () => {
-    console.log('Редактирование "Обо мне"');
-  };
+  const handleEditAbout = () => {};
 
-  const handleEditSkills = () => {
-    console.log('Редактирование навыков');
-  };
+  const handleEditSkills = () => {};
 
-  const handleAddService = () => {
-    console.log('Добавление услуги');
-  };
+  const handleAddService = () => {};
 
-  const handleServiceClick = (serviceId: number) => {
-    console.log('Клик по услуге:', serviceId);
-  };
+  const handleServiceClick = (_serviceId: string) => {};
 
-  const handleEditContact = () => {
-    console.log('Редактирование контактов');
-  };
+  const handleEditContact = () => {};
 
-  const handleShare = () => {
-    console.log('Поделиться профилем');
-    if (navigator.share) {
-      navigator.share({
-        title: `Профиль ${currentUser?.name}`,
-        url: window.location.href,
-      });
-    }
-  };
+  const handleShare = () => {};
 
-  const handleMessage = () => {
-    console.log('Написать сообщение');
-  };
+  const handleMessage = () => {};
 
   const editInitialValues = {
     name: currentUser?.name ?? '',
+
     surname: currentUser?.surname ?? '',
+
     patronymic: currentUser?.patronymic ?? '',
+
     nickname: currentUser ? `${currentUser.name} ${currentUser.surname}` : '',
+
     phone: currentUser ? '+7 (999) 123-45-67' : '',
+
     city: currentUser?.city ?? null,
+
     about: profileAbout ?? '',
+
     workingHours: isMaster ? 'Пн-Пт 09:00-20:00' : '',
+
     skills: profileSkills ?? [],
+
     avatarUrl: currentUser?.avatarPath,
   };
 
   const handleProfileSubmit = (values: EditUserProfileForm) => {
-    console.log('Сохранение профиля', values);
+    console.log('Сохранить профиль', values);
   };
 
   return (
