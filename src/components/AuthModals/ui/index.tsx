@@ -35,6 +35,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 
   const [form, setForm] = useState(authInitialState);
   const [errors, setErrors] = useState<{ email?: string; password?: string; submit?: string }>({});
+  const [showPassword, setShowPassword] = useState(false);
 
   const clearFieldError = (field: keyof typeof errors) => {
     if (errors[field]) {
@@ -112,6 +113,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
           label="Пароль"
           placeholder="Введите пароль..."
           isPassword
+          passwordVisible={showPassword}
+          onTogglePassword={() => setShowPassword((p) => !p)}
           value={form.password}
           onChange={(v) => {
             setForm((prev) => ({ ...prev, password: v }));
@@ -166,6 +169,7 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 
   const [form, setForm] = useState(registerInitialState);
   const [errors, setErrors] = useState<RegisterErrors>({});
+  const [showPasswords, setShowPasswords] = useState(false);
 
   const passwordScore = useMemo(() => zxcvbn(form.password).score, [form.password]);
 
@@ -300,7 +304,7 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
         <InputField
           name="email"
           label="Почта"
-          placeholder="tutuvania2004@zov.ru"
+          placeholder="example@mail.ru"
           value={form.email}
           onChange={(v) => {
             setForm((prev) => ({ ...prev, email: v }));
@@ -332,8 +336,10 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
         <InputField
           name="password"
           label="Пароль"
-          placeholder="IvanSexyBeast2004Vpr12Pasholko!!!"
+          placeholder="Введите пароль..."
           isPassword
+          passwordVisible={showPasswords}
+          onTogglePassword={() => setShowPasswords((prev) => !prev)}
           showStrengthBar
           value={form.password}
           onChange={(v) => {
@@ -346,9 +352,10 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
         <InputField
           name="confirmPassword"
           label="Подтвердите пароль"
-          placeholder="IvanSexyBeast2004Vpr12Pasholko!!!"
+          placeholder="Подтвердите пароль..."
           isPassword
           value={form.confirmPassword}
+          passwordVisible={showPasswords}
           onChange={(v) => {
             setForm((prev) => ({ ...prev, confirmPassword: v }));
             clearFieldError('confirmPassword');
