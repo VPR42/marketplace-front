@@ -15,17 +15,14 @@ interface MyOrderCardProps extends OrderItem {
 }
 
 export const MyOrderCard: React.FC<MyOrderCardProps> = ({
-  id,
   master,
   title,
   created,
   status,
   description,
-  categoryId,
   categoryLabel,
   budget,
   location,
-  clientId,
   image,
   onClick,
   role = 'customer',

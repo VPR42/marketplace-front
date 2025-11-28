@@ -14,7 +14,6 @@ interface PaymentMethod {
 
 export interface PaymentModalProps {
   open: boolean;
-  orderId: number | string;
   title: string;
   serviceTitle: string;
   price: number;
@@ -26,7 +25,6 @@ export interface PaymentModalProps {
 
 export const PaymentModal: React.FC<PaymentModalProps> = ({
   open,
-  orderId,
   title,
   serviceTitle,
   price,

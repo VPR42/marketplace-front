@@ -100,9 +100,21 @@ const mockOrders: OrderItem[] = [
 ];
 
 export const MyOrdersPage: React.FC = () => {
-  const [activeStatus, setActiveStatus] = useState<StatusFilter>('all');
-  const [activeRole, setActiveRole] = useState<'customer' | 'worker'>('customer');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [activeStatus, setActiveStatus] = useState<StatusFilter>(() => {
+    const saved = localStorage.getItem('myOrdersStatus') as StatusFilter | null;
+    if (saved && (saved === 'all' || statusFilters.some((s) => s.value === saved))) {
+      return saved;
+    }
+    return 'all';
+  });
+  const [activeRole, setActiveRole] = useState<'customer' | 'worker'>(() => {
+    const saved = localStorage.getItem('myOrdersRole');
+    if (saved === 'customer' || saved === 'worker') {
+      return saved;
+    }
+    return 'customer';
+  });
+  const [searchTerm, setSearchTerm] = useState(() => localStorage.getItem('myOrdersSearch') || '');
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [actionModal, setActionModal] = useState<{
@@ -127,15 +139,16 @@ export const MyOrdersPage: React.FC = () => {
   }, [activeStatus, searchTerm]);
 
   useEffect(() => {
-    const savedRole = localStorage.getItem('myOrdersRole');
-    if (savedRole === 'customer' || savedRole === 'worker') {
-      setActiveRole(savedRole);
-    }
-  }, []);
-
-  useEffect(() => {
     localStorage.setItem('myOrdersRole', activeRole);
   }, [activeRole]);
+
+  useEffect(() => {
+    localStorage.setItem('myOrdersStatus', activeStatus);
+  }, [activeStatus]);
+
+  useEffect(() => {
+    localStorage.setItem('myOrdersSearch', searchTerm);
+  }, [searchTerm]);
 
   return (
     <div className="MyOrders">
@@ -160,7 +173,11 @@ export const MyOrdersPage: React.FC = () => {
       </div>
 
       <div className="MyOrders__search">
-        <SearchInput placeholder="Поиск услуг..." onSearch={(value) => setSearchTerm(value)} />
+        <SearchInput
+          placeholder="Поиск услуг..."
+          defaultValue={searchTerm}
+          onSearch={(value) => setSearchTerm(value)}
+        />
       </div>
 
       <div className="MyOrders__filters">

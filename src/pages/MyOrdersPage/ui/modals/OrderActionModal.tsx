@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button, Modal } from 'rsuite';
 
 import './order-action-modal.scss';
@@ -50,8 +49,11 @@ const getCopy = (
 
   return {
     title: 'Отменить заказ',
-    description: 'Укажите причину отмены — клиент получит уведомление.',
-    confirm: 'Отменить',
+    description:
+      role === 'worker'
+        ? 'Подтвердите отмену. Клиент получит уведомление.'
+        : 'Подтвердите отмену заказа.',
+    confirm: 'Отменить заказ',
     tone: 'cancel',
   };
 };
