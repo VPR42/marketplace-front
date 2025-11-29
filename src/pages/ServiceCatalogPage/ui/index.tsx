@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Loader, Pagination } from 'rsuite';
 
+import { OrderCreateModal } from '@/components/OrderCreateModal';
 import { PaymentModal, PaymentResultModal } from '@/pages/MyOrdersPage/ui/modals';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
 import { selectServicesState } from '@/redux-rtk/store/services/selectors';
@@ -38,7 +39,7 @@ export const ServiceCatalogPage: React.FC = () => {
   const [pageSize] = useState(9);
   const [pageNumber, setPageNumber] = useState(0); //from vj-68
 
-  const [orderFormKey, setOrderFormKey] = useState(0);
+  const [_orderFormKey, setOrderFormKey] = useState(0);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentResult, setPaymentResult] = useState<{
     open: boolean;
@@ -198,6 +199,25 @@ export const ServiceCatalogPage: React.FC = () => {
           onClose={() => setOpenServiceModal(false)}
           mode="create"
           onSubmit={() => setOpenServiceModal(false)}
+        />
+      )}
+
+      {isOrderModalOpen && (
+        <OrderCreateModal
+          open={isOrderModalOpen}
+          service={{
+            title: selectedService!.name ?? 'Ошибка при выборе услуги',
+            price: selectedService!.price ?? '',
+            gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)',
+            workerName:
+              selectedService!.user.master?.pseudonym ||
+              `${selectedService!.user.name} ${selectedService!.user.surname}`,
+            category: selectedService!.category.name,
+            tags: selectedService!.tags.map(String),
+            location: selectedService!.user.city.name,
+          }}
+          onClose={() => setIsOrderModalOpen(false)}
+          onSubmit={() => setIsOrderModalOpen(false)}
         />
       )}
 

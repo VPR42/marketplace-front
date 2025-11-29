@@ -1,7 +1,7 @@
 export type OrderStatus = 'created' | 'working' | 'completed' | 'cancelled' | 'rejected';
 
 export interface OrderItem {
-  id: number;
+  id: string;
   clientId: number;
   master: string;
   title: string;
