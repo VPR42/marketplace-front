@@ -1,10 +1,18 @@
-import { Heart } from 'lucide-react';
-import { Modal } from 'rsuite';
+﻿import { Heart } from 'lucide-react';
+import { useState } from 'react';
+import { Loader, Modal } from 'rsuite';
 
 import type { ServiceDetailModalProps } from '../types';
 import './service-detail-modal.scss';
 
-// Компонент для блока действий (Action Bar) справа
+const getInitialsFromTitle = (title: string) => {
+  const parts = title.split(' ').filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+  return title.substring(0, 2).toUpperCase();
+};
+
 const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string) => string }> = ({
   service,
   onOrder,
@@ -14,7 +22,6 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
   getInitials,
 }) => (
   <div className="ServiceDetailModal__action-bar">
-    {/* 1. Блок стоимости и избранного */}
     <div className="ServiceDetailModal__price-and-favorite">
       <div className="ServiceDetailModal__price-top">
         <div className="ServiceDetailModal__price">
@@ -43,7 +50,6 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
       </div>
     </div>
 
-    {/* 3. Информация о мастере */}
     <div className="ServiceDetailModal__master-container">
       <div className="ServiceDetailModal__master">
         <div className="ServiceDetailModal__master-avatar">{getInitials(service.workerName)}</div>
@@ -56,7 +62,7 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
       </div>
       <div className="ServiceDetailModal__master-actions">
         <button className="ServiceDetailModal__master-btn">Профиль</button>
-        <button className="ServiceDetailModal__master-btn">Все услуги</button>
+        <button className="ServiceDetailModal__master-btn">Написать</button>
       </div>
     </div>
   </div>
@@ -76,11 +82,14 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
     if (parts.length >= 2) {
       return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
     }
-    // Если имя состоит из одного слова, берем первые две буквы
     return name.substring(0, 2).toUpperCase();
   };
 
-  const masterTags = ['Гарантия 6 месяцев', 'Чек и договор', 'Безнал/Наличные', 'Выезд сегодня'];
+  // const masterTags = ['Опыт 6 лет', 'Работаю по договору', 'Безналичный расчет', 'Выезд сегодня'];
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  const hasImage = Boolean(service.coverUrl) && !imageError;
 
   return (
     <Modal open={open} onClose={onClose} className="ServiceDetailModal" size="lg">
@@ -95,12 +104,35 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
       <Modal.Body className="ServiceDetailModal__body">
         <div className="ServiceDetailModal__top">
-          {/* ЛЕВАЯ КОЛОНКА */}
-          <div className="ServiceDetailModal__main-content">
-            <div className="ServiceDetailModal__image" />
+          <div className="ServiceDetailModal__main-content" style={{ minWidth: 0 }}>
+            <div
+              className="ServiceDetailModal__image"
+              style={{ background: service.gradient || '#e5e7eb' }}
+            >
+              {hasImage ? (
+                <>
+                  {!imageLoaded && (
+                    <div className="ServiceDetailModal__image-loader">
+                      <Loader size="md" content="" />
+                    </div>
+                  )}
+                  <img
+                    src={service.coverUrl}
+                    alt={service.title}
+                    className="ServiceDetailModal__image-img"
+                    onLoad={() => setImageLoaded(true)}
+                    onError={() => setImageError(true)}
+                    style={{ opacity: imageLoaded ? 1 : 0 }}
+                  />
+                </>
+              ) : (
+                <div className="ServiceDetailModal__image-placeholder">
+                  {getInitialsFromTitle(service.title)}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* ПРАВАЯ КОЛОНКА */}
           <ActionBar
             service={service}
             onOrder={onOrder}
@@ -113,7 +145,6 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           />
         </div>
 
-        {/* НИЖНИЙ БЛОК */}
         <div className="ServiceDetailModal__bottom">
           <div className="ServiceDetailModal__description-grid">
             <div className="ServiceDetailModal__stat-item">
@@ -121,9 +152,9 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
               <div className="ServiceDetailModal__stat-value">312 заказов</div>
             </div>
             <div className="ServiceDetailModal__stat-item">
-              <div className="ServiceDetailModal__stat-label">Район</div>
+              <div className="ServiceDetailModal__stat-label">Локация</div>
               <div className="ServiceDetailModal__stat-value">
-                {service.location || 'Москва, весь город'}
+                {service.location || 'Город не указан'}
               </div>
             </div>
           </div>
@@ -131,13 +162,15 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           <div className="ServiceDetailModal__description-title">Описание</div>
           <div className="ServiceDetailModal__description-text">{service.description}</div>
 
-          <div className="ServiceDetailModal__master-tags">
-            {masterTags.map((tag) => (
-              <span key={tag} className="ServiceDetailModal__master-tag">
-                {tag}
-              </span>
-            ))}
-          </div>
+          {service.tags && service.tags.length > 0 && (
+            <div className="ServiceDetailModal__master-tags">
+              {service.tags.map((tag) => (
+                <span key={tag} className="ServiceDetailModal__master-tag">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </Modal.Body>
     </Modal>

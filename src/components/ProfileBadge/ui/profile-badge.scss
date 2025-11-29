@@ -19,7 +19,8 @@
     border-color: var(--orange-hover);
   }
 
-  &__avatar {
+  &__avatar,
+  &__avatar-img {
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -30,6 +31,11 @@
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
+    object-fit: cover;
+  }
+
+  &__avatar-img {
+    background: transparent;
   }
 
   &__name {
