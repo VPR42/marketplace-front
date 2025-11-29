@@ -66,7 +66,7 @@ export const ServiceCatalogPage: React.FC = () => {
 
   const [openDetailModal, setOpenDetailModal] = useState(false);
 
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+  // const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
 
@@ -88,7 +88,7 @@ export const ServiceCatalogPage: React.FC = () => {
 
   const [pageNumber, setPageNumber] = useState(0);
 
-  const [_orderFormKey, setOrderFormKey] = useState(0);
+  // const [_orderFormKey, setOrderFormKey] = useState(0);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentResult, setPaymentResult] = useState<{
     open: boolean;
