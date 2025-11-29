@@ -20,4 +20,5 @@
   onMessage?: () => void;
   onFavorite?: () => void;
   isFavorite?: boolean;
+  isTogglingFavorite?: boolean;
 }

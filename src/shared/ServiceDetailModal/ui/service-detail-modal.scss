@@ -215,7 +215,7 @@
   }
 
   &__favorite-btn {
-    min-width: 130px;
+    min-width: 138px;
     height: 47px;
     padding: 0 12px;
     border-radius: 10px;
@@ -244,6 +244,10 @@
         background: var(--orange-hover);
       }
     }
+  }
+
+  &__favorite-label {
+    min-width: 86px;
   }
 
   /* Кнопки действий */
