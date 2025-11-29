@@ -19,7 +19,8 @@
   &__add-btn {
     padding: 10px 16px;
     background-color: var(--orange);
-    color: white;
+    color: #fff;
+    border-color: var(--orange);
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -28,8 +29,22 @@
     align-items: center;
     gap: 8px;
 
-    &:hover {
+    &.rs-btn {
+      background-color: var(--orange);
+      color: #fff;
+      border-color: var(--orange);
+    }
+
+    &:hover,
+    &:focus,
+    &:active {
       background-color: var(--orange-hover);
+      color: #fff;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--orange-hover);
+      outline-offset: 2px;
     }
   }
 

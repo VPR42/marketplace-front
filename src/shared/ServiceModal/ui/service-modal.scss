@@ -237,7 +237,7 @@
   }
 
   &__buttonPrimary {
-    background: #3873ff;
+    background: var(--orange);
     color: #fff;
     border-radius: 8px;
     padding: 8px 32px;
@@ -251,7 +251,7 @@
     justify-content: center;
 
     &:hover {
-      background: #2756b3;
+      background: var(--orange-hover);
     }
   }
 
