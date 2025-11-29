@@ -32,7 +32,6 @@ export const ProfileBadge = () => {
     { label: 'Избранное', icon: Heart, path: '/favorites' },
     { label: 'Мои услуги', icon: Wrench, path: '/my-services' },
     { label: 'Мои заказы', icon: ClipboardList, path: '/my-orders' },
-    { label: 'Мои отзывы', icon: Star, path: '/my-reviews' },
   ];
 
   const handleNavigate = (path: string) => {

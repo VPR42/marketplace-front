@@ -5,7 +5,6 @@ import { ChatsPage } from '@/pages/ChatsPage';
 import { FavoritesPage } from '@/pages/FavoritesPage';
 import { LandingPage } from '@/pages/LandingPage';
 import { MyOrdersPage } from '@/pages/MyOrdersPage';
-import { MyReviewsPage } from '@/pages/MyReviewsPage';
 import { MyServicesPage } from '@/pages/MyServicesPage';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { ServiceCatalogPage } from '@/pages/ServiceCatalogPage';
@@ -20,7 +19,6 @@ export const router = createBrowserRouter([
       { path: '/favorites', element: <FavoritesPage /> },
       { path: '/my-services', element: <MyServicesPage /> },
       { path: '/my-orders', element: <MyOrdersPage /> },
-      { path: '/my-reviews', element: <MyReviewsPage /> },
       { path: '/profile', element: <ProfilePage /> },
       { path: '/profile/:userId', element: <ProfilePage /> },
       { path: '/chats', element: <ChatsPage /> },
