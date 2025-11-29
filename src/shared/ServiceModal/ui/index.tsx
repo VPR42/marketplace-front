@@ -290,6 +290,8 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
               value={formValue.categoryId}
               onChange={(value) => handleChange({ categoryId: (value as number) ?? null })}
               placeholder="Выбери категорию"
+              container={() => document.body}
+              placement="autoVerticalStart"
               searchable
               block
             />
@@ -308,6 +310,8 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
               value={formValue.tags}
               onChange={(value) => handleChange({ tags: (value as number[]) ?? [] })}
               placeholder="Выбери теги"
+              container={() => document.body}
+              placement="autoVerticalStart"
               block
             />
             {errors.tags ? <span className="input-error-text">{errors.tags}</span> : null}

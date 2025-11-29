@@ -4,6 +4,11 @@
     flex-direction: column;
     gap: 16px;
     margin-top: 16px;
+    &--empty,
+    &--load {
+      display: flex;
+      justify-content: center;
+    }
   }
 
   &__title {

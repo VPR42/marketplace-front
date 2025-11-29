@@ -1,14 +1,31 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Container, Header, Content } from 'rsuite';
 
-import { FavoritesList } from './FavoritesList';
-
-import './FavoritesPage.scss';
-import { useState } from 'react';
-
+import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
+import { fetchCategories } from '@/redux-rtk/store/utils/utilsThunks';
 import { CategoryTabs } from '@/shared/FilterTabs';
 
+import { FavoritesList } from './FavoritesList';
+import './FavoritesPage.scss';
+
 export const FavoritesPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { categories, status } = useAppSelector(selectUtilsState);
   const [activeFilter, setActiveFilter] = useState('Все');
+
+  useEffect(() => {
+    if (status === 'idle') {
+      dispatch(fetchCategories({ jobsCountSort: 'DESC' }));
+    }
+  }, [dispatch, status]);
+
+  const categoryTabs = useMemo(() => {
+    if (status === 'loading') {
+      return ['Все'];
+    }
+    return ['Все', ...categories.map((c) => c.category.name)];
+  }, [categories, status]);
 
   return (
     <div className="FavoritesPage">
@@ -18,11 +35,11 @@ export const FavoritesPage: React.FC = () => {
         </Header>
         <Content className="FavoritesPage__content">
           <CategoryTabs
-            categories={['Все', 'Ремонт', 'Уборка', 'Сантехника', 'IT услуги', 'Электрика']}
+            categories={categoryTabs}
             active={activeFilter}
             onChange={setActiveFilter}
           />
-          <FavoritesList />
+          <FavoritesList filterCategory={activeFilter} />
         </Content>
       </Container>
     </div>
