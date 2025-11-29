@@ -45,6 +45,12 @@ const servicesSlice = createSlice({
         state.status = 'loading';
 
         state.error = null;
+
+        state.items = [];
+
+        state.totalPages = 0;
+
+        state.totalElements = 0;
       })
 
       .addCase(fetchServices.fulfilled, (state, action) => {
