@@ -1,15 +1,15 @@
 /* Определяем переменные (если они не определены глобально) */
 :root {
-  --orange: #ff7f00; /* Используем примерный оранжевый цвет */
+  --orange: #ff7f00;
   --orange-hover: #e57300;
 }
 
 .ServiceDetailModal {
-  max-width: 960px; /* Увеличенная максимальная ширина */
+  max-width: 1100px;
   width: 100%;
   border-radius: 18px;
   background: #fff;
-  box-shadow: 0 8px 32px 0 rgba(56, 115, 255, 0.08);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
 
   /* RSuite Modal Header / Close Button */
   .rs-modal-header {
@@ -41,7 +41,8 @@
   &__category {
     display: inline-block;
     padding: 4px 12px;
-    background: #f7f9fc;
+    background: #fff;
+    border: 1px solid var(--grey-borderline);
     border-radius: 12px;
     font-size: 12px;
     font-weight: 500;
@@ -59,52 +60,51 @@
 
   /* --- Секция 2: Body (Две колонки: Main Content и Action Bar) --- */
   &__body {
-    padding: 24px;
+    padding: 16px 12px 18px;
     display: flex;
-    gap: 24px;
+    flex-direction: column;
+    gap: 16px;
+    background: #fff;
+  }
+
+  &__top {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 16px;
     align-items: flex-start;
   }
 
   /* ЛЕВЫЙ БЛОК - Основной контент */
   &__main-content {
-    flex: 1; /* Позволяет растягиваться */
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    /* Убрал max-width, чтобы контент мог растягиваться */
+    gap: 14px;
+    min-width: 0;
   }
 
   &__image {
     width: 100%;
-    min-height: 300px;
+    height: 300px;
     border-radius: 12px;
-    background: #f7f9fc;
-  }
-
-  /* Миниатюры */
-  &__thumbnails {
-    display: flex;
-    gap: 8px;
-  }
-
-  &__thumbnail {
-    width: 70px;
-    height: 70px;
-    border-radius: 8px;
-    background: #f7f9fc;
-    border: 1px solid #edf0f5;
-    cursor: pointer;
-    flex-shrink: 0;
-
-    &:hover {
-      border-color: #d1d5db;
-    }
+    background: #e5e7eb;
+    border: 1px solid #dfe3e8;
   }
 
   /* Статистика */
   &__stats {
+    display: none;
+  }
+
+  &__stat-item {
+    background: #f1f3f5;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-height: 57px;
+    width: 206px;
     display: flex;
-    gap: 24px;
+    flex-direction: column;
+    justify-content: center;
   }
 
   &__stat-label {
@@ -117,19 +117,38 @@
     font-weight: 600;
     color: #2c3446;
   }
+  /* Нижний блок с описанием и статистикой */
+  &__bottom {
+    width: 100%;
+    border: 1px solid var(--grey-borderline);
+    border-radius: 12px;
+    padding: 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-sizing: border-box;
+    align-self: stretch;
+  }
 
-  /* Описание */
+  &__description-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
   &__description-title {
     font-size: 16px;
     font-weight: 600;
     color: #2c3446;
-    margin-bottom: 8px;
+    margin: 0;
   }
 
   &__description-text {
     font-size: 14px;
     color: #404964;
     line-height: 1.6;
+    margin: 0;
   }
 
   /* Теги-шильдики */
@@ -137,11 +156,12 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    margin-top: 4px;
   }
 
   &__master-tag {
     padding: 6px 12px;
-    background: #2c3446;
+    background: #18181b;
     border-radius: 12px;
     font-size: 12px;
     font-weight: 500;
@@ -151,26 +171,35 @@
 
   /* --- ПРАВЫЙ БЛОК: Action Bar (Фиксированная боковая панель) --- */
   &__action-bar {
-    width: 280px;
+    width: 100%;
     flex-shrink: 0;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    padding: 0;
     display: flex;
     flex-direction: column;
+    gap: 12px;
   }
 
   &__price-and-favorite {
-    padding: 24px 16px 16px;
-    border-bottom: 1px solid #edf0f5;
+    padding: 14px;
+    border: 1px solid var(--grey-borderline);
+    border-radius: 16px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  &__price-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
   }
 
   &__price {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   &__price-label {
@@ -182,17 +211,19 @@
     font-size: 24px;
     font-weight: 700;
     color: #2c3446;
+    min-height: 40px;
   }
 
   &__favorite-btn {
-    width: 100%;
-    padding: 10px 16px;
-    border-radius: 8px;
-    border: 1px solid var(--orange); /* Оранжевая рамка по умолчанию */
-    background: #fff; /* Белый фон по умолчанию */
-    color: var(--orange); /* Оранжевый текст по умолчанию */
+    min-width: 130px;
+    height: 47px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--grey-borderline);
+    background: #fff;
+    color: #1d1d1f;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -201,16 +232,16 @@
     transition: all 0.2s;
 
     &:hover {
-      background: #fff5f5; /* Легкий оранжевый фон при наведении на белую кнопку */
+      background: #fff5f5;
     }
 
     &--active {
-      background: var(--orange); /* Оранжевый фон при активном состоянии */
+      background: var(--orange);
       border-color: var(--orange);
-      color: #fff; /* Белый текст при активном состоянии */
+      color: #fff;
 
       &:hover {
-        background: var(--orange-hover); /* Темнее оранжевый при наведении на активную */
+        background: var(--orange-hover);
       }
     }
   }
@@ -218,21 +249,21 @@
   /* Кнопки действий */
   &__actions {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 16px;
-    border-bottom: 1px solid #edf0f5;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
   }
 
   &__message-btn {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: 8px;
+    width: 239px;
+    height: 47px;
+    padding: 0 16px;
+    border-radius: 10px;
     border: none;
     background: var(--orange);
     color: #fff;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 15px;
+    font-weight: 700;
     cursor: pointer;
     transition: background 0.2s;
 
@@ -242,13 +273,14 @@
   }
 
   &__order-btn {
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: 1px solid #edf0f5; /* Более светлый бордер */
-    background: #f7f9fc; /* Светлый фон */
-    color: #404964;
-    font-size: 14px;
+    width: 93px;
+    height: 47px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--grey-borderline);
+    background: #fff;
+    color: #2d3748;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -260,10 +292,14 @@
 
   /* Информация о мастере в Action Bar */
   &__master-container {
-    padding: 16px;
+    padding: 14px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
+    border: 1px solid var(--grey-borderline);
+    border-radius: 16px;
+    background: #fff;
+    min-height: 121px;
   }
 
   &__master {
@@ -306,24 +342,27 @@
 
   &__master-actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
     width: 100%;
+    align-items: center;
   }
 
   &__master-btn {
-    width: 100%;
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #edf0f5;
+    width: auto;
+    min-width: 84px;
+    height: 39px;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid var(--grey-borderline);
     background: #fff;
-    color: #404964;
+    color: #2d3748;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
 
     &:hover {
-      background: #f0f3f7;
+      background: #f6f7fb;
     }
   }
 }

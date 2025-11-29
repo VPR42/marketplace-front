@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { Button } from 'rsuite';
 
-import { MyServiceCard } from '@/pages/MyServicesPage/ui/MyServiceCard';
 import { myServices } from '@/shared/data/myServices';
 import { CategoryTabs } from '@/shared/FilterTabs';
 import { ServiceOrderModal } from '@/shared/ServiceModal/ui';
 import './my-services.scss';
 
 import { Plus } from 'lucide-react';
+
+import { MyServiceCard } from '@/shared/MyServicesCard/ui';
 
 export type modalMode = 'create' | 'edit';
 
@@ -50,6 +51,7 @@ export const MyServicesPage: React.FC = () => {
       <div className="MyServices__list">
         {myServices.map((service) => (
           <MyServiceCard
+            mode="my"
             key={service.id}
             {...service}
             onEdit={() => {

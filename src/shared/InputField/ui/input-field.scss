@@ -11,3 +11,16 @@
   font-size: 12px;
   margin-top: -4px;
 }
+.input-inner {
+  position: relative;
+}
+.password-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: transparent !important;
+}
+
+.input-password {
+  padding-right: 40px;
+}

@@ -22,6 +22,7 @@ export const router = createBrowserRouter([
       { path: '/my-orders', element: <MyOrdersPage /> },
       { path: '/my-reviews', element: <MyReviewsPage /> },
       { path: '/profile', element: <ProfilePage /> },
+      { path: '/profile/:userId', element: <ProfilePage /> },
       { path: '/chats', element: <ChatsPage /> },
     ],
   },
