@@ -1,40 +1,49 @@
-// стили карточки да
+﻿// Карточка услуги
 .ServiceCard {
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   background: white;
-  transition: transform 0.2s ease;
-  min-height: 405px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  height: 360px;
   border: 1px solid var(--grey-borderline);
   display: flex;
   flex-direction: column;
 
   &:hover {
-    transform: scale(1.01); // чтобы живее крч была
-    cursor: pointer; // нууу типо наверн при наведении на нее у нас она должна открываться наверн
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
   }
 
-  // верх
   &__top {
-    height: 180px;
+    position: relative;
+    height: 170px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 18px;
   }
 
-  // заголовок
   &__top-text {
     text-align: center;
     max-width: 80%;
   }
 
-  // тело
+  &__fav {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 16px;
+    color: #ff7a18;
+  }
+
   &__body {
-    padding: 20px;
+    padding: 16px 16px 18px;
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -44,87 +53,79 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 8px;
   }
 
-  // заголовок услуги
   &__title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--color-dark-red);
-    margin: 2px 0 8px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  // мужик
   &__worker {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 4px;
 
-    // фотк мужика
     &-img {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       object-fit: cover;
     }
 
-    // фио мужика
-    &-name {
-      font-size: 14px;
-      color: var(--text-primary);
-      font-weight: 500;
-    }
-
-    // оценк мужика
-    &-rating {
-      font-size: 14px;
-      color: var(--yellow);
+    &-placeholder {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #ddd;
+      color: #111;
       display: flex;
       align-items: center;
-      gap: 2px;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
 
-      svg {
-        font-size: 12px;
-      }
+    &-name {
+      font-size: 14px;
+      color: #111;
+      font-weight: 500;
     }
   }
 
-  &__star {
-    font-size: 14px;
-    color: var(--yellow);
-    font-weight: bold;
-  }
-
-  // описание услуги
   &__description {
     font-size: 14px;
-    color: var(--text-gray);
-    margin: 0 0 12px;
+    color: #585858;
+    margin: 0 0 8px;
     line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
-  // футер карточк
   &__footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 16px;
+    padding-top: 12px;
     border-top: 1px solid var(--grey-borderline);
   }
 
-  // цена услуги
   &__price {
-    font-weight: 600;
-    color: var(
-      --orange
-    ); // на макете черный текст цены но я подумал оранжевый мб интереснее смотрится
+    font-weight: 700;
+    color: #111;
     font-size: 16px;
   }
 
-  // число заказов
   &__orders {
-    font-size: 14px;
-    color: var(--text-gray);
+    font-size: 13px;
+    color: #999;
   }
 }

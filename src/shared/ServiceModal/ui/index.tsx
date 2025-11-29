@@ -1,13 +1,53 @@
-import React, { useEffect, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { Button, Form, Modal, SelectPicker, TagPicker, Uploader } from 'rsuite';
 import type { FileType } from 'rsuite/Uploader';
 
+import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import { selectAuthState } from '@/redux-rtk/store/auth/authSlice';
+import { selectServicesState } from '@/redux-rtk/store/services/selectors';
+import { createService, updateService } from '@/redux-rtk/store/services/servicesThunks';
+import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
+import { fetchCategories, fetchTags } from '@/redux-rtk/store/utils/utilsThunks';
 import { ServiceIcon } from '@/shared/icons/ServiceModal/ServiceModalDownloadIcon';
-import './service-modal.scss';
 
 import type { ServiceFormValue, ServiceOrderModalProps } from '../types';
+import './service-modal.scss';
 
 import { Edit2 } from 'lucide-react';
+
+const PLACEHOLDER_COVER = 'https://placehold.co/800x450';
+
+const validate = (values: ServiceFormValue) => {
+  const errors: Partial<Record<keyof ServiceFormValue | 'submit', string>> = {};
+  if (!values.name || values.name.trim().length < 5) {
+    errors.name = 'Название от 5 символов';
+  } else if (values.name.trim().length > 60) {
+    errors.name = 'Название до 60 символов';
+  }
+  if (!values.description || values.description.trim().length < 10) {
+    errors.description = 'Описание от 10 символов';
+  } else if (values.description.trim().length > 200) {
+    errors.description = 'Описание до 200 символов';
+  }
+  if (values.price === '' || Number.isNaN(Number(values.price))) {
+    errors.price = 'Укажите цену';
+  } else {
+    const priceNum = Number(values.price);
+    if (priceNum < 10) {
+      errors.price = 'Минимум 10';
+    }
+    if (priceNum > 9999999999) {
+      errors.price = 'Слишком большая цена';
+    }
+  }
+  if (!values.categoryId) {
+    errors.categoryId = 'Выберите категорию';
+  }
+  if (!values.tags || values.tags.length === 0) {
+    errors.tags = 'Добавьте хотя бы один тег';
+  }
+  return errors;
+};
 
 export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
   open,
@@ -15,18 +55,34 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
   mode,
   onSubmit,
   onDelete,
+  showDelete = false,
   initialValues = {},
-  coverUrl = '',
+  coverUrl = PLACEHOLDER_COVER,
+  serviceId,
 }) => {
+  const dispatch = useAppDispatch();
+  const { status: serviceStatus } = useAppSelector(selectServicesState);
+  const { categories, tags } = useAppSelector(selectUtilsState);
+  const { isAuthenticated } = useAppSelector(selectAuthState);
+
   const [formValue, setFormValue] = useState<ServiceFormValue>({
-    serviceName: initialValues.serviceName || '',
+    name: initialValues.name || '',
     description: initialValues.description || '',
-    cost: initialValues.cost || '',
-    category: initialValues.category || '',
+    price: initialValues.price ?? '',
+    categoryId: initialValues.categoryId ?? null,
     tags: initialValues.tags || [],
+    coverUrl: initialValues.coverUrl || coverUrl,
   });
 
   const [files, setFiles] = useState<FileType[]>([]);
+  const [errors, setErrors] = useState<Partial<Record<keyof ServiceFormValue | 'submit', string>>>(
+    {},
+  );
+
+  useEffect(() => {
+    dispatch(fetchCategories({ jobsCountSort: null, query: null }));
+    dispatch(fetchTags());
+  }, [dispatch]);
 
   useEffect(() => {
     if (coverUrl && mode === 'edit') {
@@ -45,7 +101,7 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
     if (fileList.length > 0) {
       const file = fileList[0];
       if (file.blobFile && !file.blobFile.type.startsWith('image/')) {
-        alert('Пожалуйста, загрузите картинку!');
+        alert('Пожалуйста, выберите изображение');
         return;
       }
       setFiles(fileList);
@@ -54,43 +110,58 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
 
   const handleChange = (value: Partial<ServiceFormValue>) => {
     setFormValue({ ...formValue, ...value });
+    const key = Object.keys(value)[0] as keyof ServiceFormValue;
+    if (key) {
+      setErrors((prev) => ({ ...prev, [key]: undefined }));
+    }
   };
 
-  const handleSubmit = () => onSubmit(formValue);
+  const handleSubmit = async () => {
+    const validationErrors = validate(formValue);
+    if (Object.keys(validationErrors).length) {
+      setErrors(validationErrors);
+      return;
+    }
 
-  const tagData = [
-    { label: 'Экологичная химия', value: 'eco_chemistry' },
-    { label: 'Мытьё окон', value: 'window_cleaning' },
-    { label: 'Своё оборудование', value: 'own_equipment' },
-    { label: 'Гарантия', value: 'warranty' },
-    { label: 'Срочный вызов', value: 'urgent_call' },
-    { label: '24/7', value: '24_7' },
-    { label: 'После ремонта', value: 'after_repair' },
-    { label: 'Химчистка', value: 'dry_cleaning' },
-    { label: 'Безнал', value: 'cashless' },
-    { label: 'Наличные', value: 'cash' },
-    { label: 'Выезд сегодня', value: 'today_visit' },
-    { label: 'Чек и договор', value: 'check_contract' },
-  ];
+    const payload = {
+      name: formValue.name.trim(),
+      description: formValue.description.trim(),
+      price: Number(formValue.price),
+      categoryId: formValue.categoryId!,
+      tags: formValue.tags,
+      coverUrl: formValue.coverUrl || PLACEHOLDER_COVER,
+    };
 
-  const categoryData = [
-    { label: 'Электроника', value: 'electronics' },
-    { label: 'Уборка', value: 'cleaning' },
-    { label: 'Мелкий ремонт', value: 'small_repair' },
-    { label: 'Сантехника', value: 'plumbing' },
-    { label: 'IT-услуги', value: 'it_services' },
-    { label: 'Кондиционеры', value: 'air_conditioning' },
-    { label: 'Сборка мебели', value: 'furniture_assembly' },
-    { label: 'Монтажные работы', value: 'installation_works' },
-    { label: 'Ремонт', value: 'repair' },
-    { label: 'Автомобили', value: 'automobiles' },
-  ];
+    if (!isAuthenticated) {
+      setErrors((prev) => ({ ...prev, name: 'Авторизуйтесь, чтобы создать услугу' }));
+      return;
+    }
+
+    try {
+      if (mode === 'create') {
+        await dispatch(createService(payload)).unwrap();
+      } else if (mode === 'edit' && serviceId) {
+        await dispatch(updateService({ id: serviceId, body: payload })).unwrap();
+      }
+      onSubmit({ ...formValue, price: Number(formValue.price), coverUrl: payload.coverUrl });
+      onClose();
+    } catch (e) {
+      setErrors((prev) => ({ ...prev, submit: (e as string) || 'Ошибка сохранения' }));
+    }
+  };
+
+  const categoryOptions = useMemo(
+    () => categories.map((c) => ({ label: c.category.name, value: c.category.id })),
+    [categories],
+  );
+
+  const tagOptions = useMemo(() => tags.map((t) => ({ label: t.name, value: t.id })), [tags]);
 
   return (
     <Modal size="lg" open={open} onClose={onClose} className="ServiceOrderModal">
       <Modal.Header className="ServiceOrderModal__header">
         <Modal.Title className="ServiceOrderModal__title">
-          {mode === 'edit' ? '✏️ Редактировать услугу' : '✨ Создать услугу'}
+          {mode === 'edit' ? 'Редактировать услугу' : 'Создать услугу'}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body className="ServiceOrderModal__body">
@@ -98,7 +169,7 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
           fluid
           className="ServiceOrderModal__form"
           formValue={formValue}
-          onChange={handleChange}
+          onChange={(value) => setFormValue(value as ServiceFormValue)}
         >
           <Form.Group className="ServiceOrderModal__formGroup">
             <Form.ControlLabel className="ServiceOrderModal__label">Фото услуги</Form.ControlLabel>
@@ -121,12 +192,7 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
                             const newFile = e.target.files?.[0];
                             if (newFile) {
                               if (!newFile.type.startsWith('image/')) {
-                                alert('Только картинки! Допустимые форматы: JPG, PNG, WebP и т.д.');
-                                return;
-                              }
-                              const maxSize = 5 * 1024 * 1024;
-                              if (newFile.size > maxSize) {
-                                alert('Файл слишком большой! Максимум 5MB.');
+                                alert('Добавьте изображение JPG/PNG');
                                 return;
                               }
 
@@ -160,7 +226,7 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
                   </div>
                   <div className="ServiceOrderModal__upload-label">Загрузить фото</div>
                   <div className="ServiceOrderModal__upload-tip">
-                    Рекомендуется: Формат - 16:9, JPG или PNG
+                    Рекомендуется 16:9, JPG или PNG
                   </div>
                 </div>
               </Uploader>
@@ -171,7 +237,13 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
             <Form.ControlLabel className="ServiceOrderModal__label">
               Название услуги <b className="required">*</b>
             </Form.ControlLabel>
-            <Form.Control className="ServiceOrderModal__input" name="serviceName" />
+            <Form.Control
+              className="ServiceOrderModal__input"
+              name="name"
+              value={formValue.name}
+              onChange={(val) => handleChange({ name: val as string })}
+            />
+            {errors.name ? <span className="input-error-text">{errors.name}</span> : null}
           </Form.Group>
 
           <Form.Group className="ServiceOrderModal__formGroup">
@@ -185,17 +257,27 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
               value={formValue.description}
               onChange={(e) => handleChange({ description: e.target.value })}
             />
+            {errors.description ? (
+              <span className="input-error-text">{errors.description}</span>
+            ) : null}
           </Form.Group>
 
           <Form.ControlLabel className="ServiceOrderModal__tip">
-            💡 Подробное описание повышает доверие клиентов
+            Подробное описание повышает доверие клиентов
           </Form.ControlLabel>
 
           <Form.Group className="ServiceOrderModal__formGroup">
             <Form.ControlLabel className="ServiceOrderModal__label">
               Цена (₽) <b className="required">*</b>
             </Form.ControlLabel>
-            <Form.Control className="ServiceOrderModal__input" name="cost" type="number" />
+            <Form.Control
+              className="ServiceOrderModal__input"
+              name="price"
+              type="number"
+              value={formValue.price}
+              onChange={(val) => handleChange({ price: Number(val) })}
+            />
+            {errors.price ? <span className="input-error-text">{errors.price}</span> : null}
           </Form.Group>
 
           <Form.Group className="ServiceOrderModal__formGroup">
@@ -204,12 +286,16 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
             </Form.ControlLabel>
             <SelectPicker
               className="ServiceOrderModal__input category-tag-picker"
-              data={categoryData}
-              value={formValue.category}
-              onChange={(value) => handleChange({ category: value || '' })}
+              data={categoryOptions}
+              value={formValue.categoryId}
+              onChange={(value) => handleChange({ categoryId: (value as number) ?? null })}
               placeholder="Выбери категорию"
               searchable
+              block
             />
+            {errors.categoryId ? (
+              <span className="input-error-text">{errors.categoryId}</span>
+            ) : null}
           </Form.Group>
 
           <Form.Group className="ServiceOrderModal__formGroup ">
@@ -217,17 +303,19 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
               Теги <b className="required">*</b>
             </Form.ControlLabel>
             <TagPicker
-              className="ServiceOrderModal__input category-tag-picker"
-              data={tagData}
+              className="ServiceOrderModal__input category-tag-picker service-tag-picker"
+              data={tagOptions}
               value={formValue.tags}
-              onChange={(value) => handleChange({ tags: value })}
+              onChange={(value) => handleChange({ tags: (value as number[]) ?? [] })}
               placeholder="Выбери теги"
+              block
             />
+            {errors.tags ? <span className="input-error-text">{errors.tags}</span> : null}
           </Form.Group>
         </Form>
       </Modal.Body>
       <Modal.Footer className="ServiceOrderModal__footer">
-        {mode === 'edit' && (
+        {mode === 'edit' && (showDelete || onDelete) && (
           <Button
             className="ServiceOrderModal__buttonDanger"
             appearance="subtle"
@@ -244,8 +332,9 @@ export const ServiceOrderModal: React.FC<ServiceOrderModalProps> = ({
           className="ServiceOrderModal__buttonPrimary"
           appearance="primary"
           onClick={handleSubmit}
+          loading={serviceStatus === 'loading'}
         >
-          {mode === 'edit' ? 'Сохранить изменения' : 'Опубликовать услугу'}
+          {mode === 'edit' ? 'Сохранить' : 'Опубликовать услугу'}
         </Button>
       </Modal.Footer>
     </Modal>

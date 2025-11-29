@@ -1,12 +1,15 @@
-import './service-catalog.scss';
-import { Plus } from 'lucide-react';
+﻿import { Plus } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button } from 'rsuite';
+import { Button, Loader, Pagination } from 'rsuite';
 
 import { OrderCreateModal } from '@/components/OrderCreateModal';
 import { PaymentModal, PaymentResultModal } from '@/pages/MyOrdersPage/ui/modals';
-import { services } from '@/shared/data/services';
+import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import { selectServicesState } from '@/redux-rtk/store/services/selectors';
+import { fetchServices } from '@/redux-rtk/store/services/servicesThunks';
+import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
+import { fetchCategories } from '@/redux-rtk/store/utils/utilsThunks';
 import { FilterGroup } from '@/shared/FilterGroup';
 import { CategoryTabs } from '@/shared/FilterTabs';
 import { SearchInput } from '@/shared/SearchInput';
@@ -14,19 +17,29 @@ import { ServiceCard } from '@/shared/ServiceCard/ui';
 import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 import { ServiceOrderModal } from '@/shared/ServiceModal/ui';
 
+import './service-catalog.scss';
+
 export const ServiceCatalogPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { items, totalPages, status } = useAppSelector(selectServicesState);
+  const { categories } = useAppSelector(selectUtilsState);
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const initialSearch = searchParams.get('search') ?? '';
   const shouldOpenCreate = searchParams.get('create') === 'service';
 
-  const [activeFilter, setActiveFilter] = useState('Все');
   const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [openServiceModal, setOpenServiceModal] = useState(false);
-  const [selectedService, setSelectedService] = useState<(typeof services)[0] | null>(null);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
-  const [orderFormKey, setOrderFormKey] = useState(0);
+
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [pageSize] = useState(9);
+  const [pageNumber, setPageNumber] = useState(0); //from vj-68
+
+  const [_orderFormKey, setOrderFormKey] = useState(0);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentResult, setPaymentResult] = useState<{
     open: boolean;
@@ -36,7 +49,22 @@ export const ServiceCatalogPage: React.FC = () => {
     open: false,
     status: 'success',
     methodMask: '',
-  });
+  }); //from khasso
+
+  useEffect(() => {
+    dispatch(fetchCategories({ jobsCountSort: 'DESC', query: null }));
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(
+      fetchServices({
+        page: pageNumber,
+        pageSize,
+        query: searchTerm || undefined,
+        categoryId: categoryId ?? undefined,
+      }),
+    );
+  }, [dispatch, pageNumber, pageSize, searchTerm, categoryId]); //from vj-68
 
   const filters = [
     { name: 'Стоимость', options: ['По убыванию', 'По возрастанию'] },
@@ -44,18 +72,18 @@ export const ServiceCatalogPage: React.FC = () => {
     { name: 'Рейтинг', options: ['4.9 и выше', '4.5 и выше', '4.0 и выше'] },
   ];
 
-  const filteredServices = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-    if (!term) {
-      return services;
-    }
-    return services.filter(
-      (s) =>
-        s.title.toLowerCase().includes(term) ||
-        s.description.toLowerCase().includes(term) ||
-        s.workerName.toLowerCase().includes(term),
-    );
-  }, [searchTerm]);
+  // const filteredServices = useMemo(() => {
+  //   const term = searchTerm.trim().toLowerCase();
+  //   if (!term) {
+  //     return services;
+  //   }
+  //   return services.filter(
+  //     (s) =>
+  //       s.title.toLowerCase().includes(term) ||
+  //       s.description.toLowerCase().includes(term) ||
+  //       s.workerName.toLowerCase().includes(term),
+  //   );
+  // }, [searchTerm]);
 
   useEffect(() => {
     if (shouldOpenCreate) {
@@ -67,64 +95,129 @@ export const ServiceCatalogPage: React.FC = () => {
     setSearchTerm(initialSearch);
   }, [initialSearch]);
 
+  const categoryTabs = useMemo(
+    () => ['Все', ...categories.map((c) => c.category.name)],
+    [categories],
+  );
+  const activeTab = useMemo(() => {
+    if (categoryId === null) {
+      return 'Все';
+    }
+    const found = categories.find((c) => c.category.id === categoryId);
+    return found?.category.name ?? 'Все';
+  }, [categories, categoryId]);
+
+  const handleCategoryChange = (label: string) => {
+    if (label === 'Все') {
+      setCategoryId(null);
+      setPageNumber(0);
+      return;
+    }
+    const found = categories.find((c) => c.category.name === label);
+    setCategoryId(found?.category.id ?? null);
+    setPageNumber(0);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setPageNumber(0);
+  };
+
+  const isLoading = status === 'loading';
+  const isEmpty = !isLoading && items.length === 0;
+  const selectedService = items.find((s) => s.id === selectedServiceId) || null;
+
   return (
     <div className="ServiceCatalog">
       <div className="ServiceCatalog__header">
         <h2 className="ServiceCatalog__title">Каталог услуг</h2>
         <Button
           className="ServiceCatalog__add-btn"
-          title="Разместить услугу"
+          title="Создать услугу"
           onClick={() => setOpenServiceModal(true)}
         >
-          <Plus /> Разместить услугу
+          <Plus /> Создать услугу
         </Button>
       </div>
 
       <SearchInput
-        placeholder="Поиск услуг и мастеров..."
+        placeholder="Ищи услуги по названию или описанию..."
         defaultValue={initialSearch}
-        onSearch={(value) => setSearchTerm(value)}
+        onSearch={handleSearch}
       />
 
-      <CategoryTabs
-        categories={['Все', 'Ремонт', 'Уборка', 'Сантехника', 'IT услуги', 'Электрика']}
-        active={activeFilter}
-        onChange={setActiveFilter}
-      />
+      <CategoryTabs categories={categoryTabs} active={activeTab} onChange={handleCategoryChange} />
 
       <FilterGroup filters={filters} />
 
       <div className="ServiceCatalog__grid">
-        {filteredServices.map((service) => (
+        {items.map((service) => (
           <div className="ServiceCatalog__card-wrapper" key={service.id}>
             <ServiceCard
               key={service.id}
-              title={service.title}
+              title={service.name}
               description={service.description}
-              price={service.price}
-              orders={service.orders}
-              gradient={service.gradient}
-              workerAvatar={service.workerAvatar}
-              workerName={service.workerName}
-              workerRating={service.workerRating}
+              price={service.price.toString()}
+              orders={service.ordersCount}
+              gradient="linear-gradient(135deg, #4facfe, #00f2fe)"
+              workerName={
+                service.user.master?.pseudonym || `${service.user.name} ${service.user.surname}`
+              }
+              workerAvatar={service.user.avatarPath}
               onClick={() => {
-                setSelectedService(service);
+                setSelectedServiceId(service.id);
                 setOrderFormKey((k) => k + 1);
                 setIsDetailModalOpen(true);
               }}
             />
           </div>
         ))}
+        {isLoading && (
+          <div className="ServiceCatalog__loader">
+            <Loader size="md" content="" />
+          </div>
+        )}
+        {isEmpty && <div className="ServiceCatalog__empty">Нет подходящих услуг</div>}
       </div>
+
+      {!isLoading && !isEmpty && (
+        <div className="ServiceCatalog__pagination">
+          <Pagination
+            prev
+            next
+            total={Math.max(1, totalPages) * pageSize}
+            limit={pageSize}
+            activePage={pageNumber + 1}
+            onChangePage={(p) => setPageNumber(p - 1)}
+          />
+        </div>
+      )}
+
       {openServiceModal && (
-        /*крч вот тут я для тестов оставил чтобы открыть модалку создания услуги сделайте mode = "create" и удалите onDelete
-          а для вызова модалки редактирования укажите mode = "edit" и прокиньте onDelete чтобы кнопка удаления услуги срабатывала как нада.
-          onSubmit ето действие, что будет происходить при нажатии на голубую кнопку (в разных режимах она будет называться по разному)*/
         <ServiceOrderModal
           open={openServiceModal}
           onClose={() => setOpenServiceModal(false)}
           mode="create"
-          onSubmit={() => {}}
+          onSubmit={() => setOpenServiceModal(false)}
+        />
+      )}
+
+      {isOrderModalOpen && (
+        <OrderCreateModal
+          open={isOrderModalOpen}
+          service={{
+            title: selectedService!.name ?? 'Ошибка при выборе услуги',
+            price: selectedService!.price ?? '',
+            gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)',
+            workerName:
+              selectedService!.user.master?.pseudonym ||
+              `${selectedService!.user.name} ${selectedService!.user.surname}`,
+            category: selectedService!.category.name,
+            tags: selectedService!.tags.map(String),
+            location: selectedService!.user.city.name,
+          }}
+          onClose={() => setIsOrderModalOpen(false)}
+          onSubmit={() => setIsOrderModalOpen(false)}
         />
       )}
 
@@ -133,22 +226,26 @@ export const ServiceCatalogPage: React.FC = () => {
           open={isDetailModalOpen}
           onClose={() => {
             setIsDetailModalOpen(false);
-            setSelectedService(null);
+            setSelectedServiceId(null);
           }}
           service={{
             id: selectedService.id,
-            title: selectedService.title,
+            title: selectedService.name,
             description: selectedService.description,
             price: selectedService.price,
-            orders: selectedService.orders,
-            gradient: selectedService.gradient,
-            workerName: selectedService.workerName,
-            workerRating: selectedService.workerRating,
-            workerAvatar: selectedService.workerAvatar,
-            category: 'Сантехника', // можно будет получать из данных
-            tags: ['Гарантия 6 месяцев', 'Чек и договор', 'Безнал/Наличные', 'Выезд сегодня'],
-            experience: '7 лет опыта',
-            location: 'Москва, СВО',
+            orders: selectedService.ordersCount,
+            gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)',
+            workerName:
+              selectedService.user.master?.pseudonym ||
+              `${selectedService.user.name} ${selectedService.user.surname}`,
+            workerRating: '—',
+            workerAvatar: selectedService.user.avatarPath,
+            category: selectedService.category.name,
+            tags: selectedService.tags.map(String),
+            experience: selectedService.user.master?.experience
+              ? `${selectedService.user.master.experience} лет опыта`
+              : undefined,
+            location: selectedService.user.city.name,
           }}
           onOrder={() => {
             setIsDetailModalOpen(false);
@@ -160,39 +257,7 @@ export const ServiceCatalogPage: React.FC = () => {
           onFavorite={() => {
             console.log('Добавить в избранное');
           }}
-        />
-      )}
-
-      {selectedService && (
-        <OrderCreateModal
-          key={orderFormKey}
-          open={isOrderModalOpen}
-          onClose={() => {
-            setIsOrderModalOpen(false);
-            setIsDetailModalOpen(false);
-            setSelectedService(null);
-            setOrderFormKey((k) => k + 1);
-          }}
-          onBack={() => {
-            setIsOrderModalOpen(false);
-            if (selectedService) {
-              setIsDetailModalOpen(true);
-            }
-          }}
-          onSubmit={(data) => {
-            console.log('Данные заказа:', data);
-            setIsOrderModalOpen(false);
-            setOrderFormKey((k) => k + 1);
-            setIsPaymentModalOpen(true);
-          }}
-          service={{
-            title: selectedService.title,
-            workerName: selectedService.workerName,
-            price: Number(selectedService.price),
-            location: 'Москва, СВО',
-            gradient: selectedService.gradient,
-            tags: ['Гарантия 6 месяцев', 'Чек и договор', 'Выезд сегодня'],
-          }}
+          isFavorite={false}
         />
       )}
 
@@ -200,7 +265,7 @@ export const ServiceCatalogPage: React.FC = () => {
         <PaymentModal
           open={isPaymentModalOpen}
           title="Оплата услуги"
-          serviceTitle={selectedService.title}
+          serviceTitle={selectedService.name}
           price={Number(selectedService.price)}
           fee={0}
           methods={[
@@ -215,7 +280,6 @@ export const ServiceCatalogPage: React.FC = () => {
           }}
         />
       )}
-
       {selectedService && (
         <PaymentResultModal
           open={paymentResult.open}
@@ -229,7 +293,7 @@ export const ServiceCatalogPage: React.FC = () => {
           onSecondary={() => {
             setPaymentResult((prev) => ({ ...prev, open: false }));
             setIsDetailModalOpen(false);
-            setSelectedService(null);
+            setSelectedServiceId(null);
             navigate('/my-orders');
           }}
         />

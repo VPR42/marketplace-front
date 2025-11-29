@@ -5,8 +5,8 @@ import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 
 import type { OrderItem, OrderStatus } from '../types';
 import { OrderActionModal } from './modals';
-import { MyOrderCard } from './MyOrderCard';
 import './my-orders.scss';
+import { MyOrderCard } from './MyOrderCard';
 
 type StatusFilter = OrderStatus | 'all';
 
@@ -29,7 +29,7 @@ const statusLabels: Record<OrderStatus, string> = {
 
 const mockOrders: OrderItem[] = [
   {
-    id: 1,
+    id: '1',
     clientId: 15,
     master: 'Анна Петрова',
     title: 'Репетитор английского для подготовки к IELTS',
@@ -43,7 +43,7 @@ const mockOrders: OrderItem[] = [
     location: 'Москва, Тверская',
   },
   {
-    id: 2,
+    id: '2',
     clientId: 23,
     master: 'Клининг Профи',
     title: 'Генеральная уборка квартир и офисов',
@@ -57,7 +57,7 @@ const mockOrders: OrderItem[] = [
     location: 'Москва, весь город',
   },
   {
-    id: 3,
+    id: '3',
     clientId: 8,
     master: 'Сергей Иванов',
     title: 'Сантехнические работы любой сложности',
@@ -71,7 +71,7 @@ const mockOrders: OrderItem[] = [
     location: 'Москва, СВАО',
   },
   {
-    id: 4,
+    id: '4',
     clientId: 42,
     master: 'Дмитрий Козлов',
     title: 'Репетитор по математике и физике',
@@ -84,7 +84,7 @@ const mockOrders: OrderItem[] = [
     location: 'Москва, ЦАО',
   },
   {
-    id: 5,
+    id: '5',
     clientId: 19,
     master: 'Мастер на час',
     title: 'Мелкий бытовой ремонт',
@@ -233,7 +233,7 @@ export const MyOrdersPage: React.FC = () => {
             id: selectedOrder.id,
             title: selectedOrder.title,
             description: selectedOrder.description,
-            price: selectedOrder.budget.toString(),
+            price: selectedOrder.budget,
             orders: 0,
             gradient: 'linear-gradient(135deg, #ff7a45, #ffb347)',
             workerName: selectedOrder.master,
