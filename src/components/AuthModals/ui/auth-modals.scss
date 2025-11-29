@@ -1,0 +1,115 @@
+﻿.auth-modal {
+  max-width: 400px;
+  width: 100%;
+  border-bottom: 1px solid var(--grey-borderline);
+  > * .rs-modal-content {
+    border-radius: 15px;
+  }
+
+  &__header {
+    border-bottom: 1px solid var(--grey-borderline);
+    padding: 4px 20px 20px 4px;
+    display: flex;
+    align-items: center;
+    h4 {
+      font-weight: 600;
+    }
+  }
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    > * input {
+      border: 2px solid var(--grey-borderline);
+      border-radius: 10px;
+    }
+    > * input:hover,
+    > * input:focus {
+      border-color: var(--orange-hover) !important;
+    }
+    > * input::placeholder {
+      font-family: 'PT Sans Caption', sans-serif;
+    }
+    border-bottom: 1px solid var(--grey-borderline);
+  }
+  &__footer {
+    padding-top: 20px;
+    width: 100%;
+    display: flex;
+    gap: 4px;
+    justify-content: flex-end;
+    > button {
+      font-family: 'Roboto', sans-serif;
+      font-weight: 700;
+      padding: 12px 20px;
+      border-radius: 12px;
+    }
+    .login-button {
+      background-color: var(--orange);
+      color: #fff;
+    }
+    .login-button:hover {
+      background-color: var(--orange-hover);
+    }
+  }
+  .remember {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -8px;
+    > * span {
+      font-family: 'PT Sans Caption', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    > *div {
+      display: flex;
+      align-items: center;
+      padding-top: 0;
+      padding-bottom: 0;
+    }
+  }
+}
+.rs-checkbox-checked > * .rs-checkbox-inner::before {
+  background-color: var(--orange) !important;
+  border-color: var(--orange) !important;
+}
+.fio-block {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  > * {
+    flex: 1 1 45%;
+    min-width: 140px;
+  }
+}
+.sogl {
+  margin-top: -12px;
+  font-weight: 500;
+}
+.city-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.city-picker {
+  width: 100%;
+  .rs-picker-toggle {
+    width: 100%;
+    border: 2px solid var(--grey-borderline);
+    border-radius: 10px;
+  }
+  .rs-picker-toggle:hover,
+  .rs-picker-toggle:focus {
+    border-color: var(--orange-hover);
+  }
+}
+.picker-error .rs-picker-toggle {
+  border-color: #dc2626;
+}
+.form-error {
+  color: #dc2626;
+  font-size: 13px;
+}

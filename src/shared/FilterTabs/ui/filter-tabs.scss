@@ -1,0 +1,28 @@
+.CategoryTabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  &__item {
+    padding: 7px 21px;
+    border: 1px solid var(--grey-borderline);
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: color 0.2s ease;
+
+    &--active {
+      background-color: var(--orange);
+      /*тут мб интереснее оранжевый чем черный на макете просто черный*/
+      color: white;
+      border-color: var(--orange);
+    }
+
+    &:not(.ServiceCatalog__category--active):hover {
+      background-color: var(--orange);
+      color: white;
+      border-color: var(--orange);
+    }
+  }
+}

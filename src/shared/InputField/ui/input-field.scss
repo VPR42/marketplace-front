@@ -1,0 +1,26 @@
+﻿.sb {
+  margin-bottom: -18px;
+}
+
+.input-error {
+  border-color: #dc2626 !important;
+}
+
+.input-error-text {
+  color: #dc2626;
+  font-size: 12px;
+  margin-top: -4px;
+}
+.input-inner {
+  position: relative;
+}
+.password-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: transparent !important;
+}
+
+.input-password {
+  padding-right: 40px;
+}
