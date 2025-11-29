@@ -1,4 +1,4 @@
-﻿import { ChevronDown, ClipboardList, Heart, LogOut, Star, User, Wrench } from 'lucide-react';
+﻿import { ChevronDown, ClipboardList, Heart, LogOut, User, Wrench } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader, Message } from 'rsuite';
