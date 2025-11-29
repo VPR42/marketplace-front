@@ -1,11 +1,18 @@
 ﻿import { Plus } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Loader, Pagination } from 'rsuite';
+import { Button, Pagination } from 'rsuite';
 
+import { CustomLoader } from '@/components/CustomLoader/ui';
 import { OrderCreateModal } from '@/components/OrderCreateModal';
 import { PaymentModal, PaymentResultModal } from '@/pages/MyOrdersPage/ui/modals';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import {
+  addToFavorites,
+  fetchFavorites,
+  removeFromFavorites,
+} from '@/redux-rtk/store/favorites/favoriteThunks';
+import { selectFavorites } from '@/redux-rtk/store/favorites/selectors';
 import { selectServicesState } from '@/redux-rtk/store/services/selectors';
 import { fetchServices } from '@/redux-rtk/store/services/servicesThunks';
 import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
@@ -23,6 +30,7 @@ export const ServiceCatalogPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { items, totalPages, status } = useAppSelector(selectServicesState);
   const { categories } = useAppSelector(selectUtilsState);
+  const favorites = useAppSelector(selectFavorites);
 
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -99,6 +107,7 @@ export const ServiceCatalogPage: React.FC = () => {
     () => ['Все', ...categories.map((c) => c.category.name)],
     [categories],
   );
+
   const activeTab = useMemo(() => {
     if (categoryId === null) {
       return 'Все';
@@ -126,6 +135,45 @@ export const ServiceCatalogPage: React.FC = () => {
   const isLoading = status === 'loading';
   const isEmpty = !isLoading && items.length === 0;
   const selectedService = items.find((s) => s.id === selectedServiceId) || null;
+
+  const isFavorite = useMemo(() => {
+    if (!selectedService) {
+      return false;
+    }
+    return favorites.some((f) => f.id === selectedService.id);
+  }, [favorites, selectedService]);
+
+  const [togglingFavoriteId, setTogglingFavoriteId] = useState<string | null>(null);
+
+  const handleToggleFavorite = useCallback(
+    async (serviceId: string, makeFavorite: boolean) => {
+      if (!serviceId) {
+        return;
+      }
+      if (togglingFavoriteId === serviceId) {
+        return;
+      }
+
+      setTogglingFavoriteId(serviceId);
+
+      try {
+        const isAlready = favorites.some((f) => f.id === serviceId);
+
+        if (makeFavorite && !isAlready) {
+          await dispatch(addToFavorites(serviceId)).unwrap();
+        } else if (!makeFavorite && isAlready) {
+          await dispatch(removeFromFavorites(serviceId)).unwrap();
+        }
+
+        await dispatch(fetchFavorites()).unwrap();
+      } catch (err) {
+        console.error('toggle favorite failed', err);
+      } finally {
+        setTogglingFavoriteId(null);
+      }
+    },
+    [dispatch, favorites, togglingFavoriteId],
+  );
 
   return (
     <div className="ServiceCatalog">
@@ -174,7 +222,7 @@ export const ServiceCatalogPage: React.FC = () => {
         ))}
         {isLoading && (
           <div className="ServiceCatalog__loader">
-            <Loader size="md" content="" />
+            <CustomLoader size="md" content="" />
           </div>
         )}
         {isEmpty && <div className="ServiceCatalog__empty">Нет подходящих услуг</div>}
@@ -251,13 +299,13 @@ export const ServiceCatalogPage: React.FC = () => {
             setIsDetailModalOpen(false);
             setIsOrderModalOpen(true);
           }}
-          onMessage={() => {
-            console.log('Написать мастеру');
-          }}
+          onMessage={() => console.log('Написать мастеру')}
+          isFavorite={isFavorite}
           onFavorite={() => {
-            console.log('Добавить в избранное');
+            const currentlyFavorite = favorites.some((f) => f.id === selectedService.id);
+            handleToggleFavorite(selectedService.id, !currentlyFavorite);
           }}
-          isFavorite={false}
+          isTogglingFavorite={togglingFavoriteId === selectedService.id}
         />
       )}
 
