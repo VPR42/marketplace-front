@@ -1,8 +1,8 @@
-import { MyServiceCard } from '@/shared/MyServicesCard/ui';
+/* eslint-disable import/no-duplicates */
+import { formatDistanceToNow, parseISO } from 'date-fns';
+import { ru } from 'date-fns/locale';
+/* eslint-enable import/no-duplicates */
 
-import { formatDistanceToNow, parseISO, ru } from 'date-fns';
-
-import './FavoritesPage.scss';
 import { useEffect } from 'react';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
@@ -14,6 +14,9 @@ import {
   removeFromFavorites,
 } from '@/redux-rtk/store/favorites/favoriteThunks';
 import { selectFavorites, selectFavoritesStatus } from '@/redux-rtk/store/favorites/selectors';
+import { MyServiceCard } from '@/shared/MyServicesCard/ui';
+
+import './FavoritesPage.scss';
 
 export const FavoritesList: React.FC<FavoritesListProps> = ({ filterCategory = 'Все' }) => {
   const dispatch = useAppDispatch();
