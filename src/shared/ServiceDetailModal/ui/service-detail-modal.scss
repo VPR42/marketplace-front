@@ -1,4 +1,4 @@
-/* Определяем переменные (если они не определены глобально) */
+﻿/* Определяем переменные (если они не определены глобально) */
 :root {
   --orange: #ff7f00;
   --orange-hover: #e57300;
@@ -88,6 +88,36 @@
     border-radius: 12px;
     background: #e5e7eb;
     border: 1px solid #dfe3e8;
+    position: relative;
+    overflow: hidden;
+  }
+
+  &__image-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 1;
+  }
+
+  &__image-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  &__image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.4);
   }
 
   /* Статистика */
