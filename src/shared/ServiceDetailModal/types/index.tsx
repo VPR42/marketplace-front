@@ -8,6 +8,7 @@
     price: number;
     orders: number;
     gradient: string;
+    coverUrl?: string;
     workerName: string;
     workerRating: string;
     workerAvatar: string;

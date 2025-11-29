@@ -69,7 +69,6 @@ export const ServiceCatalogPage: React.FC = () => {
   const filters = [
     { name: 'Стоимость', options: ['По убыванию', 'По возрастанию'] },
     { name: 'Опыт', options: ['Больше 5 лет', '3–5 лет', 'Менее 3 лет'] },
-    { name: 'Рейтинг', options: ['4.9 и выше', '4.5 и выше', '4.0 и выше'] },
   ];
 
   // const filteredServices = useMemo(() => {
@@ -164,6 +163,7 @@ export const ServiceCatalogPage: React.FC = () => {
                 service.user.master?.pseudonym || `${service.user.name} ${service.user.surname}`
               }
               workerAvatar={service.user.avatarPath}
+              coverUrl={service.coverUrl}
               onClick={() => {
                 setSelectedServiceId(service.id);
                 setOrderFormKey((k) => k + 1);
@@ -235,10 +235,11 @@ export const ServiceCatalogPage: React.FC = () => {
             price: selectedService.price,
             orders: selectedService.ordersCount,
             gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)',
+            coverUrl: selectedService.coverUrl,
             workerName:
               selectedService.user.master?.pseudonym ||
               `${selectedService.user.name} ${selectedService.user.surname}`,
-            workerRating: '—',
+            workerRating: '-',
             workerAvatar: selectedService.user.avatarPath,
             category: selectedService.category.name,
             tags: selectedService.tags.map(String),

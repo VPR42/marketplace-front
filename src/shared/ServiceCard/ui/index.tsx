@@ -1,4 +1,5 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
+import { Loader } from 'rsuite';
 
 import './service-card.scss';
 import type { ServiceCardProps } from '@/shared/ServiceCard/types';
@@ -9,6 +10,7 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
   price,
   orders,
   gradient,
+  coverUrl,
   workerName = 'Без имени',
   workerAvatar,
   favorite,
@@ -23,28 +25,47 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
   }, [workerName]);
 
   const [avatarSrc, setAvatarSrc] = useState(workerAvatar);
-  const [loaded, setLoaded] = useState(false);
-  const [error, setError] = useState(false);
+  const [avatarLoaded, setAvatarLoaded] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
+
+  const [coverLoaded, setCoverLoaded] = useState(false);
+  const [coverError, setCoverError] = useState(false);
 
   useEffect(() => {
     setAvatarSrc(workerAvatar);
-    setLoaded(false);
-    setError(false);
+    setAvatarLoaded(false);
+    setAvatarError(false);
   }, [workerAvatar]);
 
-  const handleError = () => {
-    setError(true);
-  };
+  useEffect(() => {
+    setCoverLoaded(false);
+    setCoverError(false);
+  }, [coverUrl]);
 
-  const handleLoad = () => {
-    setLoaded(true);
-  };
-
-  const showPlaceholder = !avatarSrc || error || !loaded;
+  const showAvatarPlaceholder = !avatarSrc || avatarError || !avatarLoaded;
+  const showCover = Boolean(coverUrl) && !coverError;
 
   return (
     <div className="ServiceCard" onClick={onClick}>
       <div className="ServiceCard__top" style={{ background: gradient }}>
+        {showCover && (
+          <>
+            {!coverLoaded && !coverError && (
+              <div className="ServiceCard__cover-loader">
+                <Loader size="sm" content="" />
+              </div>
+            )}
+            <img
+              className="ServiceCard__cover"
+              src={coverUrl}
+              alt={title}
+              onLoad={() => setCoverLoaded(true)}
+              onError={() => setCoverError(true)}
+              style={{ opacity: coverLoaded ? 1 : 0 }}
+            />
+          </>
+        )}
+        {!showCover && <div className="ServiceCard__cover-fallback" />}
         <span className="ServiceCard__top-text">{title}</span>
         {favorite ? <span className="ServiceCard__fav">❤</span> : null}
       </div>
@@ -53,17 +74,17 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
           <h3 className="ServiceCard__title">{title}</h3>
 
           <div className="ServiceCard__worker">
-            {showPlaceholder ? (
+            {showAvatarPlaceholder ? (
               <div className="ServiceCard__worker-placeholder">{initials}</div>
             ) : null}
-            {!error && avatarSrc ? (
+            {!avatarError && avatarSrc ? (
               <img
                 className="ServiceCard__worker-img"
                 src={avatarSrc}
                 alt={workerName}
-                onError={handleError}
-                onLoad={handleLoad}
-                style={{ display: showPlaceholder ? 'none' : 'block' }}
+                onError={() => setAvatarError(true)}
+                onLoad={() => setAvatarLoaded(true)}
+                style={{ display: showAvatarPlaceholder ? 'none' : 'block' }}
               />
             ) : null}
             <span className="ServiceCard__worker-name">{workerName}</span>
