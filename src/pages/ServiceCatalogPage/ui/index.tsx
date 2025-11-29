@@ -470,8 +470,10 @@ export const ServiceCatalogPage: React.FC = () => {
           onMessage={() => console.log('Написать мастеру')}
           isFavorite={isFavorite}
           onFavorite={() => {
-            console.log('Добавить в избранное');
+            const currentlyFavorite = favorites.some((f) => f.id === selectedService.id);
+            handleToggleFavorite(selectedService.id, !currentlyFavorite);
           }}
+          isTogglingFavorite={togglingFavoriteId === selectedService.id}
         />
       )}
 
