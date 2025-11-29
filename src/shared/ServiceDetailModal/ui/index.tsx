@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { Loader, Modal } from 'rsuite';
 
 import type { ServiceDetailModalProps } from '../types';
+
 import './service-detail-modal.scss';
+import { CustomLoader } from '@/components/CustomLoader/ui';
 
 const getInitialsFromTitle = (title: string) => {
   const parts = title.split(' ').filter(Boolean);
@@ -20,6 +22,7 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
   onFavorite,
   isFavorite,
   getInitials,
+  isTogglingFavorite,
 }) => (
   <div className="ServiceDetailModal__action-bar">
     <div className="ServiceDetailModal__price-and-favorite">
@@ -34,9 +37,22 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
         <button
           className={`ServiceDetailModal__favorite-btn ${isFavorite ? 'ServiceDetailModal__favorite-btn--active' : ''}`}
           onClick={onFavorite}
+          disabled={isTogglingFavorite}
         >
-          <Heart size={16} fill={isFavorite ? '#fff' : 'transparent'} />
-          {isFavorite ? 'В избранном' : 'В избранное'}
+          <Heart
+            className="ServiceDetailModal__favorite-icon"
+            size={16}
+            fill={isFavorite ? '#fff' : 'transparent'}
+          />
+          <span className="ServiceDetailModal__favorite-label">
+            {isTogglingFavorite ? (
+              <CustomLoader size="xs" />
+            ) : isFavorite ? (
+              'В избранном'
+            ) : (
+              'В избранное'
+            )}
+          </span>
         </button>
       </div>
 
@@ -76,6 +92,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   onMessage,
   onFavorite,
   isFavorite = false,
+  isTogglingFavorite = false,
 }) => {
   const getInitials = (name: string) => {
     const parts = name.split(' ');
@@ -140,6 +157,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
             onFavorite={onFavorite}
             isFavorite={isFavorite}
             getInitials={getInitials}
+            isTogglingFavorite={isTogglingFavorite}
             open={open}
             onClose={onClose}
           />

@@ -1,9 +1,17 @@
 ﻿import { Plus } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Button, Input, Loader, Pagination, SelectPicker } from 'rsuite';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Button, Input, Pagination, SelectPicker } from 'rsuite';
 
+import { CustomLoader } from '@/components/CustomLoader/ui';
+import { PaymentModal, PaymentResultModal } from '@/pages/MyOrdersPage/ui/modals';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import {
+  addToFavorites,
+  fetchFavorites,
+  removeFromFavorites,
+} from '@/redux-rtk/store/favorites/favoriteThunks';
+import { selectFavorites } from '@/redux-rtk/store/favorites/selectors';
 import { selectServicesState } from '@/redux-rtk/store/services/selectors';
 import { fetchServices } from '@/redux-rtk/store/services/servicesThunks';
 import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
@@ -42,6 +50,9 @@ export const ServiceCatalogPage: React.FC = () => {
   const { items, totalPages, status } = useAppSelector(selectServicesState);
 
   const { categories } = useAppSelector(selectUtilsState);
+  const favorites = useAppSelector(selectFavorites);
+
+  const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
 
@@ -54,6 +65,8 @@ export const ServiceCatalogPage: React.FC = () => {
   const [openServiceModal, setOpenServiceModal] = useState(false);
 
   const [openDetailModal, setOpenDetailModal] = useState(false);
+
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
 
@@ -74,6 +87,18 @@ export const ServiceCatalogPage: React.FC = () => {
   const [pageSize] = useState(9);
 
   const [pageNumber, setPageNumber] = useState(0);
+
+  const [_orderFormKey, setOrderFormKey] = useState(0);
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [paymentResult, setPaymentResult] = useState<{
+    open: boolean;
+    status: 'success' | 'error';
+    methodMask: string;
+  }>({
+    open: false,
+    status: 'success',
+    methodMask: '',
+  }); //from khasso
 
   useEffect(() => {
     dispatch(fetchCategories({ jobsCountSort: 'DESC', query: null }));
@@ -174,7 +199,6 @@ export const ServiceCatalogPage: React.FC = () => {
 
     [categories],
   );
-
   const activeTab = useMemo(() => {
     if (categoryId === null) {
       return 'Все';
@@ -212,6 +236,45 @@ export const ServiceCatalogPage: React.FC = () => {
   const isEmpty = !isLoading && items.length === 0;
 
   const selectedService = items.find((s) => s.id === selectedServiceId) || null;
+
+  const isFavorite = useMemo(() => {
+    if (!selectedService) {
+      return false;
+    }
+    return favorites.some((f) => f.id === selectedService.id);
+  }, [favorites, selectedService]);
+
+  const [togglingFavoriteId, setTogglingFavoriteId] = useState<string | null>(null);
+
+  const handleToggleFavorite = useCallback(
+    async (serviceId: string, makeFavorite: boolean) => {
+      if (!serviceId) {
+        return;
+      }
+      if (togglingFavoriteId === serviceId) {
+        return;
+      }
+
+      setTogglingFavoriteId(serviceId);
+
+      try {
+        const isAlready = favorites.some((f) => f.id === serviceId);
+
+        if (makeFavorite && !isAlready) {
+          await dispatch(addToFavorites(serviceId)).unwrap();
+        } else if (!makeFavorite && isAlready) {
+          await dispatch(removeFromFavorites(serviceId)).unwrap();
+        }
+
+        await dispatch(fetchFavorites()).unwrap();
+      } catch (err) {
+        console.error('toggle favorite failed', err);
+      } finally {
+        setTogglingFavoriteId(null);
+      }
+    },
+    [dispatch, favorites, togglingFavoriteId],
+  );
 
   return (
     <div className="ServiceCatalog">
@@ -330,7 +393,7 @@ export const ServiceCatalogPage: React.FC = () => {
 
         {isLoading && (
           <div className="ServiceCatalog__loader">
-            <Loader size="md" content="" />
+            <CustomLoader size="md" content="" />
           </div>
         )}
 
@@ -362,7 +425,10 @@ export const ServiceCatalogPage: React.FC = () => {
       {selectedService && (
         <ServiceDetailModal
           open={openDetailModal}
-          onClose={() => setOpenDetailModal(false)}
+          onClose={() => {
+            setOpenDetailModal(false);
+            setSelectedServiceId(null);
+          }}
           service={{
             id: selectedService.id,
 
@@ -401,13 +467,49 @@ export const ServiceCatalogPage: React.FC = () => {
 
             setOpenServiceModal(true);
           }}
-          onMessage={() => {
-            console.log('Сообщение мастеру');
-          }}
+          onMessage={() => console.log('Написать мастеру')}
+          isFavorite={isFavorite}
           onFavorite={() => {
-            console.log('В избранное');
+            console.log('Добавить в избранное');
           }}
-          isFavorite={false}
+        />
+      )}
+
+      {selectedService && (
+        <PaymentModal
+          open={isPaymentModalOpen}
+          title="Оплата услуги"
+          serviceTitle={selectedService.name}
+          price={Number(selectedService.price)}
+          fee={0}
+          methods={[
+            { id: 'card1', brand: 'Mastercard', masked: '•••• 1234', expire: '08/27' },
+            { id: 'card2', brand: 'Visa', masked: '•••• 9876', expire: '01/29' },
+          ]}
+          onClose={() => setIsPaymentModalOpen(false)}
+          onConfirm={(methodId) => {
+            const methodMask = methodId === 'card2' ? '•••• 9876' : '•••• 1234';
+            setIsPaymentModalOpen(false);
+            setPaymentResult({ open: true, status: 'success', methodMask });
+          }}
+        />
+      )}
+      {selectedService && (
+        <PaymentResultModal
+          open={paymentResult.open}
+          status={paymentResult.status}
+          orderId={selectedService.id}
+          amount={Number(selectedService.price)}
+          cardMask={paymentResult.methodMask || '•••• 1234'}
+          datetime={new Date().toLocaleString('ru-RU')}
+          onClose={() => setPaymentResult((prev) => ({ ...prev, open: false }))}
+          onPrimary={() => setPaymentResult((prev) => ({ ...prev, open: false }))}
+          onSecondary={() => {
+            setPaymentResult((prev) => ({ ...prev, open: false }));
+            setOpenDetailModal(false);
+            setSelectedServiceId(null);
+            navigate('/my-orders');
+          }}
         />
       )}
     </div>

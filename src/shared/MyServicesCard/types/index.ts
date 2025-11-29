@@ -13,10 +13,11 @@ export interface MyServiceCardProps {
   status?: string;
   workerName?: string;
   timeAgo?: string;
+  isFavorite?: boolean;
 
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
-  onRemove?: (id: string) => void;
+  onToggle?: (id: string, makeFavorite: boolean) => Promise<void> | void;
   onProfile?: (id: string) => void;
   onMessage?: (id: string) => void;
 }
