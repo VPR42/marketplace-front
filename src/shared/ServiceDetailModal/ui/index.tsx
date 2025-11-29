@@ -85,7 +85,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
     return name.substring(0, 2).toUpperCase();
   };
 
-  const masterTags = ['Опыт 6 лет', 'Работаю по договору', 'Безналичный расчет', 'Выезд сегодня'];
+  // const masterTags = ['Опыт 6 лет', 'Работаю по договору', 'Безналичный расчет', 'Выезд сегодня'];
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
