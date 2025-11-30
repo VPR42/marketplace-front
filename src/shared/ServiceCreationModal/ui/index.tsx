@@ -24,8 +24,8 @@ const validate = (values: ServiceFormValue) => {
   } else if (values.name.trim().length > 60) {
     errors.name = 'Название до 60 символов';
   }
-  if (!values.description || values.description.trim().length < 10) {
-    errors.description = 'Описание от 10 символов';
+  if (!values.description || values.description.trim().length < 20) {
+    errors.description = 'Описание от 20 символов';
   } else if (values.description.trim().length > 200) {
     errors.description = 'Описание до 200 символов';
   }
@@ -33,8 +33,8 @@ const validate = (values: ServiceFormValue) => {
     errors.price = 'Укажите цену';
   } else {
     const priceNum = Number(values.price);
-    if (priceNum < 10) {
-      errors.price = 'Минимум 10';
+    if (priceNum < 100) {
+      errors.price = 'Минимум 100';
     }
     if (priceNum > 9999999999) {
       errors.price = 'Слишком большая цена';
@@ -158,7 +158,13 @@ export const ServiceCreationModal: React.FC<ServiceCreationProps> = ({
   const tagOptions = useMemo(() => tags.map((t) => ({ label: t.name, value: t.id })), [tags]);
 
   return (
-    <Modal size="lg" open={open} onClose={onClose} className="ServiceOrderModal">
+    <Modal
+      size="lg"
+      open={open}
+      onClose={onClose}
+      className="ServiceOrderModal"
+      backdrop="static" // не закрывать при клике мимо
+    >
       <Modal.Header className="ServiceOrderModal__header">
         <Modal.Title className="ServiceOrderModal__title">
           {mode === 'edit' ? 'Редактировать услугу' : 'Создать услугу'}
@@ -316,6 +322,7 @@ export const ServiceCreationModal: React.FC<ServiceCreationProps> = ({
             />
             {errors.tags ? <span className="input-error-text">{errors.tags}</span> : null}
           </Form.Group>
+          {errors.submit ? <div className="input-error-text">{errors.submit}</div> : null}
         </Form>
       </Modal.Body>
       <Modal.Footer className="ServiceOrderModal__footer">

@@ -7,8 +7,10 @@ export interface MyServiceCardProps {
   category?: string;
   price?: number;
   location?: string;
-  image?: string;
+  cover?: string;
+  workerAvatar?: string;
   tags?: string[];
+  gradient?: string;
   createdAt?: string;
   workerName?: string;
   timeAgo?: string;
