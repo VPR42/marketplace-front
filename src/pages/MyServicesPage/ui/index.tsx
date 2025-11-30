@@ -88,8 +88,9 @@ export const MyServicesPage: React.FC = () => {
     () => ['Все категории', ...availableCategories.map((c) => c.name)],
     [availableCategories],
   );
-  const isLoading = pageLoading || status === 'loading' || status === 'idle';
-  const hasItems = myItems.length > 0;
+  const isLoading = status === 'loading' || status === 'idle';
+  const showList = status === 'succeeded' && myItems.length > 0;
+  const showEmpty = status === 'succeeded' && myItems.length === 0;
 
   const handleModalOpen = (mode: modalMode, service?: Service) => {
     setModalMode(mode);
@@ -193,7 +194,7 @@ export const MyServicesPage: React.FC = () => {
       </div>
 
       <div className="MyServices__body">
-        {isLoading && !hasItems && (
+        {isLoading && (
           <div className="MyServices__list MyServices__list--loader">
             <CustomLoader size="md" />
           </div>
@@ -206,14 +207,14 @@ export const MyServicesPage: React.FC = () => {
           </div>
         )}
 
-        {!isLoading && !hasItems && status !== 'failed' && (
+        {showEmpty && (
           <div className="MyServices__empty">
             <div className="MyServices__empty-title">У вас пока нет услуг</div>
             <div className="MyServices__empty-sub">Создайте первую услугу, чтобы начать</div>
           </div>
         )}
 
-        {hasItems && (
+        {showList && (
           <div className="MyServices__list">
             {myItems.map((service) => (
               <MyServiceCard
@@ -225,7 +226,7 @@ export const MyServicesPage: React.FC = () => {
                 category={service.category?.name}
                 price={service.price}
                 location={service.user?.city?.name}
-                image={service.coverUrl}
+                cover={service.coverUrl}
                 tags={service.tags?.map((t) => t.name)}
                 createdAt={service.createdAt}
                 onEdit={() => {
