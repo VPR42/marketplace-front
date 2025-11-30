@@ -2,7 +2,7 @@
 
 import { api } from '@/shared/axios.config';
 
-import type { CategoryWithCount, Tag } from './types';
+import type { CategoryWithCount, Skill, Tag } from './types';
 
 export interface FetchCategoriesParams {
   query?: string | null;
@@ -25,5 +25,10 @@ export const fetchCategories = createAsyncThunk<CategoryWithCount[], FetchCatego
 
 export const fetchTags = createAsyncThunk<Tag[]>('utils/fetchTags', async () => {
   const { data } = await api.get<Tag[]>('/feed/tags');
+  return data;
+});
+
+export const fetchSkills = createAsyncThunk<Skill[]>('utils/fetchSkills', async () => {
+  const { data } = await api.get<Skill[]>('/profile/skills');
   return data;
 });

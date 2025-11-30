@@ -2,6 +2,7 @@
 
 import authReducer from './store/auth/authSlice';
 import favoritesReducer from './store/favorites/favoritesSlice';
+import profileReducer from './store/profile/profileSlice';
 import servicesReducer from './store/services/servicesSlice';
 import utilsReducer from './store/utils/utilsSlice';
 
@@ -10,6 +11,7 @@ export const rootReducer = combineReducers({
   services: servicesReducer,
   utils: utilsReducer,
   favorites: favoritesReducer,
+  profile: profileReducer,
 });
 
 export const store = configureStore({

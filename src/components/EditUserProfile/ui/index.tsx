@@ -1,30 +1,33 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Avatar, Button, Input, Modal, SelectPicker, TagPicker, Uploader } from 'rsuite';
+import {
+  Avatar,
+  Button,
+  Input,
+  InputNumber,
+  Modal,
+  SelectPicker,
+  TagPicker,
+  Uploader,
+} from 'rsuite';
 
 import { cities } from '@/shared/data/cities';
 
 import './edit-user-profile.scss';
 
-const skillOptions = [
-  { label: 'Электроника', value: 'electronics' },
-  { label: 'Уборка', value: 'cleaning' },
-  { label: 'Мелкий ремонт', value: 'small-repair' },
-  { label: 'Сантехника', value: 'plumbing' },
-  { label: 'IT-услуги', value: 'it-services' },
-  { label: 'Кондиционеры', value: 'air-conditioning' },
-  { label: 'Сборка мебели', value: 'furniture' },
-];
-
 export interface EditUserProfileForm {
   name: string;
   surname: string;
   patronymic: string;
-  nickname: string;
+  pseudonym: string;
   phone: string;
   city: number | null;
   about: string;
-  workingHours: string;
-  skills: string[];
+  description: string;
+  experience: number;
+  daysOfWeek: number[];
+  startTime: string;
+  endTime: string;
+  skills: number[];
   avatarUrl?: string;
 }
 
@@ -32,6 +35,7 @@ interface EditUserProfileModalProps {
   open: boolean;
   onClose: () => void;
   initialValues?: Partial<EditUserProfileForm>;
+  skillsOptions?: { id: number; name: string }[];
   onSubmit?: (form: EditUserProfileForm) => void;
 }
 
@@ -39,19 +43,34 @@ const defaultForm: EditUserProfileForm = {
   name: '',
   surname: '',
   patronymic: '',
-  nickname: '',
+  pseudonym: '',
   phone: '',
   city: null,
   about: '',
-  workingHours: '',
+  description: '',
+  experience: 0,
+  daysOfWeek: [],
+  startTime: '',
+  endTime: '',
   skills: [],
   avatarUrl: '',
 };
+
+const dayOptions = [
+  { label: 'Пн', value: 0 },
+  { label: 'Вт', value: 1 },
+  { label: 'Ср', value: 2 },
+  { label: 'Чт', value: 3 },
+  { label: 'Пт', value: 4 },
+  { label: 'Сб', value: 5 },
+  { label: 'Вс', value: 6 },
+];
 
 export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
   open,
   onClose,
   initialValues,
+  skillsOptions = [],
   onSubmit,
 }) => {
   const [form, setForm] = useState<EditUserProfileForm>({ ...defaultForm, ...initialValues });
@@ -85,6 +104,11 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
     }
   };
 
+  const handlePhoneChange = (value: string) => {
+    const numeric = value.replace(/\D/g, '');
+    handleChange('phone', numeric);
+  };
+
   const handleAvatarUpload = (
     fileList: Parameters<NonNullable<React.ComponentProps<typeof Uploader>['onChange']>>[0],
   ) => {
@@ -111,21 +135,53 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
 
   const validate = () => {
     const nextErrors: Partial<Record<keyof EditUserProfileForm, string>> = {};
-    if (!form.name.trim()) {
-      nextErrors.name = 'Укажите имя';
-    }
-    if (!form.surname.trim()) {
-      nextErrors.surname = 'Укажите фамилию';
-    }
+
+    const checkLength = (
+      value: string,
+      field: keyof EditUserProfileForm,
+      min: number,
+      max: number,
+    ) => {
+      if (!value.trim()) {
+        nextErrors[field] = 'Поле обязательно';
+        return;
+      }
+      if (value.trim().length < min || value.trim().length > max) {
+        nextErrors[field] = `От ${min} до ${max} символов`;
+      }
+    };
+
+    checkLength(form.name, 'name', 2, 20);
+    checkLength(form.surname, 'surname', 2, 20);
+    checkLength(form.patronymic, 'patronymic', 2, 20);
+    checkLength(form.pseudonym, 'pseudonym', 2, 20);
+
     if (!form.city) {
-      nextErrors.city = 'Выберите город';
+      nextErrors.city = 'Укажите город';
     }
+
     if (!form.phone.trim()) {
-      nextErrors.phone = 'Введите номер телефона';
+      nextErrors.phone = 'Укажите телефон';
+    } else if (!/^\d{10,15}$/.test(form.phone)) {
+      nextErrors.phone = 'Только цифры, 10-15 символов';
     }
-    if (!form.workingHours.trim()) {
-      nextErrors.workingHours = 'Укажите рабочие часы';
+
+    if (!form.startTime.trim() || !form.endTime.trim()) {
+      nextErrors.startTime = 'Укажите время работы';
     }
+
+    if (!form.about.trim() || form.about.length < 10 || form.about.length > 200) {
+      nextErrors.about = 'О себе: от 10 до 200 символов';
+    }
+
+    if (!form.skills.length) {
+      nextErrors.skills = 'Выберите навыки';
+    }
+
+    if (!form.daysOfWeek.length) {
+      nextErrors.daysOfWeek = 'Выберите дни недели';
+    }
+
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
@@ -145,6 +201,11 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
         value: city.value,
       })),
     [],
+  );
+
+  const mappedSkillsOptions = useMemo(
+    () => skillsOptions.map((skill) => ({ label: skill.name, value: skill.id })),
+    [skillsOptions],
   );
 
   return (
@@ -184,7 +245,7 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
             <Input
               id="surname"
               value={form.surname}
-              placeholder="Иванов"
+              placeholder="Фамилия"
               onChange={(value) => handleChange('surname', value)}
             />
             {errors.surname ? <span className="input-error-text">{errors.surname}</span> : null}
@@ -195,7 +256,7 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
             <Input
               id="name"
               value={form.name}
-              placeholder="Иван"
+              placeholder="Имя"
               onChange={(value) => handleChange('name', value)}
             />
             {errors.name ? <span className="input-error-text">{errors.name}</span> : null}
@@ -206,19 +267,23 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
             <Input
               id="patronymic"
               value={form.patronymic}
-              placeholder="Иванович"
+              placeholder="Отчество"
               onChange={(value) => handleChange('patronymic', value)}
             />
+            {errors.patronymic ? (
+              <span className="input-error-text">{errors.patronymic}</span>
+            ) : null}
           </div>
 
           <div className="edit-profile-modal__field">
-            <label htmlFor="nickname">Псевдоним</label>
+            <label htmlFor="pseudonym">Псевдоним</label>
             <Input
-              id="nickname"
-              value={form.nickname}
-              placeholder="Например, Мастер Иван"
-              onChange={(value) => handleChange('nickname', value)}
+              id="pseudonym"
+              value={form.pseudonym}
+              placeholder="Псевдоним"
+              onChange={(value) => handleChange('pseudonym', value)}
             />
+            {errors.pseudonym ? <span className="input-error-text">{errors.pseudonym}</span> : null}
           </div>
 
           <div className="edit-profile-modal__field">
@@ -237,27 +302,35 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
           </div>
 
           <div className="edit-profile-modal__field">
-            <label htmlFor="phone">Номер телефона</label>
+            <label htmlFor="phone">Телефон</label>
             <Input
               id="phone"
               value={form.phone}
-              placeholder="+7 (___) ___-__-__"
-              onChange={(value) => handleChange('phone', value)}
+              placeholder="79991234567"
+              onChange={handlePhoneChange}
             />
             {errors.phone ? <span className="input-error-text">{errors.phone}</span> : null}
           </div>
 
           <div className="edit-profile-modal__field">
-            <label htmlFor="workingHours">Рабочие часы</label>
-            <Input
-              id="workingHours"
-              value={form.workingHours}
-              placeholder="Пн-Пт 09:00-20:00"
-              onChange={(value) => handleChange('workingHours', value)}
+            <label htmlFor="experience">Опыт (лет)</label>
+            <InputNumber
+              id="experience"
+              value={form.experience}
+              onChange={(value) => handleChange('experience', Number(value) || 0)}
+              min={0}
+              className="edit-profile-modal__number-input"
             />
-            {errors.workingHours ? (
-              <span className="input-error-text">{errors.workingHours}</span>
-            ) : null}
+          </div>
+
+          <div className="edit-profile-modal__field">
+            <label htmlFor="description">Краткая информация</label>
+            <Input
+              id="description"
+              value={form.description}
+              placeholder="Опишите специализацию"
+              onChange={(value) => handleChange('description', value)}
+            />
           </div>
 
           <div className="edit-profile-modal__field">
@@ -267,22 +340,60 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
               as="textarea"
               rows={4}
               value={form.about}
-              placeholder="Расскажите о своём опыте и подходе"
+              placeholder="Расскажите о себе"
               onChange={(value) => handleChange('about', value)}
             />
+            {errors.about ? <span className="input-error-text">{errors.about}</span> : null}
+          </div>
+
+          <div className="edit-profile-modal__field edit-profile-modal__time">
+            <div>
+              <label htmlFor="startTime">Начало работы</label>
+              <Input
+                id="startTime"
+                value={form.startTime}
+                placeholder="09:00"
+                onChange={(value) => handleChange('startTime', value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="endTime">Окончание</label>
+              <Input
+                id="endTime"
+                value={form.endTime}
+                placeholder="20:00"
+                onChange={(value) => handleChange('endTime', value)}
+              />
+            </div>
+            {errors.startTime ? <span className="input-error-text">{errors.startTime}</span> : null}
+          </div>
+
+          <div className="edit-profile-modal__field">
+            <label htmlFor="daysOfWeek">Дни работы</label>
+            <TagPicker
+              id="daysOfWeek"
+              data={dayOptions}
+              value={form.daysOfWeek}
+              onChange={(value) => handleChange('daysOfWeek', value ?? [])}
+              placeholder="Выберите дни"
+              block
+            />
+            {errors.daysOfWeek ? (
+              <span className="input-error-text">{errors.daysOfWeek}</span>
+            ) : null}
           </div>
 
           <div className="edit-profile-modal__field">
             <label htmlFor="skills">Навыки и направления</label>
             <TagPicker
               id="skills"
-              data={skillOptions}
+              data={mappedSkillsOptions}
               value={form.skills}
               onChange={(value) => handleChange('skills', value ?? [])}
               placeholder="Выберите навыки"
               block
-              searchable={false}
             />
+            {errors.skills ? <span className="input-error-text">{errors.skills}</span> : null}
           </div>
         </div>
       </Modal.Body>
