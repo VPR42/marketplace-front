@@ -26,10 +26,10 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   onToggle,
   onProfile,
   onMessage,
+  isToggling,
   isFavorite = false,
 }) => {
   const [fav, setFav] = useState<boolean>(Boolean(isFavorite));
-  const [isToggling, setIsToggling] = useState(false);
 
   useEffect(() => {
     setFav(Boolean(isFavorite));
@@ -38,17 +38,14 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   const handleToggle = useCallback(async () => {
     const next = !fav;
     setFav(next);
-    setIsToggling(true);
 
     try {
       await onToggle?.(id, next);
     } catch (e) {
       setFav((prev) => !prev);
       console.error('Failed toggle favorite', e);
-    } finally {
-      setIsToggling(false);
     }
-  }, [fav, id, onToggle]);
+  }, [fav, id, onToggle, isToggling]);
 
   return (
     <div className={`MyServiceCard MyServiceCard--${mode}`}>
