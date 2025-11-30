@@ -1,4 +1,4 @@
-import { formatDistanceToNowStrict, parseISO, ru } from 'date-fns';
+import ru, { formatDistanceToNowStrict, parseISO } from 'date-fns';
 import { Plus } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from 'rsuite';
