@@ -1,16 +1,7 @@
 import { Button, Modal } from 'rsuite';
 
 import './order-action-modal.scss';
-
-type ActionType = 'start' | 'complete' | 'cancel';
-
-interface OrderActionModalProps {
-  open: boolean;
-  type: ActionType;
-  role?: 'customer' | 'worker';
-  onClose: () => void;
-  onConfirm: (payload?: { reason?: string }) => void;
-}
+import type { ActionType, OrderActionModalProps } from '@/pages/MyOrdersPage/types';
 
 const getCopy = (
   type: ActionType,

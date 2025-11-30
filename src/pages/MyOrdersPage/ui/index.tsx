@@ -1,12 +1,27 @@
-import { useEffect, useMemo, useState } from 'react';
+import { formatDistanceToNow, ru } from 'date-fns';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Button, Pagination } from 'rsuite';
 
+import { CustomLoader } from '@/components/CustomLoader/ui';
+import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import { fetchOrders } from '@/redux-rtk/store/orders/ordersThunks';
+import {
+  selectOrders,
+  selectOrdersLoading,
+  selectOrdersPagination,
+} from '@/redux-rtk/store/orders/selectors';
+import type { OrdersQueryParams } from '@/redux-rtk/store/orders/types';
+import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
+import { fetchCategories } from '@/redux-rtk/store/utils/utilsThunks';
 import { SearchInput } from '@/shared/SearchInput';
 import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 
-import type { OrderItem, OrderStatus } from '../types';
+import type { ApiOrderItem, OrderItem, OrderStatus } from '../types';
 import { OrderActionModal } from './modals';
 import './my-orders.scss';
 import { MyOrderCard } from './MyOrderCard';
+
+import { CategoryTabs } from '@/shared/FilterTabs';
 
 type StatusFilter = OrderStatus | 'all';
 
@@ -27,78 +42,6 @@ const statusLabels: Record<OrderStatus, string> = {
   rejected: 'Не выполнен',
 };
 
-const mockOrders: OrderItem[] = [
-  {
-    id: '1',
-    clientId: 15,
-    master: 'Анна Петрова',
-    title: 'Репетитор английского для подготовки к IELTS',
-    created: '2 часа назад',
-    status: 'created',
-    description:
-      'Помогу подготовиться к экзамену IELTS. Опыт преподавания 8 лет. Сама сдавала экзамен на 8.0. Индивидуальный подход, разбор всех секций экзамена. Гарантирую результат!',
-    categoryId: 1,
-    categoryLabel: 'Репетиторство',
-    budget: 1500,
-    location: 'Москва, Тверская',
-  },
-  {
-    id: '2',
-    clientId: 23,
-    master: 'Клининг Профи',
-    title: 'Генеральная уборка квартир и офисов',
-    created: '5 часов назад',
-    status: 'created',
-    description:
-      'Профессиональная уборка любой сложности. Используем экологичную химию. Моем окна, убираем после ремонта, чистим мебель. Выезд в день обращения.',
-    categoryId: 2,
-    categoryLabel: 'Уборка',
-    budget: 8000,
-    location: 'Москва, весь город',
-  },
-  {
-    id: '3',
-    clientId: 8,
-    master: 'Сергей Иванов',
-    title: 'Сантехнические работы любой сложности',
-    created: '1 день назад',
-    status: 'working',
-    description:
-      'Прочистка канализации, установка сантехники, замена труб, устранение протечек. Работаю быстро и качественно. Гарантия 1 год.',
-    categoryId: 3,
-    categoryLabel: 'Сантехника',
-    budget: 3500,
-    location: 'Москва, СВАО',
-  },
-  {
-    id: '4',
-    clientId: 42,
-    master: 'Дмитрий Козлов',
-    title: 'Репетитор по математике и физике',
-    created: '2 дня назад',
-    status: 'completed',
-    description: 'Подготовка к ОГЭ и ЕГЭ. Кандидат физ.-мат. наук. Все ученики сдают на 80+.',
-    categoryId: 1,
-    categoryLabel: 'Репетиторство',
-    budget: 1200,
-    location: 'Москва, ЦАО',
-  },
-  {
-    id: '5',
-    clientId: 19,
-    master: 'Мастер на час',
-    title: 'Мелкий бытовой ремонт',
-    created: '3 дня назад',
-    status: 'cancelled',
-    description:
-      'Повешу полки, соберу мебель, заменю розетки, установлю карниз и люстру. Свой инструмент.',
-    categoryId: 4,
-    categoryLabel: 'Ремонт',
-    budget: 2000,
-    location: 'Москва, ЗАО',
-  },
-];
-
 export const MyOrdersPage: React.FC = () => {
   const [activeStatus, setActiveStatus] = useState<StatusFilter>(() => {
     const saved = localStorage.getItem('myOrdersStatus') as StatusFilter | null;
@@ -114,6 +57,9 @@ export const MyOrdersPage: React.FC = () => {
     }
     return 'customer';
   });
+
+  const [activeFilter, setActiveFilter] = useState('Все');
+
   const [searchTerm, setSearchTerm] = useState(() => localStorage.getItem('myOrdersSearch') || '');
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -123,32 +69,75 @@ export const MyOrdersPage: React.FC = () => {
     role: 'customer' | 'worker';
   }>({ type: null, order: null, role: 'customer' });
 
-  const filteredOrders = useMemo(() => {
-    const normalized = searchTerm.trim().toLowerCase();
-
-    return mockOrders.filter((order) => {
-      const statusOk = activeStatus === 'all' ? true : order.status === activeStatus;
-      const matchesSearch =
-        normalized.length === 0 ||
-        order.title.toLowerCase().includes(normalized) ||
-        order.description.toLowerCase().includes(normalized) ||
-        order.master.toLowerCase().includes(normalized);
-
-      return statusOk && matchesSearch;
-    });
-  }, [activeStatus, searchTerm]);
+  const dispatch = useAppDispatch();
+  const { categories, status: utilsStatus } = useAppSelector(selectUtilsState);
+  const {
+    totalCount,
+    pageNumber: reduxPageNumber,
+    pageSize: reduxPageSize,
+  } = useAppSelector(selectOrdersPagination);
+  const isLoading = useAppSelector(selectOrdersLoading);
 
   useEffect(() => {
-    localStorage.setItem('myOrdersRole', activeRole);
-  }, [activeRole]);
+    if (utilsStatus === 'idle') {
+      dispatch(fetchCategories({ jobsCountSort: 'DESC' }));
+    }
+  }, [dispatch, utilsStatus]);
+
+  const categoryTabs = useMemo(() => {
+    if (utilsStatus === 'loading') {
+      return ['Все'];
+    }
+    return ['Все', ...categories.map((c) => c.category.name)];
+  }, [categories, utilsStatus]);
+
+  const activeCategoryId = useMemo(() => {
+    if (activeFilter === 'Все') {
+      return null;
+    }
+    const found = categories.find((c) => c.category.name === activeFilter);
+    return found?.category.id ?? null;
+  }, [activeFilter, categories]);
+
+  const [currentPage, setCurrentPage] = useState(reduxPageNumber);
 
   useEffect(() => {
-    localStorage.setItem('myOrdersStatus', activeStatus);
-  }, [activeStatus]);
+    const params: OrdersQueryParams = {
+      pageNumber: currentPage - 1,
+      pageSize: reduxPageSize,
+      status: activeStatus === 'all' ? undefined : activeStatus,
+      categoryId: activeCategoryId ?? undefined,
+      search: searchTerm.trim() || undefined,
+    };
+    dispatch(fetchOrders(params));
+  }, [dispatch, currentPage, reduxPageSize, activeStatus, activeCategoryId, searchTerm]);
 
-  useEffect(() => {
-    localStorage.setItem('myOrdersSearch', searchTerm);
-  }, [searchTerm]);
+  const apiOrders = useAppSelector(selectOrders) as ApiOrderItem[] | undefined;
+
+  const filteredOrders = useMemo<OrderItem[]>(() => {
+    if (!apiOrders || apiOrders.length === 0) {
+      return [];
+    }
+
+    return apiOrders.map((o) => ({
+      id: String(o.orderId),
+      master: o.masterFullName ?? '',
+      title: o.jobName ?? '',
+      created: o.orderedAt
+        ? `${formatDistanceToNow(new Date(o.orderedAt), { locale: ru })} назад`
+        : '',
+      status: o.status as OrderStatus,
+      description: o.jobDescription ?? '',
+      categoryId: o.categoryId ?? 0,
+      categoryLabel: o.categoryName ?? '',
+      budget: o.jobPrice ?? 0,
+      location: o.masterCityId ? `Город #${o.masterCityId}` : '',
+      image: o.jobCoverUrl ?? undefined,
+    }));
+  }, [apiOrders]);
+
+  const hasOrders = filteredOrders.length > 0;
+  const showEmpty = !isLoading && !hasOrders;
 
   return (
     <div className="MyOrders">
@@ -176,50 +165,62 @@ export const MyOrdersPage: React.FC = () => {
         <SearchInput
           placeholder="Поиск услуг..."
           defaultValue={searchTerm}
-          onSearch={(value) => setSearchTerm(value)}
+          onSearch={setSearchTerm}
         />
       </div>
 
       <div className="MyOrders__filters">
-        {statusFilters.map(({ label, value }) => (
-          <button
-            key={value}
-            type="button"
-            className={`MyOrders__filter-btn ${
-              activeStatus === value ? 'MyOrders__filter-btn--active' : ''
-            }`}
-            onClick={() => setActiveStatus(value)}
-          >
-            {label}
-          </button>
-        ))}
+        <CategoryTabs categories={categoryTabs} active={activeFilter} onChange={setActiveFilter} />
+        <div className="MyOrders__statusTabs">
+          {statusFilters.map((s) => (
+            <Button
+              key={s.value}
+              className={`MyOrders__statusTabs__item ${s.value === activeStatus ? 'MyOrders__statusTabs__item--active' : ''}`}
+              onClick={() => setActiveStatus(s.value)}
+            >
+              {s.label}
+            </Button>
+          ))}
+        </div>
       </div>
 
       <div className="MyOrders__list">
-        {filteredOrders.length > 0 ? (
-          filteredOrders.map((order) => (
-            <MyOrderCard
-              key={order.id}
-              {...order}
-              role={activeRole}
-              onClick={() => {
-                setSelectedOrder(order);
-                setIsDetailOpen(true);
-              }}
-              onAction={(actionType) => {
-                if (
-                  actionType === 'start' ||
-                  actionType === 'complete' ||
-                  actionType === 'cancel'
-                ) {
-                  setActionModal({ type: actionType, order, role: activeRole });
-                }
-              }}
-            />
-          ))
-        ) : (
-          <div className="MyOrders__empty">Заказы не найдены</div>
-        )}
+        {showEmpty && <div className="MyOrders__empty">Заказы не найдены</div>}
+        {filteredOrders.map((order) => (
+          <MyOrderCard
+            key={order.id}
+            {...order}
+            role={activeRole}
+            onClick={() => {
+              setSelectedOrder(order);
+              setIsDetailOpen(true);
+            }}
+            onAction={(actionType) => {
+              if (actionType === 'start' || actionType === 'complete' || actionType === 'cancel') {
+                setActionModal({ type: actionType, order, role: activeRole });
+              }
+            }}
+          />
+        ))}
+
+        <div className="MyOrders__pagination">
+          {isLoading ? (
+            <div className="MyOrders__loader">
+              <CustomLoader content="" />
+            </div>
+          ) : (
+            !showEmpty && (
+              <Pagination
+                prev
+                next
+                total={totalCount}
+                limit={reduxPageSize}
+                activePage={currentPage}
+                onChangePage={setCurrentPage}
+              />
+            )
+          )}
+        </div>
       </div>
 
       {selectedOrder && (
@@ -242,7 +243,7 @@ export const MyOrdersPage: React.FC = () => {
             category: selectedOrder.categoryLabel,
             tags: [
               `Статус: ${statusLabels[selectedOrder.status]}`,
-              `Клиент #${selectedOrder.clientId}`,
+              ``,
               selectedOrder.location,
             ].filter(Boolean),
             location: selectedOrder.location,
@@ -259,9 +260,7 @@ export const MyOrdersPage: React.FC = () => {
           type={actionModal.type}
           role={actionModal.role}
           onClose={() => setActionModal({ type: null, order: null, role: 'customer' })}
-          onConfirm={() => {
-            setActionModal({ type: null, order: null, role: 'customer' });
-          }}
+          onConfirm={() => setActionModal({ type: null, order: null, role: 'customer' })}
         />
       )}
     </div>
