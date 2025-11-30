@@ -1,10 +1,9 @@
 ﻿import { Plus } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Button, Pagination } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
-import { PaymentModal, PaymentResultModal } from '@/pages/MyOrdersPage/ui/modals';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
 import {
   addToFavorites,
@@ -53,8 +52,6 @@ export const ServiceCatalogPage: React.FC = () => {
   const { categories } = useAppSelector(selectUtilsState);
   const favorites = useAppSelector(selectFilteredFavorites);
 
-  const navigate = useNavigate();
-
   const [searchParams] = useSearchParams();
 
   const initialSearch = searchParams.get('search') ?? '';
@@ -90,16 +87,6 @@ export const ServiceCatalogPage: React.FC = () => {
   const [pageNumber, setPageNumber] = useState(0);
 
   // const [_orderFormKey, setOrderFormKey] = useState(0);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [paymentResult, setPaymentResult] = useState<{
-    open: boolean;
-    status: 'success' | 'error';
-    methodMask: string;
-  }>({
-    open: false,
-    status: 'success',
-    methodMask: '',
-  }); //from khasso
 
   useEffect(() => {
     dispatch(fetchCategories({ jobsCountSort: 'DESC', query: null }));
@@ -432,44 +419,6 @@ export const ServiceCatalogPage: React.FC = () => {
             handleToggleFavorite(selectedService.id, !currentlyFavorite);
           }}
           isTogglingFavorite={togglingFavoriteId === selectedService.id}
-        />
-      )}
-
-      {selectedService && (
-        <PaymentModal
-          open={isPaymentModalOpen}
-          title="Оплата услуги"
-          serviceTitle={selectedService.name}
-          price={Number(selectedService.price)}
-          fee={0}
-          methods={[
-            { id: 'card1', brand: 'Mastercard', masked: '•••• 1234', expire: '08/27' },
-            { id: 'card2', brand: 'Visa', masked: '•••• 9876', expire: '01/29' },
-          ]}
-          onClose={() => setIsPaymentModalOpen(false)}
-          onConfirm={(methodId) => {
-            const methodMask = methodId === 'card2' ? '•••• 9876' : '•••• 1234';
-            setIsPaymentModalOpen(false);
-            setPaymentResult({ open: true, status: 'success', methodMask });
-          }}
-        />
-      )}
-      {selectedService && (
-        <PaymentResultModal
-          open={paymentResult.open}
-          status={paymentResult.status}
-          orderId={selectedService.id}
-          amount={Number(selectedService.price)}
-          cardMask={paymentResult.methodMask || '•••• 1234'}
-          datetime={new Date().toLocaleString('ru-RU')}
-          onClose={() => setPaymentResult((prev) => ({ ...prev, open: false }))}
-          onPrimary={() => setPaymentResult((prev) => ({ ...prev, open: false }))}
-          onSecondary={() => {
-            setPaymentResult((prev) => ({ ...prev, open: false }));
-            setOpenDetailModal(false);
-            setSelectedServiceId(null);
-            navigate('/my-orders');
-          }}
         />
       )}
     </div>
