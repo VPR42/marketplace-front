@@ -15,6 +15,7 @@ interface Service {
   workerName?: string;
   workerRating?: string;
   workerAvatar?: string;
+  coverUrl?: string;
 }
 
 interface ServicesSectionProps {
@@ -39,7 +40,11 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
           Мои услуги
         </Heading>
         {canEdit && onAddService && (
-          <Button appearance="primary" onClick={onAddService} className="ServicesSection__add-btn">
+          <Button
+            appearance="primary"
+            onClick={onAddService}
+            className="ServicesSection__add-btn orange-btn"
+          >
             <Plus size={16} />
             <span>Добавить услугу</span>
           </Button>
@@ -57,8 +62,9 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({
                   price={String(service.price)}
                   orders={service.orders || 0}
                   gradient={service.gradient || 'linear-gradient(135deg, #6e45e2, #88d3ce)'}
-                  workerName={service.workerName}
-                  workerAvatar={service.workerAvatar}
+                  coverUrl={service.coverUrl || service.gradient}
+                  workerName={service.workerName || ''}
+                  workerAvatar={service.workerAvatar || ''}
                   onClick={() => onServiceClick?.(service.id)}
                 />
               </div>

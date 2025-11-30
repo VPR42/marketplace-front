@@ -419,6 +419,7 @@ export const ServiceCatalogPage: React.FC = () => {
               : undefined,
 
             location: selectedService.user.city.name,
+            user: selectedService.user,
           }}
           onOrder={() => {
             setOpenDetailModal(false);

@@ -20,7 +20,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ text, canEdit, onEdi
         </Heading>
         {canEdit && onEdit && (
           <Button appearance="subtle" size="sm" onClick={onEdit} className="AboutSection__edit-btn">
-            <Edit size={14} />
+            <Edit size={18} />
           </Button>
         )}
       </div>

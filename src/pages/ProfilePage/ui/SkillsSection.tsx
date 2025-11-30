@@ -25,7 +25,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ skills, canEdit, o
             onClick={onEdit}
             className="SkillsSection__edit-btn"
           >
-            <Edit size={14} />
+            <Edit size={18} />
           </Button>
         )}
       </div>

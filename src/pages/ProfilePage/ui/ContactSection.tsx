@@ -10,6 +10,7 @@ interface ContactSectionProps {
   email?: string;
   cityId?: number;
   workingHours?: string;
+  daysOfWeek?: string[];
   canEdit: boolean;
   onEdit?: () => void;
   onMessage?: () => void;
@@ -43,11 +44,14 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   email,
   cityId,
   workingHours,
+  daysOfWeek,
   canEdit,
   onEdit,
   onMessage,
 }) => {
   const cityName = cityId ? cities.find((c) => c.value === cityId)?.label : null;
+  const schedule =
+    workingHours && daysOfWeek?.length ? `${daysOfWeek.join(', ')} ${workingHours}` : workingHours;
 
   return (
     <div className="ContactSection">
@@ -56,14 +60,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
           Контактная информация
         </Heading>
         {canEdit && onEdit && (
-          <Button
-            appearance="subtle"
-            size="sm"
-            onClick={onEdit}
-            className="ContactSection__edit-btn"
-          >
-            <Edit size={14} />
-            <span>Редактировать</span>
+          <Button appearance="subtle" size="sm" onClick={onEdit} className="AboutSection__edit-btn">
+            <Edit size={20} />
           </Button>
         )}
       </div>
@@ -86,10 +84,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
           </div>
         )}
 
-        {workingHours && (
+        {schedule && (
           <div className="ContactSection__item">
             <Clock size={18} className="ContactSection__icon" />
-            <span className="ContactSection__text">{workingHours}</span>
+            <span className="ContactSection__text">{schedule}</span>
           </div>
         )}
 

@@ -4,9 +4,11 @@ import {
   createProfileMasterInfo,
   fetchOwnProfile,
   fetchProfileById,
+  removeProfileAvatar,
   updateProfileMasterInfo,
   updateProfileSkills,
   updateProfileUser,
+  uploadProfileAvatar,
 } from './profileThunks';
 import type { ProfileState } from './types';
 
@@ -40,6 +42,20 @@ const profileSlice = createSlice({
         state.data = action.payload;
         state.isOwner = false;
       })
+      .addCase(uploadProfileAvatar.fulfilled, (state, action) => {
+        if (state.data) {
+          state.data.avatarPath = `${action.payload.url}`;
+        }
+        state.updateStatus = 'succeeded';
+      })
+      .addCase(removeProfileAvatar.fulfilled, (state, action) => {
+        state.updateStatus = 'succeeded';
+        if (state.data) {
+          state.data.avatarPath = action.payload.avatarPath ?? state.data.avatarPath;
+        } else {
+          state.data = action.payload;
+        }
+      })
       .addCase(createProfileMasterInfo.fulfilled, (state, action) => {
         state.updateStatus = 'succeeded';
         state.data = action.payload;
@@ -65,6 +81,8 @@ const profileSlice = createSlice({
           updateProfileMasterInfo.pending,
           updateProfileSkills.pending,
           createProfileMasterInfo.pending,
+          uploadProfileAvatar.pending,
+          removeProfileAvatar.pending,
         ),
         (state) => {
           state.updateStatus = 'loading';
@@ -81,6 +99,8 @@ const profileSlice = createSlice({
           updateProfileMasterInfo.rejected,
           updateProfileSkills.rejected,
           createProfileMasterInfo.rejected,
+          uploadProfileAvatar.rejected,
+          removeProfileAvatar.rejected,
         ),
         (state, action) => {
           state.updateStatus = 'failed';

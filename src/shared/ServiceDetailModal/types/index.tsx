@@ -1,4 +1,6 @@
-﻿export interface ServiceDetailModalProps {
+﻿import type { UserExtended } from '@/redux-rtk/store/profile/types';
+
+export interface ServiceDetailModalProps {
   open: boolean;
   onClose: () => void;
   service: {
@@ -16,6 +18,7 @@
     tags?: string[];
     experience?: string;
     location?: string;
+    user?: UserExtended;
   };
   onOrder?: () => void;
   onMessage?: () => void;

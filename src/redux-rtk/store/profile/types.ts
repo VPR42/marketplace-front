@@ -111,3 +111,8 @@ export interface UpdateUserPayload {
 export type UpdateMasterInfoPayload = MasterInfo;
 
 export type UpdateSkillsPayload = number[];
+
+export interface UploadAvatarResponse {
+  filename: string;
+  url: string;
+}

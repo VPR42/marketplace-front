@@ -1,5 +1,6 @@
 ﻿import { Heart } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Loader, Modal } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
@@ -24,66 +25,77 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
   isFavorite,
   getInitials,
   isTogglingFavorite,
-}) => (
-  <div className="ServiceDetailModal__action-bar">
-    <div className="ServiceDetailModal__price-and-favorite">
-      <div className="ServiceDetailModal__price-top">
-        <div className="ServiceDetailModal__price">
-          <div className="ServiceDetailModal__price-label">Стоимость</div>
-          <div className="ServiceDetailModal__price-value ServiceDetailModal__price-value--dark">
-            от {service.price} ₽
+}) => {
+  const navigate = useNavigate();
+
+  const handleGoToMasterProfile = () => {
+    console.log(service);
+    navigate(`/profile/${service.user?.id}`);
+  };
+
+  return (
+    <div className="ServiceDetailModal__action-bar">
+      <div className="ServiceDetailModal__price-and-favorite">
+        <div className="ServiceDetailModal__price-top">
+          <div className="ServiceDetailModal__price">
+            <div className="ServiceDetailModal__price-label">Стоимость</div>
+            <div className="ServiceDetailModal__price-value ServiceDetailModal__price-value--dark">
+              от {service.price} ₽
+            </div>
+          </div>
+
+          <button
+            className={`ServiceDetailModal__favorite-btn ${isFavorite ? 'ServiceDetailModal__favorite-btn--active' : ''}`}
+            onClick={onFavorite}
+            disabled={isTogglingFavorite}
+          >
+            <Heart
+              className="ServiceDetailModal__favorite-icon"
+              size={16}
+              fill={isFavorite ? '#fff' : 'transparent'}
+            />
+            <span className="ServiceDetailModal__favorite-label">
+              {isTogglingFavorite ? (
+                <CustomLoader size="xs" />
+              ) : isFavorite ? (
+                'В избранном'
+              ) : (
+                'В избранное'
+              )}
+            </span>
+          </button>
+        </div>
+
+        <div className="ServiceDetailModal__actions">
+          <button className="ServiceDetailModal__message-btn" onClick={onMessage}>
+            Написать мастеру
+          </button>
+          <button className="ServiceDetailModal__order-btn" onClick={onOrder}>
+            Заказать
+          </button>
+        </div>
+      </div>
+
+      <div className="ServiceDetailModal__master-container">
+        <div className="ServiceDetailModal__master">
+          <div className="ServiceDetailModal__master-avatar">{getInitials(service.workerName)}</div>
+          <div className="ServiceDetailModal__master-info">
+            <div className="ServiceDetailModal__master-name">{service.workerName}</div>
+            {service.experience && (
+              <div className="ServiceDetailModal__master-experience">{service.experience}</div>
+            )}
           </div>
         </div>
-
-        <button
-          className={`ServiceDetailModal__favorite-btn ${isFavorite ? 'ServiceDetailModal__favorite-btn--active' : ''}`}
-          onClick={onFavorite}
-          disabled={isTogglingFavorite}
-        >
-          <Heart
-            className="ServiceDetailModal__favorite-icon"
-            size={16}
-            fill={isFavorite ? '#fff' : 'transparent'}
-          />
-          <span className="ServiceDetailModal__favorite-label">
-            {isTogglingFavorite ? (
-              <CustomLoader size="xs" />
-            ) : isFavorite ? (
-              'В избранном'
-            ) : (
-              'В избранное'
-            )}
-          </span>
-        </button>
-      </div>
-
-      <div className="ServiceDetailModal__actions">
-        <button className="ServiceDetailModal__message-btn" onClick={onMessage}>
-          Написать мастеру
-        </button>
-        <button className="ServiceDetailModal__order-btn" onClick={onOrder}>
-          Заказать
-        </button>
-      </div>
-    </div>
-
-    <div className="ServiceDetailModal__master-container">
-      <div className="ServiceDetailModal__master">
-        <div className="ServiceDetailModal__master-avatar">{getInitials(service.workerName)}</div>
-        <div className="ServiceDetailModal__master-info">
-          <div className="ServiceDetailModal__master-name">{service.workerName}</div>
-          {service.experience && (
-            <div className="ServiceDetailModal__master-experience">{service.experience}</div>
-          )}
+        <div className="ServiceDetailModal__master-actions">
+          <button className="ServiceDetailModal__master-btn" onClick={handleGoToMasterProfile}>
+            Профиль
+          </button>
+          <button className="ServiceDetailModal__master-btn">Написать</button>
         </div>
       </div>
-      <div className="ServiceDetailModal__master-actions">
-        <button className="ServiceDetailModal__master-btn">Профиль</button>
-        <button className="ServiceDetailModal__master-btn">Написать</button>
-      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   open,

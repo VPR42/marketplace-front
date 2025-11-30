@@ -10,7 +10,10 @@ import {
   Uploader,
 } from 'rsuite';
 
+import { useAppDispatch } from '@/redux-rtk/hooks';
+import { removeProfileAvatar, uploadProfileAvatar } from '@/redux-rtk/store/profile/profileThunks';
 import { cities } from '@/shared/data/cities';
+import { skillsMock } from '@/shared/data/skills';
 
 import './edit-user-profile.scss';
 
@@ -29,6 +32,7 @@ export interface EditUserProfileForm {
   endTime: string;
   skills: number[];
   avatarUrl?: string;
+  avatarFile?: File | null;
 }
 
 interface EditUserProfileModalProps {
@@ -55,6 +59,7 @@ const defaultForm: EditUserProfileForm = {
   endTime: '',
   skills: [],
   avatarUrl: '',
+  avatarFile: null,
 };
 
 const dayOptions = [
@@ -71,10 +76,11 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
   open,
   onClose,
   initialValues,
-  skillsOptions = [],
+  skillsOptions = skillsMock,
   showHint = false,
   onSubmit,
 }) => {
+  const dispatch = useAppDispatch();
   const formatPhone = (digits: string) => {
     const clean = digits.replace(/\D/g, '').slice(0, 11);
     const parts = [
@@ -98,6 +104,7 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
   const [form, setForm] = useState<EditUserProfileForm>({ ...defaultForm, ...initialValues });
   const [errors, setErrors] = useState<Partial<Record<keyof EditUserProfileForm, string>>>({});
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(initialValues?.avatarUrl);
+  const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
 
   useEffect(() => {
     if (open) {
@@ -136,23 +143,45 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
   ) => {
     const file = fileList.at(-1);
     if (file?.blobFile) {
-      const url = URL.createObjectURL(file.blobFile);
+      if (file.blobFile.size > MAX_AVATAR_SIZE) {
+        setErrors((prev) => ({ ...prev, avatarFile: 'Максимальный размер 5 МБ' }));
+        return;
+      }
+      const localUrl = URL.createObjectURL(file.blobFile);
       setAvatarPreview((prev) => {
         if (prev?.startsWith('blob:')) {
           URL.revokeObjectURL(prev);
         }
-        return url;
+        return localUrl;
       });
-      handleChange('avatarUrl', url);
+      dispatch(uploadProfileAvatar(file.blobFile))
+        .unwrap()
+        .then((res) => {
+          handleChange('avatarUrl', res.url);
+          handleChange('avatarFile', null);
+          setAvatarPreview(res.url);
+        })
+        .catch((error) => {
+          setErrors((prev) => ({
+            ...prev,
+            avatarFile: (error as string) || 'Не удалось загрузить аватар',
+          }));
+        });
     }
   };
 
   const handleRemoveAvatar = () => {
-    if (avatarPreview?.startsWith('blob:')) {
-      URL.revokeObjectURL(avatarPreview);
-    }
-    setAvatarPreview(undefined);
-    handleChange('avatarUrl', '');
+    dispatch(removeProfileAvatar())
+      .unwrap()
+      .then((res) => {
+        const nextUrl = 'avatarPath' in res ? res.avatarPath : undefined;
+        setAvatarPreview(nextUrl);
+        handleChange('avatarUrl', nextUrl ?? '');
+        handleChange('avatarFile', null);
+      })
+      .catch((error) => {
+        setErrors((prev) => ({ ...prev, avatarFile: (error as string) || 'Не удалось удалить' }));
+      });
   };
 
   const validate = () => {
@@ -204,6 +233,10 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
       nextErrors.daysOfWeek = 'Выберите дни недели';
     }
 
+    if (form.avatarFile && form.avatarFile.size > MAX_AVATAR_SIZE) {
+      nextErrors.avatarFile = 'Максимальный размер 5 МБ';
+    }
+
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   };
@@ -225,10 +258,10 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
     [],
   );
 
-  const mappedSkillsOptions = useMemo(
-    () => skillsOptions.map((skill) => ({ label: skill.name, value: skill.id })),
-    [skillsOptions],
-  );
+  const mappedSkillsOptions = useMemo(() => {
+    const source = skillsOptions?.length ? skillsOptions : skillsMock;
+    return source.map((skill) => ({ label: skill.name, value: skill.id }));
+  }, [skillsOptions]);
 
   return (
     <Modal open={open} onClose={onClose} className="edit-profile-modal" size="md" overflow={false}>
@@ -248,8 +281,9 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
               multiple={false}
               onChange={handleAvatarUpload}
               action="#"
+              accept="image/jpeg, image/png, image/gif, image/webp, image/bmp, image/jpg, .pptx"
             >
-              <Button appearance="primary" size="sm">
+              <Button appearance="primary" size="sm" className="btn-upl">
                 Загрузить фото
               </Button>
             </Uploader>

@@ -1,5 +1,5 @@
 import { Calendar, Edit, MapPin, Share2 } from 'lucide-react';
-import { Button, Heading } from 'rsuite';
+import { Button, Heading, Loader } from 'rsuite';
 
 import { useAppSelector } from '@/redux-rtk/hooks';
 import type { User } from '@/redux-rtk/store/auth/types';
@@ -18,23 +18,33 @@ interface ProfileHeaderProps {
 
 export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   user,
-  ordersCount = 0,
   successRate,
   canEdit,
   onEdit,
   onShare,
 }) => {
-  const fullName = user ? `${user.surname} ${user.name} ${user.patronymic}`.trim() : 'Пользователь';
-  const { data: profile } = useAppSelector((state) => state.profile);
+  const fullName = user ? `${user.surname} ${user.name} ${user.patronymic}`.trim() : '';
+  const { data: profile, status } = useAppSelector((state) => state.profile);
+  const loadingProfile = status === 'loading' && !user;
   const joinYear = user?.createdAt ? new Date(user.createdAt).getFullYear() : null;
   const cityLabel = user?.city ? cities.find((c) => c.value === user.city)?.label : null;
+
+  const fallbackAvatar =
+    !user?.avatarPath && fullName
+      ? `https://avatar.iran.liara.run/username?username=${encodeURIComponent(fullName)}`
+      : undefined;
+  const avatarSrc = user?.avatarPath ?? fallbackAvatar;
 
   return (
     <div className="ProfileHeader">
       <div className="ProfileHeader__content">
         <div className="ProfileHeader__avatar">
-          {user?.avatarPath ? (
-            <img src={user.avatarPath} alt={fullName} />
+          {loadingProfile ? (
+            <div className="ProfileHeader__avatar-loader">
+              <Loader size="sm" content="" />
+            </div>
+          ) : avatarSrc ? (
+            <img src={avatarSrc} alt={fullName || 'Аватар'} />
           ) : (
             <div className="ProfileHeader__avatar-placeholder">
               <span>
@@ -51,7 +61,7 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
         <div className="ProfileHeader__info">
           <Heading level={2} className="ProfileHeader__name">
-            {fullName}
+            {user ? fullName : loadingProfile ? <Loader size="sm" content="" /> : ''}
           </Heading>
 
           <div className="ProfileHeader__meta">
@@ -89,13 +99,21 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
         <div className="ProfileHeader__actions">
           {onShare && (
-            <Button appearance="subtle" onClick={onShare} className="ProfileHeader__share-btn">
+            <Button
+              appearance="primary"
+              onClick={onShare}
+              className="ProfileHeader__share-btn white-btn"
+            >
               <Share2 size={16} />
               <span>Поделиться</span>
             </Button>
           )}
           {canEdit && onEdit && (
-            <Button appearance="primary" onClick={onEdit} className="ProfileHeader__edit-btn">
+            <Button
+              appearance="primary"
+              onClick={onEdit}
+              className="ProfileHeader__edit-btn orange-btn"
+            >
               <Edit size={16} />
               <span>Редактировать</span>
             </Button>

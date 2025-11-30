@@ -1,5 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+import { skillsMock } from '@/shared/data/skills';
+
 import type { CategoryWithCount, Skill, Tag } from './types';
 import { fetchCategories, fetchSkills, fetchTags } from './utilsThunks';
 
@@ -14,7 +16,7 @@ interface UtilsState {
 const initialState: UtilsState = {
   categories: [],
   tags: [],
-  skills: [],
+  skills: skillsMock,
   status: 'idle',
   error: null,
 };
@@ -59,7 +61,8 @@ const utilsSlice = createSlice({
       })
       .addCase(fetchSkills.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.error.message ?? 'Не удалось загрузить навыки';
+        state.skills = skillsMock;
+        state.error = action.error.message ?? 'Не удалось загрузить навыки, показаны мок-данные';
       });
   },
 });

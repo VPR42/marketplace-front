@@ -17,7 +17,7 @@ import {
 import { fetchServices } from '@/redux-rtk/store/services/servicesThunks';
 import type { Service } from '@/redux-rtk/store/services/types';
 import type { Skill } from '@/redux-rtk/store/utils/types';
-import { fetchSkills } from '@/redux-rtk/store/utils/utilsThunks';
+import { ServiceCreationModal } from '@/shared/ServiceCreationModal/ui';
 import { getWeekDayShort } from '@/shared/utils/weekDays';
 
 import { AboutSection } from './AboutSection';
@@ -70,10 +70,8 @@ export const ProfilePage = () => {
   const [hasShownOnboarding, setHasShownOnboarding] = useState(
     Boolean(sessionStorage.getItem('profileOnboardingShown')),
   );
-
-  useEffect(() => {
-    dispatch(fetchSkills());
-  }, [dispatch]);
+  const [shareCopied, setShareCopied] = useState(false);
+  const [openServiceModal, setOpenServiceModal] = useState(false);
 
   useEffect(() => {
     if (userId) {
@@ -167,10 +165,21 @@ export const ProfilePage = () => {
   const handleEditProfile = () => setEditModalOpen(true);
   const handleEditAbout = () => setEditModalOpen(true);
   const handleEditSkills = () => setEditModalOpen(true);
-  const handleAddService = () => {};
   const handleServiceClick = (_serviceId: string) => {};
+  const handleOpenServiceModal = () => setOpenServiceModal(true);
   const handleEditContact = () => setEditModalOpen(true);
-  const handleShare = () => {};
+  const handleShare = async () => {
+    try {
+      const base = window.location.origin;
+      const targetId = userId || profile?.id || currentUser?.id;
+      const link = targetId ? `${base}/profile/${targetId}` : window.location.href;
+      await navigator.clipboard.writeText(link);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2500);
+    } catch (error) {
+      setShareCopied(false);
+    }
+  };
   const handleMessage = () => {};
 
   const editInitialValues: EditUserProfileForm = {
@@ -293,6 +302,9 @@ export const ProfilePage = () => {
             onEdit={handleEditProfile}
             onShare={handleShare}
           />
+          {shareCopied && (
+            <div className="ProfilePage__share-toast">Ссылка скопирована в буфер обмена!</div>
+          )}
 
           <AboutSection text={profileAbout} canEdit={canEdit} onEdit={handleEditAbout} />
 
@@ -303,7 +315,7 @@ export const ProfilePage = () => {
           <ServicesSection
             services={userServices}
             canEdit={canEdit}
-            onAddService={handleAddService}
+            onAddService={handleOpenServiceModal}
             onServiceClick={handleServiceClick}
           />
         </div>
@@ -318,7 +330,9 @@ export const ProfilePage = () => {
               profile?.masterInfo?.startTime &&
               profile?.masterInfo?.endTime &&
               profile.masterInfo?.daysOfWeek
-                ? `${profile.masterInfo.daysOfWeek.map((el) => getWeekDayShort(el))}, ${profile.masterInfo.startTime} - ${profile.masterInfo.endTime}`
+                ? `${profile.masterInfo.daysOfWeek
+                    .map((el) => getWeekDayShort(el))
+                    .join(', ')}, ${profile.masterInfo.startTime} - ${profile.masterInfo.endTime}`
                 : undefined
             }
             canEdit={canEdit}
@@ -342,6 +356,14 @@ export const ProfilePage = () => {
             (!profile?.masterInfo?.description || (profile?.skills?.length ?? 0) === 0)
           }
           onSubmit={handleProfileSubmit}
+        />
+      )}
+      {openServiceModal && (
+        <ServiceCreationModal
+          open={openServiceModal}
+          onClose={() => setOpenServiceModal(false)}
+          mode="create"
+          onSubmit={() => setOpenServiceModal(false)}
         />
       )}
     </div>
