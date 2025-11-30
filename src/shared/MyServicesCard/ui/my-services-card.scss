@@ -21,6 +21,30 @@
     }
   }
 
+  &__left {
+    position: relative;
+    width: 180px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    overflow: hidden;
+    border-radius: 10px;
+  }
+
+  &__left-text {
+    text-align: center;
+    max-width: 80%;
+    color: #fff;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+  }
+
   &__center {
     flex: 1;
     display: flex;
@@ -36,6 +60,64 @@
   &__meta {
     display: flex;
     align-items: center;
+    margin-top: 4px;
+  }
+
+  &__worker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    &-img {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    &-placeholder {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #ddd;
+      color: #111;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    &-name {
+      font-size: 14px;
+      color: #111;
+      font-weight: 500;
+    }
+  }
+
+  &__cover {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.2s ease;
+  }
+
+  &__cover-fallback {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.08);
+  }
+
+  &__cover-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: 1;
   }
 
   &__time {
@@ -110,8 +192,13 @@
   }
 
   &__writeBtn {
-    background-color: #e65400;
+    background-color: var(--orange);
     color: #fff;
+
+    &:hover {
+      background-color: var(--orange-hover);
+      color: #fff;
+    }
   }
 
   &__deleteBtn {
