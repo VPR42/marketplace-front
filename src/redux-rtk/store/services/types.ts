@@ -31,8 +31,9 @@ export interface ServiceQueryParams {
   masterId?: string;
   query?: string;
   categoryId?: number;
-  skills?: string[];
+  skills?: number[];
   tags?: number[];
+  fromFavourites?: boolean;
   minPrice?: number;
   maxPrice?: number;
   experience?: number;
@@ -41,6 +42,7 @@ export interface ServiceQueryParams {
   priceSort?: 'ASC' | 'DESC';
   ordersCountSort?: 'ASC' | 'DESC';
   experienceSort?: 'ASC' | 'DESC';
+  signal?: AbortSignal;
 }
 
 export interface Pageable {
