@@ -1,60 +1,51 @@
 /* eslint-disable import/no-duplicates */
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { useState } from 'react';
 /* eslint-enable import/no-duplicates */
-
-import { useEffect } from 'react';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
 import type { FavoritesListProps } from '@/pages/FavoritesPage/types';
-import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import { useAppSelector } from '@/redux-rtk/hooks';
 import {
-  addToFavorites,
-  fetchFavorites,
-  removeFromFavorites,
-} from '@/redux-rtk/store/favorites/favoriteThunks';
-import { selectFavorites, selectFavoritesStatus } from '@/redux-rtk/store/favorites/selectors';
+  selectFilteredFavorites,
+  selectFavoritesStatus,
+  selectAllFavorites,
+} from '@/redux-rtk/store/favorites/selectors';
 import { MyServiceCard } from '@/shared/MyServicesCard/ui';
 
 import './FavoritesPage.scss';
 
-export const FavoritesList: React.FC<FavoritesListProps> = ({ filterCategory = 'Все' }) => {
-  const dispatch = useAppDispatch();
-  const favorites = useAppSelector(selectFavorites);
-  const status = useAppSelector(selectFavoritesStatus);
-
-  useEffect(() => {
-    dispatch(fetchFavorites());
-  }, [dispatch]);
-
-  const filteredFavorites = favorites.filter((it) => {
-    if (filterCategory === 'Все') {
-      return true;
-    }
-    return it.category?.name === filterCategory;
-  });
-
-  const handleToggle = async (id: string, makeFavorite: boolean) => {
-    try {
-      if (makeFavorite) {
-        await dispatch(addToFavorites(id)).unwrap();
-        // await dispatch(fetchFavorites()); // крч тут прикол что если делать рефетч и ты убрал допустим 2 случайно то если одну из них обратно добавить то у тя вторая пропадет ибо на беке она уже не в избранном да
-      } else {
-        await dispatch(removeFromFavorites(id)).unwrap();
-      }
-    } catch (err) {
-      console.error('Не удалось обновить избранное:', err);
-      throw err;
-    }
-  };
+export const FavoritesList: React.FC<FavoritesListProps> = ({ loadingState, onToggle }) => {
+  const allFavorites = useAppSelector(selectAllFavorites);
+  const filtered = useAppSelector(selectFilteredFavorites);
+  const favoritesStatus = useAppSelector(selectFavoritesStatus);
+  const status = loadingState ?? favoritesStatus;
+  const [togglingIds, setTogglingIds] = useState(new Set());
 
   const handleProfile = (id: string) => {
-    console.log('профиль', id);
+    console.warn('профиль', id);
   };
 
   const handleMessage = (id: string) => {
-    console.log('написать', id);
+    console.warn('написать', id);
   };
+
+  const handleToggle = async (id: string, makeFav: boolean) => {
+    setTogglingIds((prev) => new Set(prev).add(id));
+    try {
+      await onToggle?.(id, makeFav);
+    } finally {
+      setTogglingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(id);
+        return newSet;
+      });
+    }
+  };
+
+  const hasFavorites = (allFavorites?.length ?? 0) > 0;
+  const hasFiltered = (filtered?.length ?? 0) > 0;
 
   if (status === 'loading') {
     return (
@@ -64,19 +55,29 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ filterCategory = '
     );
   }
 
-  if (favorites.length === 0) {
-    return <div className="FavoritesPage__list--empty">В избранном пока пусто.</div>;
+  if (hasFavorites && !hasFiltered) {
+    return (
+      <div className="FavoritesPage__empty">
+        <div className="FavoritesPage__empty-title">Ничего не найдено</div>
+        <div className="FavoritesPage__empty-sub">Попробуйте изменить параметры фильтра</div>
+      </div>
+    );
   }
 
-  if (filteredFavorites.length === 0) {
-    return <div className="FavoritesPage__list--empty">Нет избранных услуг в этой категории.</div>;
+  if (!hasFavorites) {
+    return (
+      <div className="FavoritesPage__empty">
+        <div className="FavoritesPage__empty-title">Избранное пусто</div>
+        <div className="FavoritesPage__empty-sub">
+          Сохраните понравившиеся услуги, чтобы увидеть их здесь.
+        </div>
+      </div>
+    );
   }
-
-  // console.log(filteredFavorites);
 
   return (
     <div className="FavoritesPage__list">
-      {filteredFavorites.map((it) => (
+      {filtered.map((it) => (
         <MyServiceCard
           mode="favorite"
           key={it.id}
@@ -97,6 +98,7 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ filterCategory = '
           onMessage={handleMessage}
           onToggle={handleToggle}
           isFavorite={true}
+          isToggling={togglingIds.has(it.id)}
         />
       ))}
     </div>

@@ -5,14 +5,23 @@ import type { FavoritesState } from './types';
 
 const initialState: FavoritesState = {
   items: [],
+  filtered: [],
   status: 'idle',
   error: null,
+  filterParams: null,
 };
 
 const favoritesSlice = createSlice({
   name: 'favorites',
   initialState,
-  reducers: {},
+  reducers: {
+    setFiltered(state, action) {
+      state.filtered = action.payload;
+    },
+    setFilterParams(state, action) {
+      state.filterParams = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchFavorites.pending, (state) => {
@@ -21,7 +30,11 @@ const favoritesSlice = createSlice({
       })
       .addCase(fetchFavorites.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.items = action.payload;
+
+        state.filtered = action.payload;
+        if (!state.items.length) {
+          state.items = action.payload;
+        }
       })
       .addCase(fetchFavorites.rejected, (state, action) => {
         state.status = 'failed';
@@ -32,15 +45,11 @@ const favoritesSlice = createSlice({
         state.error = action.payload ?? action.error?.message ?? 'Failed to add favorite';
       })
 
-      // если удалять из стора еще надо то рассскоментируйте
-      // .addCase(removeFromFavorites.fulfilled, (state, action) => {
-      //   state.items = state.items.filter((it) => it.id !== action.payload);
-      // })
-
       .addCase(removeFromFavorites.rejected, (state, action) => {
         state.error = action.payload ?? action.error?.message ?? 'Failed to remove favorite';
       });
   },
 });
 
+export const { setFiltered, setFilterParams } = favoritesSlice.actions;
 export default favoritesSlice.reducer;
