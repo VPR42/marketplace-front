@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Container, Header, Content } from 'rsuite';
 
+import { FavoritesList } from '@/pages/FavoritesPage/ui/FavoritesList';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
 import {
   addToFavorites,
@@ -13,8 +14,6 @@ import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
 import { fetchCategories } from '@/redux-rtk/store/utils/utilsThunks';
 import { FiltersGroup } from '@/shared/FilterGroup';
 import { CategoryTabs } from '@/shared/FilterTabs';
-
-import { FavoritesList } from './FavoritesList';
 
 import './FavoritesPage.scss';
 import { SearchInput } from '@/shared/SearchInput';

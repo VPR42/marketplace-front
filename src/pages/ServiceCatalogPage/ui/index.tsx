@@ -1,7 +1,7 @@
 ﻿import { Plus } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Input, Pagination, SelectPicker } from 'rsuite';
+import { Button, Pagination } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
 import { PaymentModal, PaymentResultModal } from '@/pages/MyOrdersPage/ui/modals';
@@ -11,7 +11,7 @@ import {
   fetchFavorites,
   removeFromFavorites,
 } from '@/redux-rtk/store/favorites/favoriteThunks';
-import { selectFavorites } from '@/redux-rtk/store/favorites/selectors';
+import { selectFilteredFavorites } from '@/redux-rtk/store/favorites/selectors';
 import { selectServicesState } from '@/redux-rtk/store/services/selectors';
 import { fetchServices } from '@/redux-rtk/store/services/servicesThunks';
 import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
@@ -23,6 +23,7 @@ import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 import { ServiceOrderModal } from '@/shared/ServiceModal/ui';
 
 import './service-catalog.scss';
+import { FiltersGroup } from '@/shared/FilterGroup';
 
 const experienceOptions = [
   { label: 'Все', value: null },
@@ -50,7 +51,7 @@ export const ServiceCatalogPage: React.FC = () => {
   const { items, totalPages, status } = useAppSelector(selectServicesState);
 
   const { categories } = useAppSelector(selectUtilsState);
-  const favorites = useAppSelector(selectFavorites);
+  const favorites = useAppSelector(selectFilteredFavorites);
 
   const navigate = useNavigate();
 
@@ -299,73 +300,30 @@ export const ServiceCatalogPage: React.FC = () => {
       <CategoryTabs categories={categoryTabs} active={activeTab} onChange={handleCategoryChange} />
 
       <div className="ServiceCatalog__filters">
-        <div className="ServiceCatalog__filter-group">
-          <span className="ServiceCatalog__filter-label">Опыт: </span>
-
-          <SelectPicker
-            data={experienceOptions}
-            value={experience}
-            placeholder="Любой"
-            onChange={(value) => {
-              setExperience(value as number | null);
-
-              setPageNumber(0);
-            }}
-            style={{ width: 180 }}
-          />
-        </div>
-
-        <div className="ServiceCatalog__filter-group">
-          <span className="ServiceCatalog__filter-label">Цена: </span>
-
-          <div className="ServiceCatalog__price-inputs">
-            <Input
-              value={minPrice}
-              onChange={(val) => setMinPrice(val.trim())}
-              placeholder="От"
-              type="number"
-            />
-
-            <Input
-              value={maxPrice}
-              onChange={(val) => setMaxPrice(val.trim())}
-              placeholder="До"
-              type="number"
-            />
-          </div>
-
-          {priceError ? <span className="ServiceCatalog__error">{priceError}</span> : null}
-        </div>
-
-        <div className="ServiceCatalog__filter-group ServiceCatalog__filter-group--sort">
-          <span className="ServiceCatalog__filter-label">Сортировка: </span>
-
-          <div className="ServiceCatalog__filter-group--sort--pickers">
-            <SelectPicker
-              data={sortOptions}
-              value={priceSort}
-              placeholder="Цена"
-              onChange={(val) => {
-                setPriceSort((val as 'ASC' | 'DESC' | null) ?? null);
-
-                setPageNumber(0);
-              }}
-              style={{ width: 160 }}
-            />
-
-            <SelectPicker
-              data={sortOptions}
-              value={experienceSort}
-              placeholder="Опыт"
-              onChange={(val) => {
-                setExperienceSort((val as 'ASC' | 'DESC' | null) ?? null);
-
-                setPageNumber(0);
-              }}
-              style={{ width: 160 }}
-            />
-          </div>
-        </div>
+        <FiltersGroup
+          experience={experience}
+          onExperienceChange={(v) => {
+            setExperience(v);
+            setPageNumber(0);
+          }}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          onMinPriceChange={setMinPrice}
+          onMaxPriceChange={setMaxPrice}
+          priceError={priceError || undefined}
+          priceSort={priceSort}
+          experienceSort={experienceSort}
+          onPriceSortChange={(v) => {
+            setPriceSort(v);
+            setPageNumber(0);
+          }}
+          onExperienceSortChange={(v) => {
+            setExperienceSort(v);
+            setPageNumber(0);
+          }}
+          experienceOptions={experienceOptions as { label: string; value: number | null }[]}
+          sortOptions={sortOptions as { label: string; value: 'ASC' | 'DESC' }[]}
+        />
       </div>
 
       <div className="ServiceCatalog__grid">
