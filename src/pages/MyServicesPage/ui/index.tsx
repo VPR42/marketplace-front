@@ -88,9 +88,9 @@ export const MyServicesPage: React.FC = () => {
     () => ['Все категории', ...availableCategories.map((c) => c.name)],
     [availableCategories],
   );
-  const isLoading = status === 'loading' || status === 'idle';
-  const showList = status === 'succeeded' && myItems.length > 0;
-  const showEmpty = status === 'succeeded' && myItems.length === 0;
+  const isLoading = pageLoading || status === 'loading' || status === 'idle';
+  const showList = !isLoading && status === 'succeeded' && myItems.length > 0;
+  const showEmpty = !isLoading && status === 'succeeded' && myItems.length === 0;
 
   const handleModalOpen = (mode: modalMode, service?: Service) => {
     setModalMode(mode);
