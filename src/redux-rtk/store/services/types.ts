@@ -1,5 +1,5 @@
 ﻿import type { UserExtended } from '../profile/types';
-import type { Category } from '../utils/types';
+import type { Category, Tag } from '../utils/types';
 
 export interface Service {
   id: string;
@@ -10,7 +10,7 @@ export interface Service {
   createdAt: string;
   user: UserExtended;
   category: Category;
-  tags: number[];
+  tags: Tag[];
   ordersCount: number;
 }
 

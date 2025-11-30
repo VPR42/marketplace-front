@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Tag } from 'rsuite';
+import { Button } from 'rsuite';
+
 
 import './my-services-card.scss';
 import { CustomLoader } from '@/components/CustomLoader/ui';
@@ -203,22 +204,6 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
           </>
         ) : (
           <div className="MyServiceCard__right--my">
-            {mode === 'my' && status && (
-              <Tag
-                color={
-                  status === 'Активна'
-                    ? 'green'
-                    : status === 'Отклонена'
-                      ? 'red'
-                      : status === 'На модерации'
-                        ? 'orange'
-                        : undefined
-                }
-                className="MyServiceCard__status"
-              >
-                {status}
-              </Tag>
-            )}
             <div className="MyServiceCard__actions--my">
               <Button className="MyServiceCard__editBtn" onClick={() => onEdit?.(id)}>
                 Редактировать

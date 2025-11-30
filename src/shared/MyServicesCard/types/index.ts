@@ -12,7 +12,6 @@ export interface MyServiceCardProps {
   tags?: string[];
   gradient?: string;
   createdAt?: string;
-  status?: string;
   workerName?: string;
   timeAgo?: string;
   isFavorite?: boolean;
