@@ -3,12 +3,12 @@ import { Button } from 'rsuite';
 
 import { myServices } from '@/shared/data/myServices';
 import { CategoryTabs } from '@/shared/FilterTabs';
-import { ServiceOrderModal } from '@/shared/ServiceModal/ui';
 import './my-services.scss';
 
 import { Plus } from 'lucide-react';
 
 import { MyServiceCard } from '@/shared/MyServicesCard/ui';
+import { ServiceCreationModal } from '@/shared/ServiceCreationModal/ui';
 
 export type modalMode = 'create' | 'edit';
 
@@ -62,7 +62,7 @@ export const MyServicesPage: React.FC = () => {
       </div>
 
       {openServiceModal && (
-        <ServiceOrderModal
+        <ServiceCreationModal
           open={openServiceModal}
           onClose={() => setOpenServiceModal(false)}
           mode={modalMode}

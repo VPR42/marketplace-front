@@ -7,7 +7,7 @@
   coverUrl?: string;
 }
 
-export interface ServiceOrderModalProps {
+export interface ServiceCreationProps {
   open: boolean;
   onClose: () => void;
   mode: 'create' | 'edit';

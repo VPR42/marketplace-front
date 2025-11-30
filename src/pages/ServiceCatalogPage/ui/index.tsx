@@ -16,14 +16,14 @@ import { selectServicesState } from '@/redux-rtk/store/services/selectors';
 import { fetchServices } from '@/redux-rtk/store/services/servicesThunks';
 import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
 import { fetchCategories } from '@/redux-rtk/store/utils/utilsThunks';
+import { FiltersGroup } from '@/shared/FilterGroup';
 import { CategoryTabs } from '@/shared/FilterTabs';
 import { SearchInput } from '@/shared/SearchInput';
 import { ServiceCard } from '@/shared/ServiceCard/ui';
+import { ServiceCreationModal } from '@/shared/ServiceCreationModal/ui';
 import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
-import { ServiceOrderModal } from '@/shared/ServiceModal/ui';
 
 import './service-catalog.scss';
-import { FiltersGroup } from '@/shared/FilterGroup';
 
 const experienceOptions = [
   { label: 'Все', value: null },
@@ -372,7 +372,7 @@ export const ServiceCatalogPage: React.FC = () => {
       )}
 
       {openServiceModal && (
-        <ServiceOrderModal
+        <ServiceCreationModal
           open={openServiceModal}
           onClose={() => setOpenServiceModal(false)}
           mode="create"
