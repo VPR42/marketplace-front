@@ -22,7 +22,8 @@ export const MyOrderCard: React.FC<MyOrderCardProps> = ({
   role = 'customer',
   onAction,
 }) => {
-  const badge = statusToBadge[status];
+  const badge =
+    (statusToBadge as Record<string, { label: string; className: string }>)[status] ?? null;
 
   const actions =
     role === 'worker'

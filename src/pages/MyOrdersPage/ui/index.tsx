@@ -6,7 +6,7 @@ import { Button, Pagination } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
-import { fetchOrders } from '@/redux-rtk/store/orders/ordersThunks';
+import { fetchOrders, updateOrderStatus } from '@/redux-rtk/store/orders/ordersThunks';
 import {
   selectOrders,
   selectOrdersLoading,
@@ -41,6 +41,24 @@ const statusLabels: Record<OrderStatus, string> = {
   completed: 'Завершён',
   cancelled: 'Отменён',
   rejected: 'Не выполнен',
+};
+
+const serverStatus: Record<
+  'created' | 'working' | 'completed' | 'cancelled' | 'rejected' | 'other',
+  number
+> = {
+  created: 0,
+  working: 1,
+  completed: 2,
+  cancelled: 3,
+  rejected: 4,
+  other: 5,
+} as const;
+
+const actionToStatus: Record<'start' | 'complete' | 'cancel', number> = {
+  start: serverStatus.working,
+  complete: serverStatus.completed,
+  cancel: serverStatus.cancelled,
 };
 
 export const MyOrdersPage: React.FC = () => {
@@ -102,6 +120,26 @@ export const MyOrdersPage: React.FC = () => {
 
   const [currentPage, setCurrentPage] = useState(reduxPageNumber);
 
+  const normalizeStatus = (s?: string): OrderStatus => {
+    if (!s) {
+      return 'created';
+    }
+    const v = s.toLowerCase();
+    if (v.includes('work') || v.includes('in_progress') || v.includes('progress')) {
+      return 'working';
+    }
+    if (v.includes('complete') || v.includes('done') || v.includes('finished')) {
+      return 'completed';
+    }
+    if (v.includes('cancel')) {
+      return 'cancelled';
+    }
+    if (v.includes('reject') || v.includes('failed')) {
+      return 'rejected';
+    }
+    return v as unknown as OrderStatus;
+  };
+
   useEffect(() => {
     const params: OrdersQueryParams = {
       pageNumber: currentPage - 1,
@@ -127,7 +165,7 @@ export const MyOrdersPage: React.FC = () => {
       created: o.orderedAt
         ? `${formatDistanceToNow(new Date(o.orderedAt), { locale: ru })} назад`
         : '',
-      status: o.status as OrderStatus,
+      status: normalizeStatus(o.status),
       description: o.jobDescription ?? '',
       categoryId: o.categoryId ?? 0,
       categoryLabel: o.categoryName ?? '',
@@ -192,6 +230,7 @@ export const MyOrdersPage: React.FC = () => {
             key={order.id}
             {...order}
             role={activeRole}
+            status={order.status}
             onClick={() => {
               setSelectedOrder(order);
               setIsDetailOpen(true);
@@ -261,7 +300,41 @@ export const MyOrdersPage: React.FC = () => {
           type={actionModal.type}
           role={actionModal.role}
           onClose={() => setActionModal({ type: null, order: null, role: 'customer' })}
-          onConfirm={() => setActionModal({ type: null, order: null, role: 'customer' })}
+          onConfirm={async () => {
+            if (!actionModal.order || !actionModal.type) {
+              return;
+            }
+
+            const orderId = Number(actionModal.order.id);
+
+            let statusNum: number;
+
+            if (actionModal.type === 'complete' && actionModal.role === 'worker') {
+              statusNum = serverStatus.cancelled;
+            } else {
+              statusNum = actionToStatus[actionModal.type];
+            }
+
+            if (!Number.isInteger(orderId) || statusNum === undefined) {
+              console.warn('Invalid orderId or status mapping', { orderId, statusNum });
+              setActionModal({ type: null, order: null, role: 'customer' });
+              return;
+            }
+
+            await dispatch(updateOrderStatus({ orderId, status: statusNum }));
+
+            dispatch(
+              fetchOrders({
+                pageNumber: currentPage - 1,
+                pageSize: reduxPageSize,
+                status: activeStatus === 'all' ? undefined : activeStatus,
+                categoryId: activeCategoryId ?? undefined,
+                search: searchTerm.trim() || undefined,
+              }),
+            );
+
+            setActionModal({ type: null, order: null, role: 'customer' });
+          }}
         />
       )}
     </div>

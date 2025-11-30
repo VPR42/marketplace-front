@@ -41,3 +41,15 @@ export const createOrder = createAsyncThunk<CreateOrderResponse, { jobId: string
     }
   },
 );
+
+export const updateOrderStatus = createAsyncThunk<
+  CreateOrderResponse,
+  { orderId: number; status: number }
+>('orders/updateOrderStatus', async ({ orderId, status }, { rejectWithValue }) => {
+  try {
+    const response = await api.put(`/orders/${orderId}/status`, { status });
+    return response.data as CreateOrderResponse;
+  } catch (err: unknown) {
+    return rejectWithValue(getOrdersError(err, 'Не удалось обновить статус заказа'));
+  }
+});

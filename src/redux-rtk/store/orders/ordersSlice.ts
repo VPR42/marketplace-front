@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-import { createOrder, fetchOrders } from '@/redux-rtk/store/orders/ordersThunks';
+import { createOrder, fetchOrders, updateOrderStatus } from '@/redux-rtk/store/orders/ordersThunks';
 import type { OrdersState } from '@/redux-rtk/store/orders/types';
 
 const initialState: OrdersState = {
@@ -36,6 +36,29 @@ export const ordersSlice = createSlice({
         state.loading = false;
       })
       .addCase(createOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(updateOrderStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateOrderStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        if (state.data?.items) {
+          const index = state.data.items.findIndex(
+            (o) => String(o.orderId) === String(action.payload.id),
+          );
+          if (index !== -1) {
+            state.data.items[index] = {
+              ...state.data.items[index],
+              status: action.payload.status,
+            };
+          }
+        }
+      })
+      .addCase(updateOrderStatus.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
