@@ -58,6 +58,8 @@ export const ServiceCatalogPage: React.FC = () => {
   const [searchParams] = useSearchParams();
 
   const initialSearch = searchParams.get('search') ?? '';
+  const initialCategoryIdParam = searchParams.get('categoryId');
+  const initialCategoryId = initialCategoryIdParam ? Number(initialCategoryIdParam) : null;
 
   const shouldOpenCreate = searchParams.get('create') === 'service';
 
@@ -71,7 +73,9 @@ export const ServiceCatalogPage: React.FC = () => {
 
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
 
-  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [categoryId, setCategoryId] = useState<number | null>(
+    Number.isNaN(initialCategoryId) ? null : initialCategoryId,
+  );
 
   const [experience, setExperience] = useState<number | null>(null);
 
@@ -194,6 +198,13 @@ export const ServiceCatalogPage: React.FC = () => {
   useEffect(() => {
     setSearchTerm(initialSearch);
   }, [initialSearch]);
+
+  useEffect(() => {
+    const param = searchParams.get('categoryId');
+    const value = param ? Number(param) : null;
+    setCategoryId(Number.isNaN(value) ? null : value);
+    setPageNumber(0);
+  }, [searchParams]);
 
   const categoryTabs = useMemo(
     () => ['Все', ...categories.map((c) => c.category.name)],
