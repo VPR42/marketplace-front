@@ -1,0 +1,87 @@
+.ServiceDeleteModal {
+  .rs-modal-content {
+    border-radius: 16px;
+    padding: 14px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16);
+  }
+
+  &__header {
+    border-bottom: none;
+    padding: 4px 12px 0;
+  }
+
+  &__title {
+    font-weight: 700;
+    font-size: 20px;
+  }
+
+  &__body {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 12px 4px;
+  }
+
+  &__text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #2d2d2d;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__line {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  &__sub {
+    font-size: 13px;
+    color: #666;
+    margin-top: -4px;
+  }
+
+  &__button {
+    min-width: 120px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  &__button--danger {
+    background-color: var(--orange);
+    border-color: var(--orange);
+    color: #fff;
+
+    &:hover {
+      background-color: var(--orange-hover);
+      border-color: var(--orange-hover);
+    }
+
+    &:disabled,
+    &.rs-btn-disabled,
+    &[aria-disabled='true'],
+    &.rs-btn-loading {
+      background-color: var(--orange);
+      border-color: var(--orange);
+      color: #fff;
+      opacity: 1;
+    }
+  }
+
+  &__button--secondary {
+    background: #f5f5f5;
+    color: #555;
+    border-color: #e2e2e2;
+  }
+
+  &__footer {
+    border-top: none;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 4px;
+  }
+}

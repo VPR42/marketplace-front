@@ -11,9 +11,24 @@
 
   &__topBar {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__tabs {
+    flex: 1 1 260px;
+    min-width: 240px;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 0 0 auto;
+    gap: 12px;
   }
 
   &__createBtn {
@@ -27,9 +42,20 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
+    flex: 0 0 auto;
 
     &:hover {
       background-color: var(--orange-hover);
+    }
+
+    &:disabled,
+    &.rs-btn-disabled,
+    &[aria-disabled='true'] {
+      background-color: var(--orange);
+      color: white;
+      opacity: 1;
+      cursor: pointer;
     }
   }
 
@@ -37,5 +63,37 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+  }
+
+  &__list--loader {
+    display: flex;
+    justify-content: center;
+    padding: 32px 0;
+  }
+
+  &__empty {
+    padding: 32px;
+    border: 1px dashed #d9d9d9;
+    border-radius: 12px;
+    text-align: center;
+    color: #555;
+  }
+
+  &__empty-title {
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  &__empty-sub {
+    color: #777;
+  }
+
+  &__body {
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
   }
 }
