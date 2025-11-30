@@ -10,7 +10,6 @@ export interface MyServiceCardProps {
   image?: string;
   tags?: string[];
   createdAt?: string;
-  status?: string;
   workerName?: string;
   timeAgo?: string;
   isFavorite?: boolean;
