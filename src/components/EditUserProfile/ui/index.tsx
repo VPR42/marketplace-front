@@ -36,6 +36,7 @@ interface EditUserProfileModalProps {
   onClose: () => void;
   initialValues?: Partial<EditUserProfileForm>;
   skillsOptions?: { id: number; name: string }[];
+  showHint?: boolean;
   onSubmit?: (form: EditUserProfileForm) => void;
 }
 
@@ -71,8 +72,29 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
   onClose,
   initialValues,
   skillsOptions = [],
+  showHint = false,
   onSubmit,
 }) => {
+  const formatPhone = (digits: string) => {
+    const clean = digits.replace(/\D/g, '').slice(0, 11);
+    const parts = [
+      clean.slice(0, 1),
+      clean.slice(1, 4),
+      clean.slice(4, 7),
+      clean.slice(7, 9),
+      clean.slice(9, 11),
+    ];
+    if (!parts[0]) {
+      return '';
+    }
+    const country = `+${parts[0]}`;
+    const city = parts[1] ? ` (${parts[1]}${parts[1].length === 3 ? ')' : ''}` : '';
+    const first = parts[2] ? ` ${parts[2]}` : '';
+    const second = parts[3] ? `-${parts[3]}` : '';
+    const third = parts[4] ? `-${parts[4]}` : '';
+    return `${country}${city}${first}${second}${third}`;
+  };
+
   const [form, setForm] = useState<EditUserProfileForm>({ ...defaultForm, ...initialValues });
   const [errors, setErrors] = useState<Partial<Record<keyof EditUserProfileForm, string>>>({});
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(initialValues?.avatarUrl);
@@ -106,7 +128,7 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
 
   const handlePhoneChange = (value: string) => {
     const numeric = value.replace(/\D/g, '');
-    handleChange('phone', numeric);
+    handleChange('phone', numeric.slice(0, 11));
   };
 
   const handleAvatarUpload = (
@@ -239,6 +261,13 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
           </div>
         </div>
 
+        {showHint && (
+          <p className="edit-profile-modal__hint">
+            Укажите информацию о себе в полном объеме. Без нее вы не сможете создавать услуги и
+            принимать заказы!
+          </p>
+        )}
+
         <div className="edit-profile-modal__fields">
           <div className="edit-profile-modal__field">
             <label htmlFor="surname">Фамилия</label>
@@ -305,8 +334,8 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
             <label htmlFor="phone">Телефон</label>
             <Input
               id="phone"
-              value={form.phone}
-              placeholder="79991234567"
+              value={formatPhone(form.phone)}
+              placeholder="+7 (___) ___-__-__"
               onChange={handlePhoneChange}
             />
             {errors.phone ? <span className="input-error-text">{errors.phone}</span> : null}

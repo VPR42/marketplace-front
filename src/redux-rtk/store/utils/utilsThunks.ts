@@ -29,6 +29,6 @@ export const fetchTags = createAsyncThunk<Tag[]>('utils/fetchTags', async () => 
 });
 
 export const fetchSkills = createAsyncThunk<Skill[]>('utils/fetchSkills', async () => {
-  const { data } = await api.get<Skill[]>('/profile/skills');
+  const { data } = await api.get<Skill[]>('/skills');
   return data;
 });

@@ -23,7 +23,16 @@ export const fetchOwnProfile = createAsyncThunk<Profile, void, { rejectValue: st
   async (_, { rejectWithValue }) => {
     try {
       const { data } = await api.get<Profile>('/profile');
-      return data;
+      const normPhoneMas = Array.from(data.masterInfo.phoneNumber);
+      normPhoneMas.unshift('7');
+      const normPhone = normPhoneMas.join('');
+      return {
+        ...data,
+        masterInfo: {
+          ...data.masterInfo,
+          phoneNumber: normPhone,
+        },
+      };
     } catch (error: unknown) {
       return rejectWithValue(getProfileError(error, 'Не удалось получить профиль'));
     }
@@ -61,7 +70,11 @@ export const updateProfileMasterInfo = createAsyncThunk<
   { rejectValue: string }
 >('profile/updateMasterInfo', async (payload, { rejectWithValue }) => {
   try {
-    const { data } = await api.patch<Profile>('/profile/master-info', payload);
+    const validPhone = payload.phoneNumber.slice(1);
+    const { data } = await api.patch<Profile>('/profile/master-info', {
+      ...payload,
+      phoneNumber: validPhone,
+    });
     return data;
   } catch (error: unknown) {
     return rejectWithValue(getProfileError(error, 'Не удалось обновить мастер-инфо'));

@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Loader } from 'rsuite';
 
 import type { EditUserProfileForm } from '@/components/EditUserProfile';
 import { EditUserProfileModal } from '@/components/EditUserProfile';
@@ -13,8 +14,11 @@ import {
   updateProfileSkills,
   updateProfileUser,
 } from '@/redux-rtk/store/profile/profileThunks';
+import { fetchServices } from '@/redux-rtk/store/services/servicesThunks';
+import type { Service } from '@/redux-rtk/store/services/types';
 import type { Skill } from '@/redux-rtk/store/utils/types';
 import { fetchSkills } from '@/redux-rtk/store/utils/utilsThunks';
+import { getWeekDayShort } from '@/shared/utils/weekDays';
 
 import { AboutSection } from './AboutSection';
 import { ContactSection } from './ContactSection';
@@ -37,15 +41,35 @@ interface BasicService {
   workerAvatar?: string;
 }
 
+const mapServicesToCards = (services: Service[]): BasicService[] =>
+  services.map((service) => ({
+    id: service.id,
+    title: service.name,
+    description: service.description,
+    price: service.price,
+    orders: service.ordersCount,
+    workerName: `${service.user.surname} ${service.user.name}`,
+    workerAvatar: service.user.avatarPath,
+    gradient: service.coverUrl,
+  }));
+
 export const ProfilePage = () => {
   const { userId } = useParams<{ userId?: string }>();
   const dispatch = useAppDispatch();
 
   const { user: currentUser, isAuthenticated } = useAppSelector(selectAuthState);
-  const { data: profile, isOwner } = useAppSelector((state) => state.profile);
+  const {
+    data: profile,
+    isOwner,
+    status: profileStatus,
+  } = useAppSelector((state) => state.profile);
+  const servicesState = useAppSelector((state) => state.services);
   const utilsState = useAppSelector((state) => state.utils);
 
   const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [hasShownOnboarding, setHasShownOnboarding] = useState(
+    Boolean(sessionStorage.getItem('profileOnboardingShown')),
+  );
 
   useEffect(() => {
     dispatch(fetchSkills());
@@ -60,10 +84,28 @@ export const ProfilePage = () => {
   }, [dispatch, userId]);
 
   useEffect(() => {
-    if (profile && isOwner && (!profile.masterInfo?.description || profile.skills.length === 0)) {
-      setEditModalOpen(true);
+    if (profile?.id) {
+      dispatch(
+        fetchServices({
+          masterId: profile.id,
+          pageSize: 6,
+        }),
+      );
     }
-  }, [isOwner, profile]);
+  }, [dispatch, profile?.id]);
+
+  useEffect(() => {
+    if (
+      profile &&
+      isOwner &&
+      !hasShownOnboarding &&
+      (!profile.masterInfo?.description || profile.skills.length === 0)
+    ) {
+      setEditModalOpen(true);
+      setHasShownOnboarding(true);
+      sessionStorage.setItem('profileOnboardingShown', 'true');
+    }
+  }, [hasShownOnboarding, isOwner, profile]);
 
   const skillsMap = useMemo(
     () =>
@@ -81,7 +123,39 @@ export const ProfilePage = () => {
 
   const isMaster = Boolean(profile?.masterInfo);
 
-  const userServices: BasicService[] = [];
+  const userServices: BasicService[] = mapServicesToCards(servicesState.items || []);
+  const recentOrders = profile
+    ? [
+        {
+          id: 1,
+          title: 'Монтаж проводки',
+          price: 6500,
+          date: '18.01.2025',
+          status: 'cancelled' as const,
+        },
+        {
+          id: 2,
+          title: 'Сборка мебели',
+          price: 4500,
+          date: '12.01.2025',
+          status: 'cancelled' as const,
+        },
+        {
+          id: 3,
+          title: 'Установка техники',
+          price: 2300,
+          date: '10.01.2025',
+          status: 'completed' as const,
+        },
+        {
+          id: 4,
+          title: 'Установка розеток',
+          price: 1200,
+          date: '05.01.2025',
+          status: 'completed' as const,
+        },
+      ]
+    : [];
 
   const canEdit = isOwner && isAuthenticated;
   const canShowEditButton = canEdit;
@@ -187,6 +261,26 @@ export const ProfilePage = () => {
     }
   };
 
+  const handleCloseModal = () => {
+    setEditModalOpen(false);
+    if (
+      isOwner &&
+      !hasShownOnboarding &&
+      (!profile?.masterInfo?.description || (profile?.skills?.length ?? 0) === 0)
+    ) {
+      setHasShownOnboarding(true);
+      sessionStorage.setItem('profileOnboardingShown', 'true');
+    }
+  };
+
+  if (profileStatus === 'loading' && !profile) {
+    return (
+      <div className="ProfilePage ProfilePage__loader">
+        <Loader center content="Загрузка профиля..." />
+      </div>
+    );
+  }
+
   return (
     <div className="ProfilePage">
       <div className="ProfilePage__container">
@@ -206,14 +300,12 @@ export const ProfilePage = () => {
             <SkillsSection skills={profileSkills} canEdit={canEdit} onEdit={handleEditSkills} />
           )}
 
-          {isMaster && (
-            <ServicesSection
-              services={userServices}
-              canEdit={canEdit}
-              onAddService={handleAddService}
-              onServiceClick={handleServiceClick}
-            />
-          )}
+          <ServicesSection
+            services={userServices}
+            canEdit={canEdit}
+            onAddService={handleAddService}
+            onServiceClick={handleServiceClick}
+          />
         </div>
 
         <div className="ProfilePage__sidebar">
@@ -222,8 +314,11 @@ export const ProfilePage = () => {
             email={profile?.email}
             cityId={profile?.city}
             workingHours={
-              isMaster && profile?.masterInfo?.startTime && profile?.masterInfo?.endTime
-                ? `${profile.masterInfo.startTime} - ${profile.masterInfo.endTime}`
+              isMaster &&
+              profile?.masterInfo?.startTime &&
+              profile?.masterInfo?.endTime &&
+              profile.masterInfo?.daysOfWeek
+                ? `${profile.masterInfo.daysOfWeek.map((el) => getWeekDayShort(el))}, ${profile.masterInfo.startTime} - ${profile.masterInfo.endTime}`
                 : undefined
             }
             canEdit={canEdit}
@@ -231,16 +326,21 @@ export const ProfilePage = () => {
             onMessage={!canEdit ? handleMessage : undefined}
           />
 
-          {isMaster && <RecentOrdersSection orders={[]} />}
+          <RecentOrdersSection orders={recentOrders} />
         </div>
       </div>
 
       {canShowEditButton && (
         <EditUserProfileModal
           open={isEditModalOpen}
-          onClose={() => setEditModalOpen(false)}
+          onClose={handleCloseModal}
           initialValues={editInitialValues}
           skillsOptions={utilsState.skills}
+          showHint={
+            !hasShownOnboarding &&
+            isOwner &&
+            (!profile?.masterInfo?.description || (profile?.skills?.length ?? 0) === 0)
+          }
           onSubmit={handleProfileSubmit}
         />
       )}

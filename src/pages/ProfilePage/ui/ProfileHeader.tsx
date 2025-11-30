@@ -1,7 +1,9 @@
-import { Edit, MapPin, Calendar, Share2 } from 'lucide-react';
+import { Calendar, Edit, MapPin, Share2 } from 'lucide-react';
 import { Button, Heading } from 'rsuite';
 
+import { useAppSelector } from '@/redux-rtk/hooks';
 import type { User } from '@/redux-rtk/store/auth/types';
+import { cities } from '@/shared/data/cities';
 
 import './profile.scss';
 
@@ -23,8 +25,9 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   onShare,
 }) => {
   const fullName = user ? `${user.surname} ${user.name} ${user.patronymic}`.trim() : 'Пользователь';
-
+  const { data: profile } = useAppSelector((state) => state.profile);
   const joinYear = user?.createdAt ? new Date(user.createdAt).getFullYear() : null;
+  const cityLabel = user?.city ? cities.find((c) => c.value === user.city)?.label : null;
 
   return (
     <div className="ProfileHeader">
@@ -52,10 +55,10 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           </Heading>
 
           <div className="ProfileHeader__meta">
-            {user?.city && (
+            {cityLabel && (
               <div className="ProfileHeader__meta-item">
                 <MapPin size={16} />
-                <span>Москва</span>
+                <span>{cityLabel}</span>
               </div>
             )}
             {joinYear && (
@@ -66,15 +69,17 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             )}
           </div>
 
-          {ordersCount > 0 && (
+          {user && (
             <div className="ProfileHeader__stats">
               <div className="ProfileHeader__stat">
-                <span className="ProfileHeader__stat-value">{ordersCount}</span>
+                <span className="ProfileHeader__stat-value">{profile?.orders.ordersCount}</span>
                 <span className="ProfileHeader__stat-label">Заказов выполнено</span>
               </div>
               {successRate !== undefined && (
                 <div className="ProfileHeader__stat">
-                  <span className="ProfileHeader__stat-value">{successRate}%</span>
+                  <span className="ProfileHeader__stat-value">
+                    {profile?.orders.completedPercent}%
+                  </span>
                   <span className="ProfileHeader__stat-label">Успешных заказов</span>
                 </div>
               )}
