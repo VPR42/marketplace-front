@@ -342,7 +342,7 @@ export const ServiceCatalogPage: React.FC = () => {
               workerAvatar={service.user.avatarPath}
               onClick={() => {
                 setSelectedServiceId(service.id);
-
+                console.log(service.tags);
                 setOpenDetailModal(true);
               }}
             />
@@ -412,7 +412,7 @@ export const ServiceCatalogPage: React.FC = () => {
 
             category: selectedService.category.name,
 
-            tags: selectedService.tags.map(String),
+            tags: selectedService.tags.map((elem) => elem.name),
 
             experience: selectedService.user.master?.experience
               ? `${selectedService.user.master.experience} лет опыта`

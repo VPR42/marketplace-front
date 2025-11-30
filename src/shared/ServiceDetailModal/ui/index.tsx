@@ -2,10 +2,11 @@
 import { useState } from 'react';
 import { Loader, Modal } from 'rsuite';
 
+import { CustomLoader } from '@/components/CustomLoader/ui';
+
 import type { ServiceDetailModalProps } from '../types';
 
 import './service-detail-modal.scss';
-import { CustomLoader } from '@/components/CustomLoader/ui';
 
 const getInitialsFromTitle = (title: string) => {
   const parts = title.split(' ').filter(Boolean);
