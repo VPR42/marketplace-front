@@ -55,6 +55,20 @@ export interface FavoriteJob {
 
 export interface FavoritesState {
   items: FavoriteJob[];
+  filtered: FavoriteJob[];
+  filterParams: FetchFavoritesParams | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
+
+export type FetchFavoritesParams = {
+  page?: number;
+  pageSize?: number;
+  query?: string | null;
+  categoryId?: number | null;
+  experience?: number | null;
+  minPrice?: number;
+  maxPrice?: number;
+  priceSort?: 'ASC' | 'DESC' | null;
+  experienceSort?: 'ASC' | 'DESC' | null;
+};
