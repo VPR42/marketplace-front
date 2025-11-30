@@ -12,6 +12,7 @@ import {
   removeFromFavorites,
 } from '@/redux-rtk/store/favorites/favoriteThunks';
 import { selectFilteredFavorites } from '@/redux-rtk/store/favorites/selectors';
+import { createOrder } from '@/redux-rtk/store/orders/ordersThunks';
 import { selectServicesState } from '@/redux-rtk/store/services/selectors';
 import { fetchServices } from '@/redux-rtk/store/services/servicesThunks';
 import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
@@ -342,7 +343,7 @@ export const ServiceCatalogPage: React.FC = () => {
               workerAvatar={service.user.avatarPath}
               onClick={() => {
                 setSelectedServiceId(service.id);
-                console.log(service.tags);
+                console.warn(service.tags);
                 setOpenDetailModal(true);
               }}
             />
@@ -421,11 +422,14 @@ export const ServiceCatalogPage: React.FC = () => {
             location: selectedService.user.city.name,
           }}
           onOrder={() => {
-            setOpenDetailModal(false);
-
-            setOpenServiceModal(true);
+            dispatch(createOrder({ jobId: selectedService.id }))
+              .unwrap()
+              .then(() => {
+                setOpenDetailModal(false);
+              })
+              .catch(() => {});
           }}
-          onMessage={() => console.log('Написать мастеру')}
+          onMessage={() => console.warn('Написать мастеру')}
           isFavorite={isFavorite}
           onFavorite={() => {
             const currentlyFavorite = favorites.some((f) => f.id === selectedService.id);

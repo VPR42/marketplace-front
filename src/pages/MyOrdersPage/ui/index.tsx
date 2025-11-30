@@ -1,4 +1,6 @@
-import { formatDistanceToNow, ru } from 'date-fns';
+/* eslint-disable import/no-duplicates */
+import { formatDistanceToNow } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Pagination } from 'rsuite';
 
@@ -13,6 +15,7 @@ import {
 import type { OrdersQueryParams } from '@/redux-rtk/store/orders/types';
 import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
 import { fetchCategories } from '@/redux-rtk/store/utils/utilsThunks';
+import { CategoryTabs } from '@/shared/FilterTabs';
 import { SearchInput } from '@/shared/SearchInput';
 import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 
@@ -20,8 +23,6 @@ import type { ApiOrderItem, OrderItem, OrderStatus } from '../types';
 import { OrderActionModal } from './modals';
 import './my-orders.scss';
 import { MyOrderCard } from './MyOrderCard';
-
-import { CategoryTabs } from '@/shared/FilterTabs';
 
 type StatusFilter = OrderStatus | 'all';
 
