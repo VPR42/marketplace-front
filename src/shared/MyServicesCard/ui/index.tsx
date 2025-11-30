@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Tag } from 'rsuite';
 
 import './my-services-card.scss';
@@ -15,11 +15,13 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   category,
   price,
   location,
-  image,
+  cover,
   tags = [],
   createdAt,
   status,
-  workerName,
+  workerName = 'Без имени',
+  gradient,
+  workerAvatar,
   timeAgo,
   onEdit,
   onDelete,
@@ -29,7 +31,35 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   isToggling,
   isFavorite = false,
 }) => {
+  const initials = useMemo(() => {
+    const parts = workerName.split(' ').filter(Boolean);
+    const first = parts[0]?.[0];
+    const second = parts[1]?.[0];
+    const res = `${first ?? ''}${second ?? ''}`.toUpperCase();
+    return res || 'A';
+  }, [workerName]);
   const [fav, setFav] = useState<boolean>(Boolean(isFavorite));
+
+  const [avatarSrc, setAvatarSrc] = useState(workerAvatar);
+  const [avatarLoaded, setAvatarLoaded] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
+
+  const [coverLoaded, setCoverLoaded] = useState(false);
+  const [coverError, setCoverError] = useState(false);
+
+  useEffect(() => {
+    setAvatarSrc(workerAvatar);
+    setAvatarLoaded(false);
+    setAvatarError(false);
+  }, [workerAvatar]);
+
+  useEffect(() => {
+    setCoverLoaded(false);
+    setCoverError(false);
+  }, [cover]);
+
+  const showAvatarPlaceholder = !avatarSrc || avatarError || !avatarLoaded;
+  const showCover = Boolean(cover) && !coverError;
 
   useEffect(() => {
     setFav(Boolean(isFavorite));
@@ -49,12 +79,26 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
 
   return (
     <div className={`MyServiceCard MyServiceCard--${mode}`}>
-      <div className="MyServiceCard__left">
-        {image ? (
-          <img className="MyServiceCard__thumb" src={image} alt={title} />
-        ) : (
-          <div className="MyServiceCard__thumb MyServiceCard__thumb--placeholder" />
+      <div className="MyServiceCard__left" style={{ background: gradient }}>
+        {showCover && (
+          <>
+            {!coverLoaded && !coverError && (
+              <div className="MyServiceCard__cover-loader">
+                <CustomLoader size="sm" content="" />
+              </div>
+            )}
+            <img
+              className="MyServiceCard__cover"
+              src={cover}
+              alt={title}
+              onLoad={() => setCoverLoaded(true)}
+              onError={() => setCoverError(true)}
+              style={{ opacity: coverLoaded ? 1 : 0 }}
+            />
+          </>
         )}
+        {!showCover && <div className="MyServiceCard__cover-fallback" />}
+        <span className="MyServiceCard__left-text">{title}</span>
       </div>
 
       <div className="MyServiceCard__center">
@@ -63,7 +107,26 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
 
           {mode === 'favorite' && (
             <div className="MyServiceCard__meta">
-              {workerName && <span className="MyServiceCard__worker">{workerName}</span>}
+              {workerName && (
+                <>
+                  <div className="MyServiceCard__worker">
+                    {showAvatarPlaceholder ? (
+                      <div className="MyServiceCard__worker-placeholder">{initials}</div>
+                    ) : null}
+                    {!avatarError && avatarSrc ? (
+                      <img
+                        className="MyServiceCard__worker-img"
+                        src={avatarSrc}
+                        alt={workerName}
+                        onError={() => setAvatarError(true)}
+                        onLoad={() => setAvatarLoaded(true)}
+                        style={{ display: showAvatarPlaceholder ? 'none' : 'block' }}
+                      />
+                    ) : null}
+                    <span className="MyServiceCard__worker">{workerName}</span>
+                  </div>
+                </>
+              )}
               {timeAgo && <span className="MyServiceCard__time"> • {timeAgo}</span>}
             </div>
           )}

@@ -83,14 +83,16 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ loadingState, onTo
           key={it.id}
           id={it.id}
           title={it.name}
+          gradient="linear-gradient(135deg, #4facfe, #00f2fe)"
           workerName={it.user?.master?.pseudonym}
+          workerAvatar={it.user?.avatarPath ?? ''}
           timeAgo={formatDistanceToNow(parseISO(it.createdAt), {
             addSuffix: true,
             locale: ru,
           })}
           description={it.description}
           price={it.price}
-          image={it.coverUrl ?? undefined}
+          cover={it.coverUrl ?? undefined}
           category={it.category?.name}
           location={it.user?.city?.name ?? undefined}
           tags={it.tags?.map((t) => t.name)}
