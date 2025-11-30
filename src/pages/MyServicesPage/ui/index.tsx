@@ -1,4 +1,3 @@
-import ru, { formatDistanceToNowStrict, parseISO } from 'date-fns';
 import { Plus } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from 'rsuite';
@@ -19,6 +18,40 @@ import { SearchInput } from '@/shared/SearchInput';
 import { ServiceCreationModal } from '@/shared/ServiceCreationModal/ui';
 import { ServiceDeleteModal } from '@/shared/ServiceDeleteModal';
 import './my-services.scss';
+
+const formatTimeAgo = (dateString?: string) => {
+  if (!dateString) {
+    return undefined;
+  }
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    return undefined;
+  }
+
+  const diffMs = Date.now() - date.getTime();
+  const sec = Math.floor(diffMs / 1000);
+  if (sec < 45) {
+    return 'только что';
+  }
+  const min = Math.floor(sec / 60);
+  if (min < 60) {
+    return `${min} мин назад`;
+  }
+  const hours = Math.floor(min / 60);
+  if (hours < 24) {
+    return `${hours} ч назад`;
+  }
+  const days = Math.floor(hours / 24);
+  if (days < 30) {
+    return `${days} дн назад`;
+  }
+  const months = Math.floor(days / 30);
+  if (months < 12) {
+    return `${months} мес назад`;
+  }
+  const years = Math.floor(months / 12);
+  return `${years} г назад`;
+};
 
 export type modalMode = 'create' | 'edit';
 
@@ -358,12 +391,7 @@ export const MyServicesPage: React.FC = () => {
                 service.coverUrl && !service.coverUrl.includes('placehold.co')
                   ? service.coverUrl
                   : undefined;
-              const createdLabel = service.createdAt
-                ? formatDistanceToNowStrict(parseISO(service.createdAt), {
-                    addSuffix: true,
-                    locale: ru,
-                  })
-                : undefined;
+              const createdLabel = formatTimeAgo(service.createdAt);
               return (
                 <MyServiceCard
                   mode="my"
