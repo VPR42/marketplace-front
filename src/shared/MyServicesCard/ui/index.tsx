@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from 'rsuite';
 
-
 import './my-services-card.scss';
 import { CustomLoader } from '@/components/CustomLoader/ui';
 import type { MyServiceCardProps } from '@/shared/MyServicesCard/types';
@@ -19,7 +18,6 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   cover,
   tags = [],
   createdAt,
-  status,
   workerName = 'Без имени',
   gradient,
   workerAvatar,
