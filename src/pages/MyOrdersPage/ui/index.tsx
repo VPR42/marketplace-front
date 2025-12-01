@@ -2,10 +2,12 @@
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button, Pagination } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import { createChat } from '@/redux-rtk/store/chats/chatsThunks';
 import { fetchOrders, updateOrderStatus } from '@/redux-rtk/store/orders/ordersThunks';
 import {
   selectOrders,
@@ -62,6 +64,7 @@ const actionToStatus: Record<'start' | 'complete' | 'cancel', number> = {
 };
 
 export const MyOrdersPage: React.FC = () => {
+  const dispatch = useAppDispatch();
   const [activeStatus, setActiveStatus] = useState<StatusFilter>(() => {
     const saved = localStorage.getItem('myOrdersStatus') as StatusFilter | null;
     if (saved && (saved === 'all' || statusFilters.some((s) => s.value === saved))) {
@@ -88,7 +91,6 @@ export const MyOrdersPage: React.FC = () => {
     role: 'customer' | 'worker';
   }>({ type: null, order: null, role: 'customer' });
 
-  const dispatch = useAppDispatch();
   const { categories, status: utilsStatus } = useAppSelector(selectUtilsState);
   const {
     totalCount,
@@ -96,6 +98,7 @@ export const MyOrdersPage: React.FC = () => {
     pageSize: reduxPageSize,
   } = useAppSelector(selectOrdersPagination);
   const isLoading = useAppSelector(selectOrdersLoading);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (utilsStatus === 'idle') {
@@ -261,6 +264,38 @@ export const MyOrdersPage: React.FC = () => {
             )
           )}
         </div>
+        {filteredOrders.length > 0 ? (
+          filteredOrders.map((order) => (
+            <MyOrderCard
+              key={order.id}
+              {...order}
+              role={activeRole}
+              onClick={() => {
+                setSelectedOrder(order);
+                setIsDetailOpen(true);
+              }}
+              onAction={async (actionType) => {
+                if (actionType === 'message') {
+                  try {
+                    const res = await dispatch(createChat({ orderId: order.id })).unwrap();
+                    navigate(`/chats/${res.chatId}`);
+                  } catch (e) {
+                    console.error('Create chat failed', e);
+                  }
+                  return;
+                } else if (
+                  actionType === 'start' ||
+                  actionType === 'complete' ||
+                  actionType === 'cancel'
+                ) {
+                  setActionModal({ type: actionType, order, role: activeRole });
+                }
+              }}
+            />
+          ))
+        ) : (
+          <div className="MyOrders__empty">Заказы не найдены</div>
+        )}
       </div>
 
       {selectedOrder && (
