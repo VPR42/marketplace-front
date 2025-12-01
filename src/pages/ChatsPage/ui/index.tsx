@@ -1,5 +1,6 @@
 import classNames from 'classnames';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Loader, Message } from 'rsuite';
 
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
@@ -49,7 +50,12 @@ export const ChatsPage = () => {
   const [messageText, setMessageText] = useState('');
   const [showDetails, setShowDetails] = useState(true);
   const socketRef = useRef<WebSocket | null>(null);
+  const socketChatIdRef = useRef<string | null>(null);
+  const reconnectingForChatRef = useRef<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wasConnectedRef = useRef(false);
+  const [connectionInfo, setConnectionInfo] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(fetchChats());
@@ -66,27 +72,65 @@ export const ChatsPage = () => {
     if (!currentChatId || !user?.id) {
       return;
     }
-    const socket = new WebSocket(
-      `wss://hack.kinoko.su/ws/chat?chat=${currentChatId}&uid=${user.id}`,
-    );
-    socketRef.current = socket;
 
-    socket.onopen = () => dispatch(setWsConnected(true));
-    socket.onclose = () => dispatch(setWsConnected(false));
-    socket.onerror = () => dispatch(setWsConnected(false));
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data?.chatId && data?.content) {
-          dispatch(addMessage(data));
-        }
-      } catch {
-        // ignore parse errors
+    const connect = () => {
+      if (!currentChatId || !user?.id) {
+        return;
       }
+      dispatch(setWsConnected(false));
+      const socket = new WebSocket(
+        `wss://hack.kinoko.su/ws/chat?chat=${currentChatId}&uid=${user.id}`,
+      );
+      socketRef.current = socket;
+      socketChatIdRef.current = currentChatId;
+      reconnectingForChatRef.current = currentChatId;
+
+      socket.onopen = () => {
+        dispatch(setWsConnected(true));
+        if (!wasConnectedRef.current) {
+          wasConnectedRef.current = true;
+        } else {
+          setConnectionInfo('Соединение восстановлено');
+          setTimeout(() => setConnectionInfo(null), 2000);
+        }
+        reconnectingForChatRef.current = null;
+      };
+
+      const scheduleReconnect = () => {
+        dispatch(setWsConnected(false));
+        if (reconnectTimeoutRef.current) {
+          clearTimeout(reconnectTimeoutRef.current);
+        }
+        if (currentChatId && reconnectingForChatRef.current === currentChatId) {
+          reconnectTimeoutRef.current = setTimeout(connect, 3000);
+        }
+      };
+
+      socket.onclose = scheduleReconnect;
+      socket.onerror = scheduleReconnect;
+
+      socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data?.chatId && data?.content) {
+            dispatch(addMessage(data));
+          }
+        } catch {
+          // ignore parse errors
+        }
+      };
     };
 
+    connect();
+
     return () => {
-      socket.close();
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+      }
+      socketRef.current?.close();
+      socketRef.current = null;
+      socketChatIdRef.current = null;
+      reconnectingForChatRef.current = null;
       dispatch(setWsConnected(false));
     };
   }, [currentChatId, user?.id, dispatch]);
@@ -106,7 +150,9 @@ export const ChatsPage = () => {
     if (
       !messageText.trim() ||
       !socketRef.current ||
-      socketRef.current.readyState !== WebSocket.OPEN
+      socketRef.current.readyState !== WebSocket.OPEN ||
+      socketChatIdRef.current !== currentChatId ||
+      !wsConnected
     ) {
       return;
     }
@@ -116,6 +162,10 @@ export const ChatsPage = () => {
     };
     socketRef.current.send(JSON.stringify(payload));
     setMessageText('');
+  };
+  const navigate = useNavigate();
+  const handleGoToProfile = () => {
+    navigate(`/profile/${currentChatmate?.chatmateId}`);
   };
 
   const groupedMessages = useMemo(() => {
@@ -211,6 +261,7 @@ export const ChatsPage = () => {
         {!wsConnected && currentChatId ? (
           <div className="chats__ws-warning">Нет соединения. Попробуйте обновить страницу.</div>
         ) : null}
+        {connectionInfo ? <div className="chats__ws-warning">{connectionInfo}</div> : null}
 
         <div className="chats__messages">
           {groupedMessages.map((group) => (
@@ -263,7 +314,9 @@ export const ChatsPage = () => {
             {currentChatmate.name} {currentChatmate.surname}
           </div>
           <div className="chats__details-desc">{currentChatmate.description}</div>
-          <button className="chats__details-profile">Перейти в профиль</button>
+          <button className="chats__details-profile" onClick={handleGoToProfile}>
+            Перейти в профиль
+          </button>
         </div>
       ) : null}
     </div>
