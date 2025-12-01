@@ -1,10 +1,9 @@
 ﻿import { Plus } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Button, Pagination } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
-import { PaymentModal, PaymentResultModal } from '@/pages/MyOrdersPage/ui/modals';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
 import {
   addToFavorites,
@@ -12,6 +11,7 @@ import {
   removeFromFavorites,
 } from '@/redux-rtk/store/favorites/favoriteThunks';
 import { selectFilteredFavorites } from '@/redux-rtk/store/favorites/selectors';
+import { createOrder } from '@/redux-rtk/store/orders/ordersThunks';
 import { selectServicesState } from '@/redux-rtk/store/services/selectors';
 import { fetchServices } from '@/redux-rtk/store/services/servicesThunks';
 import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
@@ -53,11 +53,11 @@ export const ServiceCatalogPage: React.FC = () => {
   const { categories } = useAppSelector(selectUtilsState);
   const favorites = useAppSelector(selectFilteredFavorites);
 
-  const navigate = useNavigate();
-
   const [searchParams] = useSearchParams();
 
   const initialSearch = searchParams.get('search') ?? '';
+  const initialCategoryIdParam = searchParams.get('categoryId');
+  const initialCategoryId = initialCategoryIdParam ? Number(initialCategoryIdParam) : null;
 
   const shouldOpenCreate = searchParams.get('create') === 'service';
 
@@ -71,7 +71,9 @@ export const ServiceCatalogPage: React.FC = () => {
 
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
 
-  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [categoryId, setCategoryId] = useState<number | null>(
+    Number.isNaN(initialCategoryId) ? null : initialCategoryId,
+  );
 
   const [experience, setExperience] = useState<number | null>(null);
 
@@ -90,16 +92,6 @@ export const ServiceCatalogPage: React.FC = () => {
   const [pageNumber, setPageNumber] = useState(0);
 
   // const [_orderFormKey, setOrderFormKey] = useState(0);
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [paymentResult, setPaymentResult] = useState<{
-    open: boolean;
-    status: 'success' | 'error';
-    methodMask: string;
-  }>({
-    open: false,
-    status: 'success',
-    methodMask: '',
-  }); //from khasso
 
   useEffect(() => {
     dispatch(fetchCategories({ jobsCountSort: 'DESC', query: null }));
@@ -194,6 +186,13 @@ export const ServiceCatalogPage: React.FC = () => {
   useEffect(() => {
     setSearchTerm(initialSearch);
   }, [initialSearch]);
+
+  useEffect(() => {
+    const param = searchParams.get('categoryId');
+    const value = param ? Number(param) : null;
+    setCategoryId(Number.isNaN(value) ? null : value);
+    setPageNumber(0);
+  }, [searchParams]);
 
   const categoryTabs = useMemo(
     () => ['Все', ...categories.map((c) => c.category.name)],
@@ -342,7 +341,7 @@ export const ServiceCatalogPage: React.FC = () => {
               workerAvatar={service.user.avatarPath}
               onClick={() => {
                 setSelectedServiceId(service.id);
-                console.log(service.tags);
+                console.warn(service.tags);
                 setOpenDetailModal(true);
               }}
             />
@@ -422,55 +421,20 @@ export const ServiceCatalogPage: React.FC = () => {
             user: selectedService.user,
           }}
           onOrder={() => {
-            setOpenDetailModal(false);
-
-            setOpenServiceModal(true);
+            dispatch(createOrder({ jobId: selectedService.id }))
+              .unwrap()
+              .then(() => {
+                setOpenDetailModal(false);
+              })
+              .catch(() => {});
           }}
-          onMessage={() => console.log('Написать мастеру')}
+          onMessage={() => console.warn('Написать мастеру')}
           isFavorite={isFavorite}
           onFavorite={() => {
             const currentlyFavorite = favorites.some((f) => f.id === selectedService.id);
             handleToggleFavorite(selectedService.id, !currentlyFavorite);
           }}
           isTogglingFavorite={togglingFavoriteId === selectedService.id}
-        />
-      )}
-
-      {selectedService && (
-        <PaymentModal
-          open={isPaymentModalOpen}
-          title="Оплата услуги"
-          serviceTitle={selectedService.name}
-          price={Number(selectedService.price)}
-          fee={0}
-          methods={[
-            { id: 'card1', brand: 'Mastercard', masked: '•••• 1234', expire: '08/27' },
-            { id: 'card2', brand: 'Visa', masked: '•••• 9876', expire: '01/29' },
-          ]}
-          onClose={() => setIsPaymentModalOpen(false)}
-          onConfirm={(methodId) => {
-            const methodMask = methodId === 'card2' ? '•••• 9876' : '•••• 1234';
-            setIsPaymentModalOpen(false);
-            setPaymentResult({ open: true, status: 'success', methodMask });
-          }}
-        />
-      )}
-      {selectedService && (
-        <PaymentResultModal
-          open={paymentResult.open}
-          status={paymentResult.status}
-          orderId={selectedService.id}
-          amount={Number(selectedService.price)}
-          cardMask={paymentResult.methodMask || '•••• 1234'}
-          datetime={new Date().toLocaleString('ru-RU')}
-          onClose={() => setPaymentResult((prev) => ({ ...prev, open: false }))}
-          onPrimary={() => setPaymentResult((prev) => ({ ...prev, open: false }))}
-          onSecondary={() => {
-            setPaymentResult((prev) => ({ ...prev, open: false }));
-            setOpenDetailModal(false);
-            setSelectedServiceId(null);
-            navigate('/my-orders');
-          }}
         />
       )}
     </div>

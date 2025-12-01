@@ -16,10 +16,10 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   price,
   location,
   cover,
+  gradient,
   tags = [],
   createdAt,
   workerName = 'Без имени',
-  gradient,
   workerAvatar,
   timeAgo,
   onEdit,
@@ -78,7 +78,7 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
 
   return (
     <div className={`MyServiceCard MyServiceCard--${mode}`}>
-      <div className="MyServiceCard__left" style={{ background: gradient }}>
+      <div className="MyServiceCard__left" style={{ background: gradient ?? '#1f1f22' }}>
         {showCover && (
           <>
             {!coverLoaded && !coverError && (
@@ -92,7 +92,7 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
               alt={title}
               onLoad={() => setCoverLoaded(true)}
               onError={() => setCoverError(true)}
-              style={{ opacity: coverLoaded ? 1 : 0 }}
+              style={{ opacity: coverLoaded ? 1 : 0, mixBlendMode: 'normal' }}
             />
           </>
         )}
