@@ -269,3 +269,35 @@
   border-radius: 8px;
   cursor: pointer;
 }
+
+@media (max-width: 900px) {
+  .chats {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    gap: 12px;
+  }
+
+  .chats__sidebar,
+  .chats__main,
+  .chats__details {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .chats__main {
+    order: 2;
+  }
+
+  .chats__sidebar {
+    order: 1;
+  }
+
+  .chats__details {
+    order: 3;
+  }
+
+  .chats__messages {
+    max-height: 60vh;
+  }
+}
