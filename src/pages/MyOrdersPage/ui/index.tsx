@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import { useAppDispatch } from '@/redux-rtk/hooks';
 import { SearchInput } from '@/shared/SearchInput';
 import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 
@@ -7,6 +9,8 @@ import type { OrderItem, OrderStatus } from '../types';
 import { OrderActionModal } from './modals';
 import './my-orders.scss';
 import { MyOrderCard } from './MyOrderCard';
+
+import { createChat } from '@/redux-rtk/store/chats/chatsThunks';
 
 type StatusFilter = OrderStatus | 'all';
 
@@ -100,6 +104,7 @@ const mockOrders: OrderItem[] = [
 ];
 
 export const MyOrdersPage: React.FC = () => {
+  const dispatch = useAppDispatch();
   const [activeStatus, setActiveStatus] = useState<StatusFilter>(() => {
     const saved = localStorage.getItem('myOrdersStatus') as StatusFilter | null;
     if (saved && (saved === 'all' || statusFilters.some((s) => s.value === saved))) {
@@ -122,6 +127,8 @@ export const MyOrdersPage: React.FC = () => {
     order: OrderItem | null;
     role: 'customer' | 'worker';
   }>({ type: null, order: null, role: 'customer' });
+
+  const navigate = useNavigate();
 
   const filteredOrders = useMemo(() => {
     const normalized = searchTerm.trim().toLowerCase();
@@ -206,8 +213,16 @@ export const MyOrdersPage: React.FC = () => {
                 setSelectedOrder(order);
                 setIsDetailOpen(true);
               }}
-              onAction={(actionType) => {
-                if (
+              onAction={async (actionType) => {
+                if (actionType === 'message') {
+                  try {
+                    const res = await dispatch(createChat({ orderId: order.id })).unwrap();
+                    navigate(`/chats/${res.chatId}`);
+                  } catch (e) {
+                    console.error('Create chat failed', e);
+                  }
+                  return;
+                } else if (
                   actionType === 'start' ||
                   actionType === 'complete' ||
                   actionType === 'cancel'
