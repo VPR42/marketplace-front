@@ -1,4 +1,5 @@
 ﻿export interface ServiceDetailModalProps {
+  mode?: string;
   open: boolean;
   onClose: () => void;
   service: {
