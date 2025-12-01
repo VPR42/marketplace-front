@@ -427,7 +427,6 @@ export const ServiceCatalogPage: React.FC = () => {
               })
               .catch(() => {});
           }}
-          onMessage={() => console.warn('Написать мастеру')}
           isFavorite={isFavorite}
           onFavorite={() => {
             const currentlyFavorite = favorites.some((f) => f.id === selectedService.id);
