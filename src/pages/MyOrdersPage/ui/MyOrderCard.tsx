@@ -1,4 +1,4 @@
-import type { OrderItem } from '../types';
+import type { MyOrderCardProps } from '../types';
 
 const statusToBadge = {
   created: { label: 'Создан', className: 'OrderCard__badge--created' },
@@ -7,12 +7,6 @@ const statusToBadge = {
   cancelled: { label: 'Отменён', className: 'OrderCard__badge--cancelled' },
   rejected: { label: 'Не выполнен', className: 'OrderCard__badge--rejected' },
 } as const;
-
-interface MyOrderCardProps extends OrderItem {
-  onClick?: () => void;
-  role?: 'customer' | 'worker';
-  onAction?: (action: 'start' | 'complete' | 'cancel' | 'message' | 'profile') => void;
-}
 
 export const MyOrderCard: React.FC<MyOrderCardProps> = ({
   master,
@@ -28,7 +22,8 @@ export const MyOrderCard: React.FC<MyOrderCardProps> = ({
   role = 'customer',
   onAction,
 }) => {
-  const badge = statusToBadge[status];
+  const badge =
+    (statusToBadge as Record<string, { label: string; className: string }>)[status] ?? null;
 
   const actions =
     role === 'worker'

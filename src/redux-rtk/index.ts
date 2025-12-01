@@ -1,7 +1,9 @@
 ﻿import { combineReducers, configureStore } from '@reduxjs/toolkit';
 
 import authReducer from './store/auth/authSlice';
+import chatsReducer from './store/chats/chatsSlice';
 import favoritesReducer from './store/favorites/favoritesSlice';
+import ordersReducer from './store/orders/ordersSlice';
 import servicesReducer from './store/services/servicesSlice';
 import utilsReducer from './store/utils/utilsSlice';
 
@@ -10,6 +12,8 @@ export const rootReducer = combineReducers({
   services: servicesReducer,
   utils: utilsReducer,
   favorites: favoritesReducer,
+  orders: ordersReducer,
+  chats: chatsReducer,
 });
 
 export const store = configureStore({
