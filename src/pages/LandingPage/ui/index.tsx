@@ -1,15 +1,15 @@
-import { useMemo, useState } from 'react';
+import { isAxiosError } from 'axios';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import type { Service } from '@/redux-rtk/store/services/types';
+import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
+import { fetchCategories } from '@/redux-rtk/store/utils/utilsThunks';
+import { api } from '@/shared/axios.config';
 import { SearchInput } from '@/shared/SearchInput';
 
 import './landing.scss';
-
-interface CategoryItem {
-  title: string;
-  count: string;
-  icon: string;
-}
 
 interface ServiceItem {
   title: string;
@@ -19,9 +19,17 @@ interface ServiceItem {
   gradient: string;
 }
 
-interface MasterItem {
-  name: string;
-  direction: string;
+interface BenefitItem {
+  title: string;
+  description: string;
+  icon: string;
+}
+
+interface PopularCategory {
+  id?: number | null;
+  title: string;
+  count: string;
+  icon: string;
 }
 
 interface StepItem {
@@ -29,13 +37,21 @@ interface StepItem {
   description: string;
 }
 
-const categories: CategoryItem[] = [
-  { title: 'Уборка', count: '2 200 мастеров', icon: '🧹' },
-  { title: 'Электрика', count: '1 300 мастеров', icon: '💡' },
-  { title: 'Сантехника', count: '1 200 мастеров', icon: '🚰' },
-  { title: 'IT услуги', count: '1 000 мастеров', icon: '💻' },
-  { title: 'Кондиционеры', count: '600 мастеров', icon: '❄️' },
-];
+const categoryIcons: Record<string, string> = {
+  уборка: '🧹',
+  клининг: '🧽',
+  электрика: '💡',
+  сантехника: '🚰',
+  ремонт: '🛠️',
+  'it услуги': '💻',
+  it: '💻',
+  доставка: '📦',
+  курьер: '🚚',
+  кондиционеры: '❄️',
+  строительство: '🏗️',
+};
+
+const heroStats = ['Мастера под любую задачу', 'Быстрые отклики и старт работ'];
 
 const services: ServiceItem[] = [
   {
@@ -59,37 +75,171 @@ const services: ServiceItem[] = [
     tags: ['Срочный вызов', '24/7'],
     gradient: 'linear-gradient(135deg, #43ef9e, #00c853)',
   },
+  {
+    title: 'Доставка и помощь',
+    location: 'Курьерская помощь · Антон Белый',
+    price: 'от 800 ₽',
+    tags: ['Быстро', 'По городу'],
+    gradient: 'linear-gradient(135deg, #f6d365, #fda085)',
+  },
 ];
 
-const masters: MasterItem[] = [
-  { name: 'Мария Иванова', direction: 'Уборка' },
-  { name: 'Андрей Кузнецов', direction: 'Сборка мебели' },
-  { name: 'Сергей Лебедев', direction: 'Сантехника' },
-  { name: 'Дмитрий Козлов', direction: 'Плотник' },
+const benefits: BenefitItem[] = [
+  {
+    title: 'Публикуйте услуги',
+    description: 'Мастер создаёт карточку с описанием, ценой и доступностью за пару минут.',
+    icon: '🛠️',
+  },
+  {
+    title: 'Видимость в каталоге',
+    description: 'Клиенты находят мастера по категориям и поиску, без лишних звонков.',
+    icon: '🔎',
+  },
+  {
+    title: 'Честные условия',
+    description: 'Простые договорённости по цене и срокам прямо в сервисе.',
+    icon: '📄',
+  },
+  {
+    title: 'Помощь по пути',
+    description: 'Подскажем по сервису и поможем с вопросами, если они появятся.',
+    icon: '🤝',
+  },
 ];
 
 const steps: StepItem[] = [
-  { title: '1. Опишите задачу', description: 'Что и когда нужно сделать, адрес и бюджет.' },
-  { title: '2. Получите отклики', description: 'Мастера предложат цену и сроки.' },
-  { title: '3. Выберите мастера', description: 'Договоритесь в чате и оплатите удобным способом.' },
+  {
+    title: '1. Разместите услугу',
+    description: 'Опишите, что делаете, укажите цену, город и удобный формат работы.',
+  },
+  {
+    title: '2. Клиенты находят вас',
+    description: 'Услуга появляется в каталоге и поиске — отклики приходят напрямую.',
+  },
+  {
+    title: '3. Общение и заказ',
+    description: 'Обсуждайте детали, подтверждайте работу и фиксируйте договорённости.',
+  },
 ];
 
 export const LandingPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { categories: utilsCategories, status: utilsStatus } = useAppSelector(selectUtilsState);
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [landingServices, setLandingServices] = useState<Service[]>([]);
+  const [servicesLoading, setServicesLoading] = useState(false);
+  const [servicesError, setServicesError] = useState<string | null>(null);
 
-  const heroChips = ['Уборка', 'Свеж. цены', 'С гарантией', 'Финализация (IT)'];
+  const defaultChips = ['Уборка', 'Свежие цены', 'С гарантией', 'IT помощь'];
+  const heroChips = useMemo(
+    () =>
+      utilsCategories.length
+        ? utilsCategories
+            .map((c) => ({ label: c.category.name, id: c.category.id }))
+            .filter((c) => Boolean(c.label))
+            .slice(0, 8)
+        : defaultChips.map((label) => ({ label, id: null })),
+    [defaultChips, utilsCategories],
+  );
 
   const staticServices = useMemo(() => services, []);
 
-  const goToFeed = (extraParams?: string) => {
-    const query = extraParams ? `?${extraParams}` : '';
-    navigate(`/feed${query}`);
+  useEffect(() => {
+    const controller = new AbortController();
+    const load = async () => {
+      setServicesLoading(true);
+      setServicesError(null);
+      try {
+        const { data } = await api.get('/feed/jobs', {
+          params: {
+            page: 0,
+            pageSize: 4,
+          },
+          signal: controller.signal,
+        });
+        setLandingServices(data?.content ?? []);
+      } catch (error) {
+        if (!controller.signal.aborted) {
+          if (
+            isAxiosError(error) &&
+            (error.response?.status === 404 ||
+              error.response?.status === 401 ||
+              error.response?.status === 500)
+          ) {
+            // тихо показываем заглушки, без ошибки
+            setServicesError(null);
+            setLandingServices([]);
+          } else {
+            setServicesError('Не удалось загрузить услуги');
+            setLandingServices([]);
+          }
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setServicesLoading(false);
+        }
+      }
+    };
+    load();
+    return () => controller.abort();
+  }, []);
+
+  const popularCategories: PopularCategory[] = useMemo(() => {
+    if (utilsCategories.length) {
+      return utilsCategories.slice(0, 8).map((c) => {
+        const name = c.category.name;
+        const key = name.toLowerCase();
+        const icon =
+          Object.entries(categoryIcons).find(([k]) => key.includes(k))?.[1] ??
+          (name ? name[0].toUpperCase() : '🛠️');
+        return {
+          id: c.category.id,
+          title: name,
+          count: `${c.count ?? 0} услуг`,
+          icon,
+        };
+      });
+    }
+
+    return [
+      { title: 'Уборка', count: '2 200 мастеров', icon: '🧹' },
+      { title: 'Электрика', count: '1 300 мастеров', icon: '💡' },
+      { title: 'Сантехника', count: '1 200 мастеров', icon: '🚰' },
+      { title: 'IT услуги', count: '1 000 мастеров', icon: '💻' },
+      { title: 'Доставка', count: '600 мастеров', icon: '🚚' },
+    ];
+  }, [utilsCategories]);
+
+  useEffect(() => {
+    if (utilsStatus === 'idle') {
+      dispatch(fetchCategories());
+    }
+  }, [dispatch, utilsStatus]);
+
+  const goToFeed = (params?: { search?: string; categoryId?: number | null; create?: string }) => {
+    const sp = new URLSearchParams();
+    if (params?.search) {
+      sp.set('search', params.search);
+    }
+    if (params?.categoryId) {
+      sp.set('categoryId', String(params.categoryId));
+    }
+    if (params?.create) {
+      sp.set('create', params.create);
+    }
+    const query = sp.toString();
+    navigate(query ? `/feed?${query}` : '/feed');
   };
 
   const handleSearch = () => {
-    const query = searchValue.trim() ? `?search=${encodeURIComponent(searchValue.trim())}` : '';
-    navigate(`/feed${query}`);
+    const value = searchValue.trim();
+    goToFeed(
+      value || selectedCategoryId !== null
+        ? { search: value || undefined, categoryId: selectedCategoryId ?? undefined }
+        : undefined,
+    );
   };
 
   return (
@@ -97,8 +247,15 @@ export const LandingPage: React.FC = () => {
       <div className="Landing__container">
         <section className="Landing__hero">
           <div className="Landing__hero-left">
+            <div className="Landing__meta">
+              {heroStats.map((item) => (
+                <span key={item} className="Landing__meta-pill">
+                  {item}
+                </span>
+              ))}
+            </div>
             <h1>Найдём мастера под вашу задачу</h1>
-            <p>Тысячи проверенных специалистов рядом</p>
+            <p>Тысячи проверенных специалистов рядом. Опишите задачу — мы подберём подходящих.</p>
 
             <div className="Landing__hero-card">
               <div className="Landing__search-row">
@@ -109,20 +266,25 @@ export const LandingPage: React.FC = () => {
                     defaultValue={searchValue}
                   />
                 </div>
-                <select className="Landing__select" defaultValue="Все">
-                  <option>Все категории</option>
-                  <option>Уборка</option>
-                  <option>Сантехника</option>
-                  <option>IT услуги</option>
-                </select>
                 <button type="button" className="Landing__search-btn" onClick={handleSearch}>
                   Найти мастера
                 </button>
               </div>
               <div className="Landing__chips">
                 {heroChips.map((chip) => (
-                  <button key={chip} type="button" className="Landing__chip">
-                    {chip}
+                  <button
+                    key={chip.label}
+                    type="button"
+                    className={`Landing__chip ${
+                      chip.id !== null && chip.id === selectedCategoryId
+                        ? 'Landing__chip--active'
+                        : ''
+                    }`}
+                    onClick={() =>
+                      setSelectedCategoryId((prev) => (prev === chip.id ? null : (chip.id ?? null)))
+                    }
+                  >
+                    {chip.label}
                   </button>
                 ))}
               </div>
@@ -139,8 +301,19 @@ export const LandingPage: React.FC = () => {
             </button>
           </div>
           <div className="Landing__cats">
-            {categories.map((cat) => (
-              <div key={cat.title} className="Landing__cat">
+            {popularCategories.map((cat) => (
+              <div
+                key={cat.id ?? cat.title}
+                className="Landing__cat"
+                onClick={() => goToFeed({ categoryId: cat.id ?? undefined })}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    goToFeed({ categoryId: cat.id ?? undefined });
+                  }
+                }}
+              >
                 <div className="Landing__cat-ico">{cat.icon}</div>
                 <div>
                   <b>{cat.title}</b>
@@ -158,49 +331,83 @@ export const LandingPage: React.FC = () => {
               Открыть каталог
             </button>
           </div>
-          <div className="Landing__services">
-            {staticServices.map((service) => (
-              <div key={service.title} className="Landing__card">
-                <div className="Landing__cover" style={{ background: service.gradient }}>
-                  <div className="Landing__cover-title">{service.title}</div>
-                </div>
-                <div className="Landing__body">
-                  <div className="Landing__meta">{service.location}</div>
-                  <div className="Landing__price">{service.price}</div>
-                  <div className="Landing__tags">
-                    {service.tags.map((tag) => (
-                      <span key={tag} className="Landing__tag">
-                        {tag}
-                      </span>
-                    ))}
+          {servicesLoading ? (
+            <div className="Landing__services-loading">Загружаем подборку...</div>
+          ) : (
+            <div className="Landing__services">
+              {(landingServices.length ? landingServices : staticServices).map((service, idx) => {
+                const gradientPalette = [
+                  'linear-gradient(135deg, #5a55fa, #8e8cf1)',
+                  'linear-gradient(135deg, #5fd4ff, #3b82f6)',
+                  'linear-gradient(135deg, #43ef9e, #00c853)',
+                ];
+
+                const isDynamic = 'id' in service;
+                const title = isDynamic ? service.name : (service as ServiceItem).title;
+                const meta = isDynamic
+                  ? [service.category?.name, service.user?.master?.pseudonym || service.user?.name]
+                      .filter(Boolean)
+                      .join(' · ')
+                  : (service as ServiceItem).location;
+                const price = isDynamic
+                  ? service.price
+                    ? `от ${service.price} ₽`
+                    : 'Цена по договорённости'
+                  : (service as ServiceItem).price;
+                const tags = isDynamic
+                  ? (service.tags?.map((t) => t.name).slice(0, 3) ?? [])
+                  : (service as ServiceItem).tags;
+                const coverUrl = isDynamic ? service.coverUrl : undefined;
+                const gradient = gradientPalette[idx % gradientPalette.length];
+
+                const coverStyle = coverUrl
+                  ? {
+                      backgroundImage: `url(${coverUrl})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center',
+                    }
+                  : { background: gradient };
+
+                return (
+                  <div
+                    key={isDynamic ? service.id : (service as ServiceItem).title}
+                    className="Landing__card"
+                  >
+                    <div className="Landing__cover" style={coverStyle}>
+                      <div className="Landing__cover-title">{title}</div>
+                    </div>
+                    <div className="Landing__body">
+                      <div className="Landing__meta">{meta}</div>
+                      <div className="Landing__price">{price}</div>
+                      <div className="Landing__tags">
+                        {tags.map((tag) => (
+                          <span key={tag} className="Landing__tag">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                );
+              })}
+              {servicesError && !landingServices.length ? (
+                <div className="Landing__services-error">{servicesError}</div>
+              ) : null}
+            </div>
+          )}
         </section>
 
         <section className="Landing__section">
           <div className="Landing__section-head">
-            <h2>Мастера, готовые помочь</h2>
-            <button type="button" className="Landing__pill" onClick={() => goToFeed()}>
-              Все мастера
-            </button>
+            <h2>Почему нас выбирают</h2>
           </div>
-          <div className="Landing__masters">
-            {masters.map((master) => (
-              <div key={master.name} className="Landing__master">
-                <div className="Landing__master-ava">
-                  {master.name
-                    .split(' ')
-                    .map((w) => w[0])
-                    .join('')
-                    .slice(0, 2)
-                    .toUpperCase()}
-                </div>
+          <div className="Landing__benefits">
+            {benefits.map((benefit) => (
+              <div key={benefit.title} className="Landing__benefit">
+                <div className="Landing__benefit-ico">{benefit.icon}</div>
                 <div>
-                  <div className="Landing__master-name">{master.name}</div>
-                  <div className="Landing__master-dir">{master.direction}</div>
+                  <div className="Landing__benefit-title">{benefit.title}</div>
+                  <div className="Landing__benefit-desc">{benefit.description}</div>
                 </div>
               </div>
             ))}
@@ -226,7 +433,11 @@ export const LandingPage: React.FC = () => {
             <h3>Готовы разместить заказ?</h3>
             <p>Опишите задачу — первые отклики придут в течение 10–15 минут.</p>
           </div>
-          <button type="button" className="Landing__btn" onClick={() => goToFeed('create=service')}>
+          <button
+            type="button"
+            className="Landing__btn"
+            onClick={() => goToFeed({ create: 'service' })}
+          >
             Разместить услугу
           </button>
         </section>
