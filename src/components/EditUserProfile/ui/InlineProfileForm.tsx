@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Avatar, Button, Input, InputNumber, SelectPicker, TagPicker } from 'rsuite';
+import { Avatar, Button, Input, InputNumber, SelectPicker, TagPicker, Uploader } from 'rsuite';
 
+import { useAppDispatch } from '@/redux-rtk/hooks';
+import { uploadProfileAvatar } from '@/redux-rtk/store/profile/profileThunks';
 import { cities } from '@/shared/data/cities';
 import { skillsMock } from '@/shared/data/skills';
 
@@ -30,6 +32,7 @@ const defaultForm: EditUserProfileForm = {
   endTime: '',
   skills: [],
   avatarUrl: '',
+  avatarFile: null,
 };
 
 const dayOptions = [
@@ -48,9 +51,11 @@ export const InlineProfileForm: React.FC<InlineProfileFormProps> = ({
   onSubmit,
   loading,
 }) => {
+  const dispatch = useAppDispatch();
   const [form, setForm] = useState<EditUserProfileForm>({ ...defaultForm, ...initialValues });
   const [errors, setErrors] = useState<Partial<Record<keyof EditUserProfileForm, string>>>({});
   const [avatarPreview, setAvatarPreview] = useState<string | undefined>(initialValues?.avatarUrl);
+  const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
 
   useEffect(() => {
     setForm({ ...defaultForm, ...initialValues });
@@ -102,6 +107,38 @@ export const InlineProfileForm: React.FC<InlineProfileFormProps> = ({
     handleChange('phone', numeric.slice(0, 11));
   };
 
+  const handleAvatarUpload = (
+    fileList: Parameters<NonNullable<React.ComponentProps<typeof Uploader>['onChange']>>[0],
+  ) => {
+    const file = fileList.at(-1);
+    if (file?.blobFile) {
+      if (file.blobFile.size > MAX_AVATAR_SIZE) {
+        setErrors((prev) => ({ ...prev, avatarFile: 'Размер файла не должен превышать 5 МБ' }));
+        return;
+      }
+      const url = URL.createObjectURL(file.blobFile);
+      setAvatarPreview((prev) => {
+        if (prev?.startsWith('blob:')) {
+          URL.revokeObjectURL(prev);
+        }
+        return url;
+      });
+      dispatch(uploadProfileAvatar(file.blobFile))
+        .unwrap()
+        .then((res) => {
+          handleChange('avatarUrl', res.url);
+          handleChange('avatarFile', null);
+          setAvatarPreview(res.url);
+        })
+        .catch((error) => {
+          setErrors((prev) => ({
+            ...prev,
+            avatarFile: (error as string) || 'Не удалось загрузить аватар',
+          }));
+        });
+    }
+  };
+
   const validate = () => {
     const nextErrors: Partial<Record<keyof EditUserProfileForm, string>> = {};
 
@@ -112,11 +149,11 @@ export const InlineProfileForm: React.FC<InlineProfileFormProps> = ({
       max: number,
     ) => {
       if (!value.trim()) {
-        nextErrors[field] = 'Поле обязательно';
+        nextErrors[field] = 'Поле обязательно для заполнения';
         return;
       }
       if (value.trim().length < min || value.trim().length > max) {
-        nextErrors[field] = `От ${min} до ${max} символов`;
+        nextErrors[field] = `От $<built-in function min> до $<built-in function max> символов`;
       }
     };
 
@@ -126,17 +163,17 @@ export const InlineProfileForm: React.FC<InlineProfileFormProps> = ({
     checkLength(form.pseudonym, 'pseudonym', 2, 20);
 
     if (!form.city) {
-      nextErrors.city = 'Укажите город';
+      nextErrors.city = 'Выберите категорию';
     }
 
     if (!form.phone.trim()) {
-      nextErrors.phone = 'Укажите телефон';
+      nextErrors.phone = 'Введите 10-15 цифр без пробелов';
     } else if (!/^\d{10,15}$/.test(form.phone)) {
       nextErrors.phone = 'Только цифры, 10-15 символов';
     }
 
     if (!form.startTime.trim() || !form.endTime.trim()) {
-      nextErrors.startTime = 'Укажите время работы';
+      nextErrors.startTime = 'Укажите часы работы';
     }
 
     if (!form.about.trim() || form.about.length < 10 || form.about.length > 200) {
@@ -149,6 +186,10 @@ export const InlineProfileForm: React.FC<InlineProfileFormProps> = ({
 
     if (!form.daysOfWeek.length) {
       nextErrors.daysOfWeek = 'Выберите дни недели';
+    }
+
+    if (form.avatarFile && form.avatarFile.size > MAX_AVATAR_SIZE) {
+      nextErrors.avatarFile = 'Размер файла не должен превышать 5 МБ';
     }
 
     setErrors(nextErrors);
@@ -183,9 +224,19 @@ export const InlineProfileForm: React.FC<InlineProfileFormProps> = ({
           {!avatarPreview && `${form.name.slice(0, 1)}${form.surname.slice(0, 1)}`.toUpperCase()}
         </Avatar>
         <div className="inline-profile-form__avatar-actions">
-          <Button appearance="primary" size="sm" className="orange-btn" disabled>
-            Загрузить фото (скоро)
-          </Button>
+          <Uploader
+            fileListVisible={false}
+            autoUpload={false}
+            multiple={false}
+            onChange={handleAvatarUpload}
+            action="#"
+            accept="image/jpeg, image/png, image/gif, image/webp, image/bmp, image/jpg"
+          >
+            <Button appearance="primary" size="sm" className="orange-btn">
+              Загрузить фото
+            </Button>
+          </Uploader>
+          {errors.avatarFile ? <span className="input-error-text">{errors.avatarFile}</span> : null}
         </div>
       </div>
 

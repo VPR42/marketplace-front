@@ -6,6 +6,7 @@ import { api } from '@/shared/axios.config';
 import type {
   PageResponse,
   Service,
+  ServiceCoverResponse,
   ServiceCreateRequest,
   ServiceQueryParams,
   ServiceUpdateRequest,
@@ -17,6 +18,24 @@ const getServiceError = (error: unknown, fallback: string) => {
   }
   return fallback;
 };
+
+export const uploadServiceCover = createAsyncThunk<
+  ServiceCoverResponse,
+  { id: string; file: File },
+  { rejectValue: string }
+>('services/uploadCover', async ({ id, file }, { rejectWithValue }) => {
+  try {
+    const formData = new FormData();
+    formData.append('id', id);
+    formData.append('file', file);
+    const { data } = await api.put<ServiceCoverResponse>('/feed/jobs/cover', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data;
+  } catch (error: unknown) {
+    return rejectWithValue(getServiceError(error, 'Не удалось загрузить обложку'));
+  }
+});
 
 export const createService = createAsyncThunk<
   Service,
@@ -103,6 +122,6 @@ export const fetchServices = createAsyncThunk<
         sort: { sorted: false, empty: true, unsorted: true },
       } as PageResponse<Service>;
     }
-    return rejectWithValue(getServiceError(error, 'Не удалось загрузить услуги'));
+    return rejectWithValue(getServiceError(error, 'Не удалось получить список услуг'));
   }
 });
