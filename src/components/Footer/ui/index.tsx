@@ -11,7 +11,7 @@ export const Footer = () => (
       </p>
     </div>
     <div className="paragraph">
-      <p className="greytext smalltext">&copy; 2025 ServiGO. Все права защищены</p>
+      <p className="greytext smalltext">&copy; 2025 JobHub. Все права защищены</p>
     </div>
   </footer>
 );

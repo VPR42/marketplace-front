@@ -68,7 +68,7 @@ export const WelcomePage = () => {
   return (
     <div className="WelcomePage">
       <div className="WelcomePage__card">
-        <h1 className="WelcomePage__title">Добро пожаловать в ServiGo!</h1>
+        <h1 className="WelcomePage__title">Добро пожаловать в JobHub!</h1>
         <p className="WelcomePage__subtitle">
           Спасибо за регистрацию. Расскажите о себе, чтобы начать создавать услуги и принимать
           заказы.
