@@ -341,7 +341,6 @@ export const ServiceCatalogPage: React.FC = () => {
               workerAvatar={service.user.avatarPath}
               onClick={() => {
                 setSelectedServiceId(service.id);
-                console.warn(service.tags);
                 setOpenDetailModal(true);
               }}
             />

@@ -1,13 +1,16 @@
-import { Heart } from 'lucide-react';
-import { useState } from 'react';
+﻿import { Heart } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Modal } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
+import { fetchProfileById } from '@/redux-rtk/store/profile/profileThunks';
 
 import type { ServiceDetailModalProps } from '../types';
 
 import './service-detail-modal.scss';
+
+import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
 
 const getInitialsFromTitle = (title: string) => {
   const parts = title.split(' ').filter(Boolean);
@@ -30,7 +33,6 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
   const navigate = useNavigate();
 
   const handleGoToMasterProfile = () => {
-    console.log(service);
     navigate(`/profile/${service.user?.id}`);
   };
 
@@ -111,6 +113,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   isFavorite = false,
   isTogglingFavorite = false,
 }) => {
+  const dispatch = useAppDispatch();
   const getInitials = (name: string) => {
     const parts = name.split(' ');
     if (parts.length >= 2) {
@@ -119,6 +122,12 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
     return name.substring(0, 2).toUpperCase();
   };
 
+  const { data: profile } = useAppSelector((state) => state.profile);
+  useEffect(() => {
+    if (service.user?.id) {
+      dispatch(fetchProfileById(service.user?.id));
+    }
+  }, [dispatch, service.user?.id]);
   // const masterTags = ['Опыт 6 лет', 'Работаю по договору', 'Безналичный расчет', 'Выезд сегодня'];
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -185,7 +194,9 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           <div className="ServiceDetailModal__description-grid">
             <div className="ServiceDetailModal__stat-item">
               <div className="ServiceDetailModal__stat-label">Выполнено</div>
-              <div className="ServiceDetailModal__stat-value">312 заказов</div>
+              <div className="ServiceDetailModal__stat-value">
+                {profile?.orders.ordersCount} заказов
+              </div>
             </div>
             <div className="ServiceDetailModal__stat-item">
               <div className="ServiceDetailModal__stat-label">Локация</div>

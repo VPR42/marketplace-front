@@ -7,11 +7,11 @@ import { api } from '@/shared/axios.config';
 const getChatError = (err: unknown, fallback = 'Failed to create chat') =>
   isAxiosError(err) ? (err.response?.data?.message ?? fallback) : fallback;
 
-export const createChat = createAsyncThunk<CreateChatResponse, { orderId: string }>(
+export const createChat = createAsyncThunk<CreateChatResponse, { serviceId: string }>(
   'chats/createChat',
-  async ({ orderId }, { rejectWithValue }) => {
+  async ({ serviceId }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/chat/create/${orderId}`, null, {});
+      const response = await api.post(`/chat/create/${serviceId}`, null, {});
       return response.data as CreateChatResponse;
     } catch (err: unknown) {
       return rejectWithValue(getChatError(err));
