@@ -132,16 +132,14 @@ export const LandingPage: React.FC = () => {
   const [servicesLoading, setServicesLoading] = useState(false);
   const [servicesError, setServicesError] = useState<string | null>(null);
 
-  const defaultChips = ['Уборка', 'Свежие цены', 'С гарантией', 'IT помощь'];
+  const maxHeroChips = 4;
   const heroChips = useMemo(
     () =>
-      utilsCategories.length
-        ? utilsCategories
-            .map((c) => ({ label: c.category.name, id: c.category.id }))
-            .filter((c) => Boolean(c.label))
-            .slice(0, 8)
-        : defaultChips.map((label) => ({ label, id: null })),
-    [defaultChips, utilsCategories],
+      utilsCategories
+        .map((c) => ({ label: c.category.name, id: c.category.id }))
+        .filter((c) => Boolean(c.label))
+        .slice(0, maxHeroChips),
+    [maxHeroChips, utilsCategories],
   );
 
   const staticServices = useMemo(() => services, []);
@@ -186,9 +184,9 @@ export const LandingPage: React.FC = () => {
     return () => controller.abort();
   }, []);
 
-  const popularCategories: PopularCategory[] = useMemo(() => {
-    if (utilsCategories.length) {
-      return utilsCategories.slice(0, 8).map((c) => {
+  const popularCategories: PopularCategory[] = useMemo(
+    () =>
+      utilsCategories.slice(0, 8).map((c) => {
         const name = c.category.name;
         const key = name.toLowerCase();
         const icon =
@@ -200,17 +198,9 @@ export const LandingPage: React.FC = () => {
           count: `${c.count ?? 0} услуг`,
           icon,
         };
-      });
-    }
-
-    return [
-      { title: 'Уборка', count: '2 200 мастеров', icon: '🧹' },
-      { title: 'Электрика', count: '1 300 мастеров', icon: '💡' },
-      { title: 'Сантехника', count: '1 200 мастеров', icon: '🚰' },
-      { title: 'IT услуги', count: '1 000 мастеров', icon: '💻' },
-      { title: 'Доставка', count: '600 мастеров', icon: '🚚' },
-    ];
-  }, [utilsCategories]);
+      }),
+    [utilsCategories],
+  );
 
   useEffect(() => {
     if (utilsStatus === 'idle') {
@@ -321,19 +311,25 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
             ))}
+            {!popularCategories.length && (
+              <div className="Landing__cats-placeholder">Загружаем категории...</div>
+            )}
           </div>
         </section>
 
         <section className="Landing__section">
           <div className="Landing__section-head">
-            <h2>Рядом с вами</h2>
+            <h2>Подборка услуг</h2>
             <button type="button" className="Landing__pill" onClick={() => goToFeed()}>
               Открыть каталог
             </button>
           </div>
-          {servicesLoading ? (
-            <div className="Landing__services-loading">Загружаем подборку...</div>
-          ) : (
+          <div className="Landing__services-wrapper">
+            {servicesLoading && (
+              <div className="Landing__services-overlay">
+                <div className="Landing__services-loading">Загружаем подборку...</div>
+              </div>
+            )}
             <div className="Landing__services">
               {(landingServices.length ? landingServices : staticServices).map((service, idx) => {
                 const gradientPalette = [
@@ -390,11 +386,11 @@ export const LandingPage: React.FC = () => {
                   </div>
                 );
               })}
-              {servicesError && !landingServices.length ? (
-                <div className="Landing__services-error">{servicesError}</div>
-              ) : null}
             </div>
-          )}
+            {servicesError && !landingServices.length ? (
+              <div className="Landing__services-error">{servicesError}</div>
+            ) : null}
+          </div>
         </section>
 
         <section className="Landing__section">

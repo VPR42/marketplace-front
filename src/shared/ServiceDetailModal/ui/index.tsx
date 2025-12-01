@@ -46,7 +46,17 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
           </div>
         </div>
         {mode === 'service' && (
+          <div className="ServiceDetailModal__actions ServiceDetailModal__actions--top">
+            <button className="ServiceDetailModal__message-btn" onClick={onMessage}>
+              Написать мастеру
+            </button>
+            <button className="ServiceDetailModal__order-btn" onClick={onOrder}>
+              Заказать
+            </button>
+          </div>
+        )}
 
+        {mode === 'service' && (
           <button
             className={`ServiceDetailModal__favorite-btn ${isFavorite ? 'ServiceDetailModal__favorite-btn--active' : ''}`}
             onClick={onFavorite}
@@ -70,18 +80,6 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
         )}
       </div>
 
-      <div className="ServiceDetailModal__actions">
-        <button className="ServiceDetailModal__message-btn" onClick={onMessage}>
-          Написать мастеру
-        </button>
-        {mode === 'service' && (
-          <button className="ServiceDetailModal__order-btn" onClick={onOrder}>
-            Заказать
-          </button>
-        )}
-
-      </div>
-
       <div className="ServiceDetailModal__master-container">
         <div className="ServiceDetailModal__master">
           <div className="ServiceDetailModal__master-avatar">{getInitials(service.workerName)}</div>
@@ -96,9 +94,7 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
           <button className="ServiceDetailModal__master-btn" onClick={handleGoToMasterProfile}>
             Профиль
           </button>
-          <button className="ServiceDetailModal__master-btn">Написать</button>
         </div>
-
       </div>
     </div>
   );
@@ -216,4 +212,3 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
     </Modal>
   );
 };
-
