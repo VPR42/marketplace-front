@@ -132,9 +132,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
         />
 
         <div className="remember">
-          <Checkbox>
-            <span>Запомнить меня</span>
-          </Checkbox>
           <Link to="/" aria-label="Забыли пароль?" className="link">
             Забыли пароль?
           </Link>
