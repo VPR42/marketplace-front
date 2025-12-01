@@ -10,6 +10,7 @@ import {
   registerUser,
 } from './authThunks';
 import type { AuthResponse, AuthState } from './types';
+import { removeProfileAvatar, uploadProfileAvatar } from '../profile/profileThunks';
 
 const initialToken = getStoredToken();
 
@@ -103,6 +104,16 @@ const authSlice = createSlice({
       .addCase(logoutUser.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload ?? action.error.message ?? 'Logout failed';
+      })
+      .addCase(uploadProfileAvatar.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user = { ...state.user, avatarPath: action.payload.url };
+        }
+      })
+      .addCase(removeProfileAvatar.fulfilled, (state, action) => {
+        if (state.user) {
+          state.user = { ...state.user, avatarPath: action.payload.avatarPath };
+        }
       });
   },
 });

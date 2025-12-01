@@ -33,6 +33,7 @@
     font-size: 18px;
     overflow: hidden;
     border-radius: 10px;
+    background: #1f1f22;
   }
 
   &__left-text {
@@ -102,6 +103,7 @@
     height: 100%;
     object-fit: cover;
     transition: opacity 0.2s ease;
+    mix-blend-mode: normal;
   }
 
   &__cover-fallback {

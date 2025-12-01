@@ -253,6 +253,15 @@
     &:hover {
       background: var(--orange-hover);
     }
+
+    &:disabled,
+    &.rs-btn-disabled,
+    &[aria-disabled='true'],
+    &.rs-btn-loading {
+      background: var(--orange);
+      color: #fff;
+      opacity: 1;
+    }
   }
 
   &__buttonSubtle {

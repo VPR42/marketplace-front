@@ -1,8 +1,9 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Loader } from 'rsuite';
 
-import './service-card.scss';
 import type { ServiceCardProps } from '@/shared/ServiceCard/types';
+
+import './service-card.scss';
 
 export const ServiceCard: React.FC<ServiceCardProps> = ({
   title,

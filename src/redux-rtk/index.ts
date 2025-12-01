@@ -4,6 +4,7 @@ import authReducer from './store/auth/authSlice';
 import chatsReducer from './store/chats/chatsSlice';
 import favoritesReducer from './store/favorites/favoritesSlice';
 import ordersReducer from './store/orders/ordersSlice';
+import profileReducer from './store/profile/profileSlice';
 import servicesReducer from './store/services/servicesSlice';
 import utilsReducer from './store/utils/utilsSlice';
 
@@ -12,6 +13,7 @@ export const rootReducer = combineReducers({
   services: servicesReducer,
   utils: utilsReducer,
   favorites: favoritesReducer,
+  profile: profileReducer,
   orders: ordersReducer,
   chats: chatsReducer,
 });

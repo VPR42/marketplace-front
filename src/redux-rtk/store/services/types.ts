@@ -18,7 +18,6 @@ export interface ServiceCreateRequest {
   name: string;
   description: string;
   price: number;
-  coverUrl: string;
   categoryId: number;
   tags: number[];
 }
@@ -85,4 +84,9 @@ export interface ServicesState {
   currentService: Service | null;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
+}
+
+export interface ServiceCoverResponse {
+  filename: string;
+  url: string;
 }

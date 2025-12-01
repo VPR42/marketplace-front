@@ -15,4 +15,5 @@ export interface FiltersGroupProps {
 
   experienceOptions: { label: string; value: number | null }[];
   sortOptions: { label: string; value: 'ASC' | 'DESC' | null }[];
+  showExperience?: boolean;
 }
