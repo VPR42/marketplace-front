@@ -1,7 +1,7 @@
 import { Heart } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader, Modal } from 'rsuite';
+import { Modal } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
 
@@ -216,3 +216,4 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
     </Modal>
   );
 };
+
