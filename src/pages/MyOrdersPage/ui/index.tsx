@@ -2,12 +2,10 @@
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button, Pagination } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
-import { createChat } from '@/redux-rtk/store/chats/chatsThunks';
 import { fetchOrders, updateOrderStatus } from '@/redux-rtk/store/orders/ordersThunks';
 import {
   selectOrders,
@@ -98,7 +96,7 @@ export const MyOrdersPage: React.FC = () => {
     pageSize: reduxPageSize,
   } = useAppSelector(selectOrdersPagination);
   const isLoading = useAppSelector(selectOrdersLoading);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     if (utilsStatus === 'idle') {
@@ -241,8 +239,8 @@ export const MyOrdersPage: React.FC = () => {
               onAction={async (actionType) => {
                 if (actionType === 'message') {
                   try {
-                    const res = await dispatch(createChat({ orderId: order.id })).unwrap();
-                    navigate(`/chats/${res.chatId}`);
+                    // const res = await dispatch(createChat({ orderId: order.id })).unwrap();
+                    // navigate(`/chats/${res.chatId}`);
                   } catch (e) {
                     console.error('Create chat failed', e);
                   }

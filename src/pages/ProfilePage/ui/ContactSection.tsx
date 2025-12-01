@@ -1,4 +1,4 @@
-import { Clock, Edit, Mail, MapPin, MessageCircle, Phone } from 'lucide-react';
+import { Clock, Edit, Mail, MapPin, Phone } from 'lucide-react';
 import { Button, Heading } from 'rsuite';
 
 import { cities } from '@/shared/data/cities';
@@ -47,7 +47,6 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   daysOfWeek,
   canEdit,
   onEdit,
-  onMessage,
 }) => {
   const cityName = cityId ? cities.find((c) => c.value === cityId)?.label : null;
   const schedule =
@@ -89,13 +88,6 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
             <Clock size={18} className="ContactSection__icon" />
             <span className="ContactSection__text">{schedule}</span>
           </div>
-        )}
-
-        {!canEdit && onMessage && (
-          <Button appearance="primary" onClick={onMessage} className="ContactSection__message-btn">
-            <MessageCircle size={16} />
-            <span>Написать сообщение</span>
-          </Button>
         )}
       </div>
     </div>
