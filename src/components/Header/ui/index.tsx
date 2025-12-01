@@ -7,7 +7,6 @@ import { ProfileBadge } from '@/components/ProfileBadge';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
 import { selectAuthState } from '@/redux-rtk/store/auth/authSlice';
 import { fetchWhoAmI, getStoredToken } from '@/redux-rtk/store/auth/authThunks';
-import { Ivan } from '@/shared/icons/ivan/Ivan';
 
 import './header.scss';
 
@@ -35,8 +34,7 @@ export const Header = () => {
       <RegisterModal open={isRegModalOpen} onClose={handleRegClose} />
       <header className="header">
         <Link to="/" className="header__logo">
-          <Ivan width={32} height={32} />
-          <Heading level={4}>ServiGO</Heading>
+          <img className="header__logo-img" src="/main_logo.png" />
         </Link>
         <div className="header__buttons">
           <Button title="Лента" onClick={() => navigate('/feed')}>
