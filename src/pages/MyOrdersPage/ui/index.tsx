@@ -227,44 +227,7 @@ export const MyOrdersPage: React.FC = () => {
       </div>
 
       <div className="MyOrders__list">
-        {showEmpty && <div className="MyOrders__empty">Заказы не найдены</div>}
-        {filteredOrders.map((order) => (
-          <MyOrderCard
-            key={order.id}
-            {...order}
-            role={activeRole}
-            status={order.status}
-            onClick={() => {
-              setSelectedOrder(order);
-              setIsDetailOpen(true);
-            }}
-            onAction={(actionType) => {
-              if (actionType === 'start' || actionType === 'complete' || actionType === 'cancel') {
-                setActionModal({ type: actionType, order, role: activeRole });
-              }
-            }}
-          />
-        ))}
-
-        <div className="MyOrders__pagination">
-          {isLoading ? (
-            <div className="MyOrders__loader">
-              <CustomLoader content="" />
-            </div>
-          ) : (
-            !showEmpty && (
-              <Pagination
-                prev
-                next
-                total={totalCount}
-                limit={reduxPageSize}
-                activePage={currentPage}
-                onChangePage={setCurrentPage}
-              />
-            )
-          )}
-        </div>
-        {filteredOrders.length > 0 ? (
+        {filteredOrders.length > 0 &&
           filteredOrders.map((order) => (
             <MyOrderCard
               key={order.id}
@@ -292,9 +255,27 @@ export const MyOrdersPage: React.FC = () => {
                 }
               }}
             />
-          ))
+          ))}
+      </div>
+
+      {showEmpty && <div className="MyOrders__empty">Заказы не найдены</div>}
+
+      <div className="MyOrders__pagination">
+        {isLoading ? (
+          <div className="MyOrders__loader">
+            <CustomLoader content="" />
+          </div>
         ) : (
-          <div className="MyOrders__empty">Заказы не найдены</div>
+          !showEmpty && (
+            <Pagination
+              prev
+              next
+              total={totalCount}
+              limit={reduxPageSize}
+              activePage={currentPage}
+              onChangePage={setCurrentPage}
+            />
+          )
         )}
       </div>
 
