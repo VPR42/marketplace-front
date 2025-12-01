@@ -6,6 +6,7 @@ import {
   fetchServiceById,
   fetchServices,
   updateService,
+  uploadServiceCover,
 } from './servicesThunks';
 import type { Service, ServicesState } from './types';
 
@@ -126,7 +127,17 @@ const servicesSlice = createSlice({
       .addCase(updateService.rejected, (state, action) => {
         state.status = 'failed';
 
-        state.error = action.payload ?? action.error.message ?? 'Не удалось обновить услугу';
+        state.error = action.payload ?? action.error.message ?? '�� 㤠���� �������� ����';
+      })
+
+      .addCase(uploadServiceCover.fulfilled, (state, action) => {
+        const serviceId = action.meta.arg.id;
+        state.items = state.items.map((item) =>
+          item.id === serviceId ? { ...item, coverUrl: action.payload.url } : item,
+        );
+        if (state.currentService?.id === serviceId) {
+          state.currentService = { ...state.currentService, coverUrl: action.payload.url };
+        }
       })
 
       .addCase(deleteService.fulfilled, (state, action) => {

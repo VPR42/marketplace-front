@@ -184,7 +184,7 @@ export const ServiceCreationModal: React.FC<ServiceCreationProps> = ({
       setFormValue((prev) => ({
         ...prev,
 
-        coverUrl: URL.createObjectURL(file.blobFile),
+        coverUrl: URL.createObjectURL(file.blobFile as Blob),
       }));
     }
   };
