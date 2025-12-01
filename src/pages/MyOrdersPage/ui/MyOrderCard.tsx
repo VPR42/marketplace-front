@@ -1,3 +1,7 @@
+import { useEffect, useState } from 'react';
+
+import { CustomLoader } from '@/components/CustomLoader/ui';
+
 import type { MyOrderCardProps } from '../types';
 
 const statusToBadge = {
@@ -15,6 +19,7 @@ export const MyOrderCard: React.FC<MyOrderCardProps> = ({
   status,
   description,
   categoryLabel,
+  gradient,
   budget,
   location,
   image,
@@ -76,14 +81,40 @@ export const MyOrderCard: React.FC<MyOrderCardProps> = ({
     onClick?.();
   };
 
+  const [coverLoaded, setCoverLoaded] = useState(false);
+  const [coverError, setCoverError] = useState(false);
+
+  useEffect(() => {
+    setCoverLoaded(false);
+    setCoverError(false);
+  }, [image]);
+
   return (
     <article className="OrderCard" onClick={handleCardClick} role="button">
       <div className="OrderCard__row">
         <div
-          className={`OrderCard__thumb ${image ? '' : 'OrderCard__thumb--empty'}`}
-          style={image ? { backgroundImage: `url(${image})` } : undefined}
+          className={`OrderCard__thumb ${!image ? 'OrderCard__thumb--empty' : ''}`}
+          style={{ background: gradient }}
         >
-          {!image && 'Фото услуги'}
+          {image ? (
+            <>
+              {!coverLoaded && !coverError && (
+                <div className="OrderCard__cover-loader">
+                  <CustomLoader size="sm" content="" />
+                </div>
+              )}
+              <img
+                className="OrderCard__cover"
+                src={image}
+                alt={title}
+                onLoad={() => setCoverLoaded(true)}
+                onError={() => setCoverError(true)}
+                style={{ opacity: coverLoaded ? 1 : 0 }}
+              />
+            </>
+          ) : (
+            <div className="OrderCard__title--fallback">{title}</div>
+          )}
         </div>
 
         <div className="OrderCard__body">
