@@ -1,5 +1,9 @@
-import './service-card.scss';
+import { useEffect, useMemo, useState } from 'react';
+import { Loader } from 'rsuite';
+
 import type { ServiceCardProps } from '@/shared/ServiceCard/types';
+
+import './service-card.scss';
 
 export const ServiceCard: React.FC<ServiceCardProps> = ({
   title,
@@ -7,36 +11,93 @@ export const ServiceCard: React.FC<ServiceCardProps> = ({
   price,
   orders,
   gradient,
-  workerName = 'Алексей С.',
-  workerRating = '4.9',
-  workerAvatar = 'https://sun9-38.userapi.com/s/v1/ig2/O_n9fwqhc6ctMwJNzSoUqrtJf3Ux8g3blHJzygBp4VW6cmcHgPQ9mdBnjBUWjLTrXkt3v-SVjdFjWDdx5-4WuECr.jpg?quality=95&as=32x48,48x72,72x108,108x162,160x240,240x360,360x540,480x720,540x810,640x960,720x1080,1080x1620,1280x1920,1440x2160,1707x2560&from=bu&cs=1280x0',
+  coverUrl,
+  workerName = 'Без имени',
+  workerAvatar,
+  favorite,
   onClick,
-}) => (
-  <div className="ServiceCard" onClick={onClick}>
-    <div className="ServiceCard__top" style={{ background: gradient }}>
-      <span className="ServiceCard__top-text">{title}</span>
-    </div>
-    <div className="ServiceCard__body">
-      <div className="ServiceCard__content">
-        <h3 className="ServiceCard__title">{title}</h3>
+}) => {
+  const initials = useMemo(() => {
+    const parts = workerName.split(' ').filter(Boolean);
+    const first = parts[0]?.[0];
+    const second = parts[1]?.[0];
+    const res = `${first ?? ''}${second ?? ''}`.toUpperCase();
+    return res || 'A';
+  }, [workerName]);
 
-        {/* Блок исполнителя */}
-        <div className="ServiceCard__worker">
-          <img className="ServiceCard__worker-img" src={workerAvatar} alt={workerName} />
-          <span className="ServiceCard__worker-name">{workerName}</span>
-          <span className="ServiceCard__worker-rating">
-            <span className="ServiceCard__star">★</span>
-            <span>{workerRating}</span>
-          </span>
+  const [avatarSrc, setAvatarSrc] = useState(workerAvatar);
+  const [avatarLoaded, setAvatarLoaded] = useState(false);
+  const [avatarError, setAvatarError] = useState(false);
+
+  const [coverLoaded, setCoverLoaded] = useState(false);
+  const [coverError, setCoverError] = useState(false);
+
+  useEffect(() => {
+    setAvatarSrc(workerAvatar);
+    setAvatarLoaded(false);
+    setAvatarError(false);
+  }, [workerAvatar]);
+
+  useEffect(() => {
+    setCoverLoaded(false);
+    setCoverError(false);
+  }, [coverUrl]);
+
+  const showAvatarPlaceholder = !avatarSrc || avatarError || !avatarLoaded;
+  const showCover = Boolean(coverUrl) && !coverError;
+
+  return (
+    <div className="ServiceCard" onClick={onClick}>
+      <div className="ServiceCard__top" style={{ background: gradient }}>
+        {showCover && (
+          <>
+            {!coverLoaded && !coverError && (
+              <div className="ServiceCard__cover-loader">
+                <Loader size="sm" content="" />
+              </div>
+            )}
+            <img
+              className="ServiceCard__cover"
+              src={coverUrl}
+              alt={title}
+              onLoad={() => setCoverLoaded(true)}
+              onError={() => setCoverError(true)}
+              style={{ opacity: coverLoaded ? 1 : 0 }}
+            />
+          </>
+        )}
+        {!showCover && <div className="ServiceCard__cover-fallback" />}
+        <span className="ServiceCard__top-text">{title}</span>
+        {favorite ? <span className="ServiceCard__fav">❤</span> : null}
+      </div>
+      <div className="ServiceCard__body">
+        <div className="ServiceCard__content">
+          <h3 className="ServiceCard__title">{title}</h3>
+
+          <div className="ServiceCard__worker">
+            {showAvatarPlaceholder ? (
+              <div className="ServiceCard__worker-placeholder">{initials}</div>
+            ) : null}
+            {!avatarError && avatarSrc ? (
+              <img
+                className="ServiceCard__worker-img"
+                src={avatarSrc}
+                alt={workerName}
+                onError={() => setAvatarError(true)}
+                onLoad={() => setAvatarLoaded(true)}
+                style={{ display: showAvatarPlaceholder ? 'none' : 'block' }}
+              />
+            ) : null}
+            <span className="ServiceCard__worker-name">{workerName}</span>
+          </div>
+
+          <p className="ServiceCard__description">{description}</p>
         </div>
-
-        <p className="ServiceCard__description">{description}</p>
-      </div>
-      {/* Футер с ценой и заказами */}
-      <div className="ServiceCard__footer">
-        <span className="ServiceCard__price">от {price}₽</span>
-        <span className="ServiceCard__orders">{orders} заказов</span>
+        <div className="ServiceCard__footer">
+          <span className="ServiceCard__price">от {price}₽</span>
+          <span className="ServiceCard__orders">{orders} заказов</span>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};

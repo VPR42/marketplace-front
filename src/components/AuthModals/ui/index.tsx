@@ -1,5 +1,5 @@
-﻿import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button, Checkbox, Modal, SelectPicker } from 'rsuite';
 import zxcvbn from 'zxcvbn';
 
@@ -28,6 +28,9 @@ const registerInitialState = {
 };
 
 const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+const MAX_NAME = 20;
+const MAX_EMAIL = 50;
+const MAX_PASSWORD = 64;
 
 export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
   const dispatch = useAppDispatch();
@@ -59,10 +62,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
     if (!form.email) {
       newErrors.email = 'Почта обязательна';
     } else if (!emailRegex.test(form.email)) {
-      newErrors.email = 'Некорректная почта';
+      newErrors.email = 'Неверный формат';
+    } else if (form.email.length > MAX_EMAIL) {
+      newErrors.email = `Максимум ${MAX_EMAIL} символов`;
     }
+
     if (!form.password) {
       newErrors.password = 'Пароль обязателен';
+    } else if (form.password.length > MAX_PASSWORD) {
+      newErrors.password = `Максимум ${MAX_PASSWORD} символов`;
     }
     return newErrors;
   };
@@ -166,6 +174,7 @@ type RegisterErrors = Partial<{
 export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
   const dispatch = useAppDispatch();
   const { status } = useAppSelector(selectAuthState);
+  const navigate = useNavigate();
 
   const [form, setForm] = useState(registerInitialState);
   const [errors, setErrors] = useState<RegisterErrors>({});
@@ -194,33 +203,43 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
     const newErrors: RegisterErrors = {};
     if (!form.name || form.name.trim().length < 2) {
       newErrors.name = 'Имя от 2 символов';
+    } else if (form.name.trim().length > MAX_NAME) {
+      newErrors.name = `Максимум ${MAX_NAME} символов`;
     }
     if (!form.surname || form.surname.trim().length < 2) {
       newErrors.surname = 'Фамилия от 2 символов';
+    } else if (form.surname.trim().length > MAX_NAME) {
+      newErrors.surname = `Максимум ${MAX_NAME} символов`;
     }
     if (!form.patronymic || form.patronymic.trim().length < 3) {
       newErrors.patronymic = 'Отчество от 3 символов';
+    } else if (form.patronymic.trim().length > MAX_NAME) {
+      newErrors.patronymic = `Максимум ${MAX_NAME} символов`;
     }
     if (!form.email) {
       newErrors.email = 'Почта обязательна';
     } else if (!emailRegex.test(form.email)) {
-      newErrors.email = 'Некорректная почта';
+      newErrors.email = 'Неверный формат';
+    } else if (form.email.length > MAX_EMAIL) {
+      newErrors.email = `Максимум ${MAX_EMAIL} символов`;
     }
     if (form.city === null) {
-      newErrors.city = 'Выберите город';
+      newErrors.city = 'Укажите город';
     }
     if (!form.password) {
       newErrors.password = 'Пароль обязателен';
     } else if (passwordScore < 2) {
       newErrors.password = 'Пароль слишком слабый';
+    } else if (form.password.length > MAX_PASSWORD) {
+      newErrors.password = `Максимум ${MAX_PASSWORD} символов`;
     }
     if (!form.confirmPassword) {
-      newErrors.confirmPassword = 'Повторите пароль';
+      newErrors.confirmPassword = 'Подтвердите пароль';
     } else if (form.confirmPassword !== form.password) {
       newErrors.confirmPassword = 'Пароли не совпадают';
     }
     if (!form.agree) {
-      newErrors.agree = 'Нужно согласиться с условиями';
+      newErrors.agree = 'Подтвердите согласие с условиями';
     }
     return newErrors;
   };
@@ -244,6 +263,7 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
         }),
       ).unwrap();
       handleClose();
+      navigate('/welcome');
     } catch (error) {
       setErrors({ submit: (error as string) || 'Не удалось зарегистрироваться' });
     }
@@ -267,7 +287,7 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
           <InputField
             name="name"
             label="Имя"
-            placeholder="Иван"
+            placeholder="Имя"
             value={form.name}
             onChange={(v) => {
               setForm((prev) => ({ ...prev, name: v }));
@@ -279,7 +299,7 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
           <InputField
             name="surname"
             label="Фамилия"
-            placeholder="Иванов"
+            placeholder="Фамилия"
             value={form.surname}
             onChange={(v) => {
               setForm((prev) => ({ ...prev, surname: v }));
@@ -291,7 +311,7 @@ export const RegisterModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
           <InputField
             name="patronymic"
             label="Отчество"
-            placeholder="Иванович"
+            placeholder="Отчество"
             value={form.patronymic}
             onChange={(v) => {
               setForm((prev) => ({ ...prev, patronymic: v }));

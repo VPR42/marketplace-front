@@ -1,48 +1,181 @@
-import './service-catalog.scss';
-import { Plus } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+﻿import { Plus } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button } from 'rsuite';
+import { Button, Pagination } from 'rsuite';
 
-import { services } from '@/shared/data/services';
-import { FilterGroup } from '@/shared/FilterGroup';
+import { CustomLoader } from '@/components/CustomLoader/ui';
+import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import {
+  addToFavorites,
+  fetchFavorites,
+  removeFromFavorites,
+} from '@/redux-rtk/store/favorites/favoriteThunks';
+import { selectFilteredFavorites } from '@/redux-rtk/store/favorites/selectors';
+import { createOrder } from '@/redux-rtk/store/orders/ordersThunks';
+import { selectServicesState } from '@/redux-rtk/store/services/selectors';
+import { fetchServices } from '@/redux-rtk/store/services/servicesThunks';
+import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
+import { fetchCategories } from '@/redux-rtk/store/utils/utilsThunks';
+import { FiltersGroup } from '@/shared/FilterGroup';
 import { CategoryTabs } from '@/shared/FilterTabs';
-import { OrderPlacementModal } from '@/shared/OrderPlacementModal';
 import { SearchInput } from '@/shared/SearchInput';
 import { ServiceCard } from '@/shared/ServiceCard/ui';
+import { ServiceCreationModal } from '@/shared/ServiceCreationModal/ui';
 import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
-import { ServiceOrderModal } from '@/shared/ServiceModal/ui';
+
+import './service-catalog.scss';
+
+const experienceOptions = [
+  { label: 'Все', value: null },
+
+  { label: 'До 1 года', value: 0 },
+
+  { label: 'От 1 года', value: 1 },
+
+  { label: 'Более 3 лет', value: 3 },
+
+  { label: 'Более 5 лет', value: 5 },
+
+  { label: 'Более 10 лет', value: 10 },
+];
+
+const sortOptions = [
+  { label: 'По возрастанию', value: 'ASC' },
+
+  { label: 'По убыванию', value: 'DESC' },
+];
 
 export const ServiceCatalogPage: React.FC = () => {
+  const dispatch = useAppDispatch();
+
+  const { items, totalPages, status } = useAppSelector(selectServicesState);
+
+  const { categories } = useAppSelector(selectUtilsState);
+  const favorites = useAppSelector(selectFilteredFavorites);
+
   const [searchParams] = useSearchParams();
+
   const initialSearch = searchParams.get('search') ?? '';
+  const initialCategoryIdParam = searchParams.get('categoryId');
+  const initialCategoryId = initialCategoryIdParam ? Number(initialCategoryIdParam) : null;
+
   const shouldOpenCreate = searchParams.get('create') === 'service';
 
-  const [activeFilter, setActiveFilter] = useState('Все');
   const [searchTerm, setSearchTerm] = useState(initialSearch);
+
   const [openServiceModal, setOpenServiceModal] = useState(false);
-  const [selectedService, setSelectedService] = useState<(typeof services)[0] | null>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
-  const filters = [
-    { name: 'Стоимость', options: ['По убыванию', 'По возрастанию'] },
-    { name: 'Опыт', options: ['Больше 5 лет', '3–5 лет', 'Менее 3 лет'] },
-    { name: 'Рейтинг', options: ['4.9 и выше', '4.5 и выше', '4.0 и выше'] },
-  ];
+  const [openDetailModal, setOpenDetailModal] = useState(false);
 
-  const filteredServices = useMemo(() => {
-    const term = searchTerm.trim().toLowerCase();
-    if (!term) {
-      return services;
+  // const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
+
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
+
+  const [categoryId, setCategoryId] = useState<number | null>(
+    Number.isNaN(initialCategoryId) ? null : initialCategoryId,
+  );
+
+  const [experience, setExperience] = useState<number | null>(null);
+
+  const [minPrice, setMinPrice] = useState('');
+
+  const [maxPrice, setMaxPrice] = useState('');
+
+  const [priceSort, setPriceSort] = useState<'ASC' | 'DESC' | null>(null);
+
+  const [experienceSort, setExperienceSort] = useState<'ASC' | 'DESC' | null>(null);
+
+  const [priceError, setPriceError] = useState<string | null>(null);
+
+  const [pageSize] = useState(9);
+
+  const [pageNumber, setPageNumber] = useState(0);
+
+  // const [_orderFormKey, setOrderFormKey] = useState(0);
+
+  useEffect(() => {
+    dispatch(fetchCategories({ jobsCountSort: 'DESC', query: null }));
+  }, [dispatch]);
+
+  useEffect(() => {
+    const min = minPrice ? Number(minPrice) : undefined;
+
+    const max = maxPrice ? Number(maxPrice) : undefined;
+
+    if (min !== undefined && Number.isNaN(min)) {
+      setPriceError('Минимальная цена должна быть числом');
+
+      return;
     }
-    return services.filter(
-      (s) =>
-        s.title.toLowerCase().includes(term) ||
-        s.description.toLowerCase().includes(term) ||
-        s.workerName.toLowerCase().includes(term),
+
+    if (max !== undefined && Number.isNaN(max)) {
+      setPriceError('Максимальная цена должна быть числом');
+
+      return;
+    }
+
+    if (min !== undefined && max !== undefined && min > max) {
+      setPriceError('Минимальная цена не может быть больше максимальной');
+
+      return;
+    }
+
+    setPriceError(null);
+  }, [minPrice, maxPrice]);
+
+  useEffect(() => {
+    if (priceError) {
+      return;
+    }
+
+    const min = minPrice ? Number(minPrice) : undefined;
+
+    const max = maxPrice ? Number(maxPrice) : undefined;
+
+    dispatch(
+      fetchServices({
+        page: pageNumber,
+
+        pageSize,
+
+        query: searchTerm || undefined,
+
+        categoryId: categoryId ?? undefined,
+
+        experience: experience ?? undefined,
+
+        minPrice: min !== undefined && !Number.isNaN(min) ? min : undefined,
+
+        maxPrice: max !== undefined && !Number.isNaN(max) ? max : undefined,
+
+        priceSort: priceSort ?? undefined,
+
+        experienceSort: experienceSort ?? undefined,
+      }),
     );
-  }, [searchTerm]);
+  }, [
+    dispatch,
+
+    pageNumber,
+
+    pageSize,
+
+    searchTerm,
+
+    categoryId,
+
+    experience,
+
+    minPrice,
+
+    maxPrice,
+
+    priceSort,
+
+    experienceSort,
+
+    priceError,
+  ]);
 
   useEffect(() => {
     if (shouldOpenCreate) {
@@ -54,122 +187,254 @@ export const ServiceCatalogPage: React.FC = () => {
     setSearchTerm(initialSearch);
   }, [initialSearch]);
 
+  useEffect(() => {
+    const param = searchParams.get('categoryId');
+    const value = param ? Number(param) : null;
+    setCategoryId(Number.isNaN(value) ? null : value);
+    setPageNumber(0);
+  }, [searchParams]);
+
+  const categoryTabs = useMemo(
+    () => ['Все', ...categories.map((c) => c.category.name)],
+
+    [categories],
+  );
+  const activeTab = useMemo(() => {
+    if (categoryId === null) {
+      return 'Все';
+    }
+
+    const found = categories.find((c) => c.category.id === categoryId);
+
+    return found?.category.name ?? 'Все';
+  }, [categories, categoryId]);
+
+  const handleCategoryChange = (label: string) => {
+    if (label === 'Все') {
+      setCategoryId(null);
+
+      setPageNumber(0);
+
+      return;
+    }
+
+    const found = categories.find((c) => c.category.name === label);
+
+    setCategoryId(found?.category.id ?? null);
+
+    setPageNumber(0);
+  };
+
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+
+    setPageNumber(0);
+  };
+
+  const isLoading = status === 'loading';
+
+  const isEmpty = !isLoading && items.length === 0;
+
+  const selectedService = items.find((s) => s.id === selectedServiceId) || null;
+
+  const isFavorite = useMemo(() => {
+    if (!selectedService) {
+      return false;
+    }
+    return favorites.some((f) => f.id === selectedService.id);
+  }, [favorites, selectedService]);
+
+  const [togglingFavoriteId, setTogglingFavoriteId] = useState<string | null>(null);
+
+  const handleToggleFavorite = useCallback(
+    async (serviceId: string, makeFavorite: boolean) => {
+      if (!serviceId) {
+        return;
+      }
+      if (togglingFavoriteId === serviceId) {
+        return;
+      }
+
+      setTogglingFavoriteId(serviceId);
+
+      try {
+        const isAlready = favorites.some((f) => f.id === serviceId);
+
+        if (makeFavorite && !isAlready) {
+          await dispatch(addToFavorites(serviceId)).unwrap();
+        } else if (!makeFavorite && isAlready) {
+          await dispatch(removeFromFavorites(serviceId)).unwrap();
+        }
+
+        await dispatch(fetchFavorites()).unwrap();
+      } catch (err) {
+        console.error('toggle favorite failed', err);
+      } finally {
+        setTogglingFavoriteId(null);
+      }
+    },
+    [dispatch, favorites, togglingFavoriteId],
+  );
+
   return (
     <div className="ServiceCatalog">
       <div className="ServiceCatalog__header">
         <h2 className="ServiceCatalog__title">Каталог услуг</h2>
+
         <Button
           className="ServiceCatalog__add-btn"
-          title="Разместить услугу"
+          title="Создать услугу"
           onClick={() => setOpenServiceModal(true)}
         >
-          <Plus /> Разместить услугу
+          <Plus /> Создать услугу
         </Button>
       </div>
 
       <SearchInput
-        placeholder="Поиск услуг и мастеров..."
+        placeholder="Ищи услуги по названию или описанию..."
         defaultValue={initialSearch}
-        onSearch={(value) => setSearchTerm(value)}
+        onSearch={handleSearch}
       />
 
-      <CategoryTabs
-        categories={['Все', 'Ремонт', 'Уборка', 'Сантехника', 'IT услуги', 'Электрика']}
-        active={activeFilter}
-        onChange={setActiveFilter}
-      />
+      <CategoryTabs categories={categoryTabs} active={activeTab} onChange={handleCategoryChange} />
 
-      <FilterGroup filters={filters} />
+      <div className="ServiceCatalog__filters">
+        <FiltersGroup
+          experience={experience}
+          onExperienceChange={(v) => {
+            setExperience(v);
+            setPageNumber(0);
+          }}
+          minPrice={minPrice}
+          maxPrice={maxPrice}
+          onMinPriceChange={setMinPrice}
+          onMaxPriceChange={setMaxPrice}
+          priceError={priceError || undefined}
+          priceSort={priceSort}
+          experienceSort={experienceSort}
+          onPriceSortChange={(v) => {
+            setPriceSort(v);
+            setPageNumber(0);
+          }}
+          onExperienceSortChange={(v) => {
+            setExperienceSort(v);
+            setPageNumber(0);
+          }}
+          experienceOptions={experienceOptions as { label: string; value: number | null }[]}
+          sortOptions={sortOptions as { label: string; value: 'ASC' | 'DESC' }[]}
+        />
+      </div>
 
       <div className="ServiceCatalog__grid">
-        {filteredServices.map((service) => (
+        {items.map((service) => (
           <div className="ServiceCatalog__card-wrapper" key={service.id}>
             <ServiceCard
-              key={service.id}
-              title={service.title}
+              title={service.name}
               description={service.description}
-              price={service.price}
-              orders={service.orders}
-              gradient={service.gradient}
-              workerAvatar={service.workerAvatar}
-              workerName={service.workerName}
-              workerRating={service.workerRating}
+              price={service.price.toString()}
+              orders={service.ordersCount}
+              gradient="linear-gradient(135deg, #4facfe, #00f2fe)"
+              coverUrl={service.coverUrl}
+              workerName={
+                service.user.master?.pseudonym || `${service.user.name} ${service.user.surname}`
+              }
+              workerAvatar={service.user.avatarPath}
               onClick={() => {
-                setSelectedService(service);
-                setIsDetailModalOpen(true);
+                setSelectedServiceId(service.id);
+                console.warn(service.tags);
+                setOpenDetailModal(true);
               }}
             />
           </div>
         ))}
+
+        {isLoading && (
+          <div className="ServiceCatalog__loader">
+            <CustomLoader size="md" content="" />
+          </div>
+        )}
+
+        {isEmpty && <div className="ServiceCatalog__empty">Нет подходящих услуг</div>}
       </div>
+
+      {!isLoading && !isEmpty && (
+        <div className="ServiceCatalog__pagination">
+          <Pagination
+            prev
+            next
+            total={Math.max(1, totalPages) * pageSize}
+            limit={pageSize}
+            activePage={pageNumber + 1}
+            onChangePage={(p) => setPageNumber(p - 1)}
+          />
+        </div>
+      )}
+
       {openServiceModal && (
-        /*крч вот тут я для тестов оставил чтобы открыть модалку создания услуги сделайте mode = "create" и удалите onDelete
-          а для вызова модалки редактирования укажите mode = "edit" и прокиньте onDelete чтобы кнопка удаления услуги срабатывала как нада.
-          onSubmit ето действие, что будет происходить при нажатии на голубую кнопку (в разных режимах она будет называться по разному)*/
-        <ServiceOrderModal
+        <ServiceCreationModal
           open={openServiceModal}
           onClose={() => setOpenServiceModal(false)}
           mode="create"
-          onSubmit={() => {}}
+          onSubmit={() => setOpenServiceModal(false)}
         />
       )}
 
       {selectedService && (
         <ServiceDetailModal
-          open={isDetailModalOpen}
+          open={openDetailModal}
           onClose={() => {
-            setIsDetailModalOpen(false);
-            setSelectedService(null);
+            setOpenDetailModal(false);
+            setSelectedServiceId(null);
           }}
           service={{
             id: selectedService.id,
-            title: selectedService.title,
+
+            title: selectedService.name,
+
             description: selectedService.description,
+
             price: selectedService.price,
-            orders: selectedService.orders,
-            gradient: selectedService.gradient,
-            workerName: selectedService.workerName,
-            workerRating: selectedService.workerRating,
-            workerAvatar: selectedService.workerAvatar,
-            category: 'Сантехника', // можно будет получать из данных
-            tags: ['Гарантия 6 месяцев', 'Чек и договор', 'Безнал/Наличные', 'Выезд сегодня'],
-            experience: '7 лет опыта',
-            location: 'Москва, СВО',
+
+            orders: selectedService.ordersCount,
+
+            gradient: 'linear-gradient(135deg, #4facfe, #00f2fe)',
+
+            coverUrl: selectedService.coverUrl,
+
+            workerName:
+              selectedService.user.master?.pseudonym ||
+              `${selectedService.user.name} ${selectedService.user.surname}`,
+
+            workerRating: '-',
+
+            workerAvatar: selectedService.user.avatarPath,
+
+            category: selectedService.category.name,
+
+            tags: selectedService.tags.map((elem) => elem.name),
+
+            experience: selectedService.user.master?.experience
+              ? `${selectedService.user.master.experience} лет опыта`
+              : undefined,
+
+            location: selectedService.user.city.name,
+            user: selectedService.user,
           }}
           onOrder={() => {
-            setIsDetailModalOpen(false);
-            setIsOrderModalOpen(true);
+            dispatch(createOrder({ jobId: selectedService.id }))
+              .unwrap()
+              .then(() => {
+                setOpenDetailModal(false);
+              })
+              .catch(() => {});
           }}
-          onMessage={() => {
-            console.log('Написать мастеру');
-          }}
+          onMessage={() => console.warn('Написать мастеру')}
+          isFavorite={isFavorite}
           onFavorite={() => {
-            console.log('Добавить в избранное');
+            const currentlyFavorite = favorites.some((f) => f.id === selectedService.id);
+            handleToggleFavorite(selectedService.id, !currentlyFavorite);
           }}
-        />
-      )}
-
-      {selectedService && (
-        <OrderPlacementModal
-          open={isOrderModalOpen}
-          onClose={() => {
-            setIsOrderModalOpen(false);
-            // Возвращаемся к модальному окну с деталями услуги
-            if (selectedService) {
-              setIsDetailModalOpen(true);
-            }
-          }}
-          service={{
-            id: selectedService.id,
-            title: selectedService.title,
-            workerName: selectedService.workerName,
-            category: 'Сантехника',
-            tags: ['Гарантия 6 месяцев', 'Чек и договор'],
-            price: selectedService.price,
-          }}
-          onSubmit={(data) => {
-            console.log('Данные заказа:', data);
-          }}
+          isTogglingFavorite={togglingFavoriteId === selectedService.id}
         />
       )}
     </div>

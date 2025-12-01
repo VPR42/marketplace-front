@@ -1,4 +1,4 @@
-.ServiceCatalog {
+﻿.ServiceCatalog {
   padding: 32px 48px;
   background-color: #f5f5f5;
 
@@ -6,7 +6,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
   }
 
   &__title {
@@ -19,7 +19,8 @@
   &__add-btn {
     padding: 10px 16px;
     background-color: var(--orange);
-    color: white;
+    color: #fff;
+    border-color: var(--orange);
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -28,20 +29,98 @@
     align-items: center;
     gap: 8px;
 
-    &:hover {
+    &.rs-btn {
+      background-color: var(--orange);
+      color: #fff;
+      border-color: var(--orange);
+    }
+
+    &:hover,
+    &:focus,
+    &:active {
       background-color: var(--orange-hover);
+      color: #fff;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--orange-hover);
+      outline-offset: 2px;
     }
   }
 
   &__grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 16px 24px;
+    gap: 20px 24px;
   }
 
   &__card-wrapper {
     display: flex;
     flex-direction: column;
     height: 100%;
+  }
+
+  &__loader {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    padding: 24px 0;
+  }
+
+  &__empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 32px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  &__pagination {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__error {
+    color: #b91c1c;
+    font-size: 12px;
+  }
+
+  &__price-inputs {
+    display: flex;
+    gap: 8px;
+
+    input {
+      width: 120px;
+    }
+  }
+
+  &__filter-label {
+    font-size: 16px;
+    color: #555;
+    font-weight: 700;
+  }
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px 16px;
+    padding: 4px 0;
+  }
+
+  &__filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    &--sort {
+      gap: 8px;
+      &--pickers {
+        display: flex;
+        gap: 8px;
+      }
+    }
   }
 }

@@ -31,6 +31,8 @@
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 180px;
+  position: relative;
 }
 
 .ProfileHeader__content {
@@ -45,7 +47,6 @@
   border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
-  background: linear-gradient(135deg, #6e45e2, #88d3ce);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -66,6 +67,7 @@
   color: #fff;
   font-size: 32px;
   font-weight: 700;
+  border-radius: 12px;
 }
 
 .ProfileHeader__info {
@@ -79,12 +81,13 @@
   margin: 0;
   font-size: 28px;
   font-weight: 700;
+  line-height: 1.3;
 }
 
 .ProfileHeader__meta {
   display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
+  width: 140%;
+  gap: 32px;
   color: #666;
   font-size: 14px;
 }
@@ -104,11 +107,10 @@
 .ProfileHeader__stat {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
 .ProfileHeader__stat-value {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: #e65400;
 }
@@ -137,6 +139,10 @@
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 180px;
+  text-overflow: clip;
+  overflow-wrap: break-word;
+  max-width: 848px;
 }
 
 .AboutSection__header {
@@ -185,6 +191,7 @@
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 160px;
 }
 
 .SkillsSection__header {
@@ -233,6 +240,7 @@
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 260px;
 }
 
 .ServicesSection__header {
@@ -256,12 +264,16 @@
 
 .ServicesSection__grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
 }
 
 .ServicesSection__card-wrapper {
   width: 100%;
+  height: 350px;
+}
+.ServicesSection__card-wrapper .ServiceCard {
+  height: 100%;
 }
 
 .ServicesSection__placeholder {
@@ -321,7 +333,7 @@
 }
 
 .ContactSection__edit-btn {
-  padding: 4px 8px;
+  padding: 8px 32px;
 }
 
 .ContactSection__content {
@@ -345,6 +357,9 @@
 
 .ContactSection__text {
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ContactSection__message-btn {
@@ -362,6 +377,7 @@
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 200px;
 }
 
 .RecentOrdersSection__header {
@@ -448,6 +464,47 @@
   font-size: 14px;
   color: #999;
   line-height: 1.6;
+}
+
+.orange-btn {
+  background-color: #ff7a00 !important;
+  border-color: #ff7a00 !important;
+  color: #fff !important;
+}
+.orange-btn:hover,
+.orange-btn:focus {
+  background-color: #e56d00 !important;
+  border-color: #e56d00 !important;
+  color: #fff !important;
+}
+.white-btn {
+  background-color: #ffffff !important;
+  border-color: #ffffff !important;
+  color: #000 !important;
+}
+.ProfileHeader__share-toast {
+  position: absolute;
+  right: 24px;
+  bottom: -8px;
+  background: #ff7a00;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.ProfilePage__share-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  background: #ff7a00;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
+  z-index: 1000;
 }
 
 // Адаптивность

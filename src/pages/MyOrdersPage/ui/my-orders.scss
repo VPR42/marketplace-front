@@ -14,6 +14,42 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+
+  &__pagination {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__statusTabs {
+    padding-top: 16px;
+  }
+
+  &__empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 32px 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+  &__filters {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__statusTabs__item {
+    margin-right: 12px;
+  }
+
+  &__statusTabs__item--active,
+  &__statusTabs__item--active:focus,
+  &__statusTabs__item--active:focus-visible,
+  &__statusTabs__item--active:focus-within {
+    background-color: #5c5c5c;
+    color: #fff;
+  }
 }
 
 .MyOrders__header {
@@ -58,6 +94,7 @@
 
 .MyOrders__search {
   width: 100%;
+
   .SearchInput {
     margin-bottom: 24px;
   }
@@ -107,10 +144,14 @@
   border: 1px solid var(--orders-border);
   border-radius: 12px;
   padding: 16px;
-  transition: box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+    cursor: pointer;
   }
 }
 
@@ -138,6 +179,35 @@
   }
 }
 
+.OrderCard__thumb {
+  position: relative;
+}
+
+.OrderCard__cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.2s ease;
+
+  &-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.6);
+    z-index: 1;
+  }
+
+  &__cover-fallback {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.08);
+  }
+}
+
 .OrderCard__body {
   flex: 1;
   display: flex;
@@ -162,6 +232,21 @@
   margin: 0;
   font-size: 18px;
   font-weight: 600;
+
+  &--fallback {
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    max-width: 80%;
+    justify-content: center;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    font-size: 18px;
+    font-weight: 600;
+  }
 }
 
 .OrderCard__meta {
@@ -188,18 +273,22 @@
     background: #cfe2ff;
     color: #084298;
   }
+
   &--working {
     background: #fff3cd;
     color: #856404;
   }
+
   &--completed {
     background: #d1e7dd;
     color: #0f5132;
   }
+
   &--cancelled {
     background: #f8d7da;
     color: #842029;
   }
+
   &--rejected {
     background: #f8d7da;
     color: #842029;

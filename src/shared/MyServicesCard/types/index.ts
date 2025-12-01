@@ -7,16 +7,19 @@ export interface MyServiceCardProps {
   category?: string;
   price?: number;
   location?: string;
-  image?: string;
+  cover?: string;
+  workerAvatar?: string;
   tags?: string[];
+  gradient?: string;
   createdAt?: string;
-  status?: string;
   workerName?: string;
   timeAgo?: string;
+  isFavorite?: boolean;
+  isToggling?: boolean;
 
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
-  onRemove?: (id: string) => void;
+  onToggle?: (id: string, makeFavorite: boolean) => Promise<void> | void;
   onProfile?: (id: string) => void;
   onMessage?: (id: string) => void;
 }
