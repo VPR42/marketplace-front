@@ -26,9 +26,8 @@ export const uploadServiceCover = createAsyncThunk<
 >('services/uploadCover', async ({ id, file }, { rejectWithValue }) => {
   try {
     const formData = new FormData();
-    formData.append('id', id);
     formData.append('file', file);
-    const { data } = await api.put<ServiceCoverResponse>('/feed/jobs/cover', formData, {
+    const { data } = await api.put<ServiceCoverResponse>(`/feed/jobs/cover/${id}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return data;
