@@ -282,6 +282,7 @@ export const MyOrdersPage: React.FC = () => {
 
       {selectedOrder && (
         <ServiceDetailModal
+          mode="orders"
           open={isDetailOpen}
           onClose={() => {
             setIsDetailOpen(false);
@@ -292,6 +293,7 @@ export const MyOrdersPage: React.FC = () => {
             title: selectedOrder.title,
             description: selectedOrder.description,
             price: selectedOrder.budget,
+            coverUrl: selectedOrder.image,
             orders: 0,
             gradient: 'linear-gradient(135deg, #ff7a45, #ffb347)',
             workerName: selectedOrder.master,

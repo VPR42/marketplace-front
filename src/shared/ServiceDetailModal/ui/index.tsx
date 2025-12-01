@@ -1,7 +1,7 @@
-﻿import { Heart } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Loader, Modal } from 'rsuite';
+import { Modal } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
 
@@ -18,6 +18,7 @@ const getInitialsFromTitle = (title: string) => {
 };
 
 const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string) => string }> = ({
+  mode,
   service,
   onOrder,
   onMessage,
@@ -43,6 +44,8 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
               от {service.price} ₽
             </div>
           </div>
+        </div>
+        {mode === 'service' && (
 
           <button
             className={`ServiceDetailModal__favorite-btn ${isFavorite ? 'ServiceDetailModal__favorite-btn--active' : ''}`}
@@ -64,16 +67,19 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
               )}
             </span>
           </button>
-        </div>
+        )}
+      </div>
 
-        <div className="ServiceDetailModal__actions">
-          <button className="ServiceDetailModal__message-btn" onClick={onMessage}>
-            Написать мастеру
-          </button>
+      <div className="ServiceDetailModal__actions">
+        <button className="ServiceDetailModal__message-btn" onClick={onMessage}>
+          Написать мастеру
+        </button>
+        {mode === 'service' && (
           <button className="ServiceDetailModal__order-btn" onClick={onOrder}>
             Заказать
           </button>
-        </div>
+        )}
+
       </div>
 
       <div className="ServiceDetailModal__master-container">
@@ -92,12 +98,14 @@ const ActionBar: React.FC<ServiceDetailModalProps & { getInitials: (name: string
           </button>
           <button className="ServiceDetailModal__master-btn">Написать</button>
         </div>
+
       </div>
     </div>
   );
 };
 
 export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
+  mode = 'service',
   open,
   onClose,
   service,
@@ -143,7 +151,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
                 <>
                   {!imageLoaded && (
                     <div className="ServiceDetailModal__image-loader">
-                      <Loader size="md" content="" />
+                      <CustomLoader size="md" content="" />
                     </div>
                   )}
                   <img
@@ -164,6 +172,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           </div>
 
           <ActionBar
+            mode={mode}
             service={service}
             onOrder={onOrder}
             onMessage={onMessage}
@@ -207,3 +216,4 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
     </Modal>
   );
 };
+
