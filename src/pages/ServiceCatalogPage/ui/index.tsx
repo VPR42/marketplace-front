@@ -418,6 +418,7 @@ export const ServiceCatalogPage: React.FC = () => {
               : undefined,
 
             location: selectedService.user.city.name,
+            user: selectedService.user,
           }}
           onOrder={() => {
             dispatch(createOrder({ jobId: selectedService.id }))

@@ -1,0 +1,67 @@
+.WelcomePage {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fdf1e3, #ffffff);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 16px;
+}
+
+.WelcomePage__card {
+  width: 100%;
+  max-width: 960px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  padding: 32px;
+}
+
+.WelcomePage__title {
+  margin: 0 0 12px 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: #1f1f1f;
+}
+
+.WelcomePage__subtitle {
+  margin: 0 0 24px 0;
+  color: #555;
+  font-size: 16px;
+}
+
+.inline-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.inline-profile-form__avatar-block {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.inline-profile-form__fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.inline-profile-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inline-profile-form__time {
+  grid-column: span 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.inline-profile-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}

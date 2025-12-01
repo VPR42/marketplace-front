@@ -22,7 +22,7 @@ export const RecentOrdersSection: React.FC<RecentOrdersSectionProps> = ({ orders
       case 'completed':
         return 'Завершён';
       case 'cancelled':
-        return 'Отменен';
+        return 'Отменён';
       case 'in_progress':
         return 'В работе';
       default:
@@ -72,8 +72,7 @@ export const RecentOrdersSection: React.FC<RecentOrdersSectionProps> = ({ orders
         ) : (
           <div className="RecentOrdersSection__placeholder">
             <p className="RecentOrdersSection__placeholder-text">
-              Мастер ещё не выполнял заказов через платформу. Как только появятся первые заказы, они
-              отобразятся здесь.
+              Пока нет недавних заказов. После появления новых заказов они будут показаны здесь.
             </p>
           </div>
         )}

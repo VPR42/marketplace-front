@@ -25,7 +25,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ skills, canEdit, o
             onClick={onEdit}
             className="SkillsSection__edit-btn"
           >
-            <Edit size={14} />
+            <Edit size={18} />
           </Button>
         )}
       </div>
@@ -42,7 +42,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ skills, canEdit, o
         ) : (
           <div className="SkillsSection__placeholder">
             <p className="SkillsSection__placeholder-text">
-              Мастер ещё не указал свои навыки и специализацию.
+              Добавьте направления и навыки, чтобы клиенты понимали, чем вы занимаетесь.
             </p>
           </div>
         )}

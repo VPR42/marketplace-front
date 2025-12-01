@@ -46,7 +46,6 @@ export const ProfileBadge = () => {
     { label: 'Мои услуги', icon: Wrench, path: '/my-services' },
 
     { label: 'Мои заказы', icon: ClipboardList, path: '/my-orders' },
-
   ];
 
   const handleNavigate = (path: string) => {
