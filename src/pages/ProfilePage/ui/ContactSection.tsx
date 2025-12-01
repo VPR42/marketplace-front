@@ -47,7 +47,6 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   daysOfWeek,
   canEdit,
   onEdit,
-  onMessage,
 }) => {
   const cityName = cityId ? cities.find((c) => c.value === cityId)?.label : null;
   const schedule =
