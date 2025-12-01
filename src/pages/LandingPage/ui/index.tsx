@@ -9,6 +9,7 @@ import { fetchCategories } from '@/redux-rtk/store/utils/utilsThunks';
 import { api } from '@/shared/axios.config';
 import { SearchInput } from '@/shared/SearchInput';
 
+import heroIllustration from '../../../../912b8eb7-70d4-4a19-b842-9e614508c2bc.png';
 import './landing.scss';
 
 interface ServiceItem {
@@ -166,7 +167,6 @@ export const LandingPage: React.FC = () => {
               error.response?.status === 401 ||
               error.response?.status === 500)
           ) {
-            // тихо показываем заглушки, без ошибки
             setServicesError(null);
             setLandingServices([]);
           } else {
@@ -280,7 +280,9 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="Landing__hero-aside" aria-hidden />
+          <div className="Landing__hero-aside">
+            <img src={heroIllustration} alt="Иллюстрация мастера за ноутбуком" loading="lazy" />
+          </div>
         </section>
 
         <section className="Landing__section">
