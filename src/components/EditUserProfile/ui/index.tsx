@@ -72,6 +72,9 @@ const dayOptions = [
   { label: 'Вс', value: 6 },
 ];
 
+const MIN_EXPERIENCE = 1;
+const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
+
 export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
   open,
   onClose,
@@ -136,6 +139,22 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
   const handlePhoneChange = (value: string) => {
     const numeric = value.replace(/\D/g, '');
     handleChange('phone', numeric.slice(0, 11));
+  };
+
+  const normalizeExperience = (value: number | string | null | undefined) => {
+    const num = Number(value);
+    if (Number.isNaN(num)) {
+      return 0;
+    }
+    return Math.max(0, Math.floor(num));
+  };
+
+  const normalizeTimeInput = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 4);
+    if (digits.length <= 2) {
+      return digits;
+    }
+    return `${digits.slice(0, 2)}:${digits.slice(2, 4)}`;
   };
 
   const handleAvatarUpload = (
@@ -206,6 +225,7 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
     checkLength(form.surname, 'surname', 2, 20);
     checkLength(form.patronymic, 'patronymic', 2, 20);
     checkLength(form.pseudonym, 'pseudonym', 2, 20);
+    checkLength(form.description, 'description', 5, 120);
 
     if (!form.city) {
       nextErrors.city = 'Укажите город';
@@ -217,8 +237,26 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
       nextErrors.phone = 'Только цифры, 10-15 символов';
     }
 
+    const exp = normalizeExperience(form.experience);
+    if (exp < MIN_EXPERIENCE) {
+      nextErrors.experience = 'Опыт должен быть не менее 1 года';
+    }
+
+    const isTimeValid = (time: string) => TIME_REGEX.test(time);
+    const toMinutes = (time: string) => {
+      const [h, m] = time.split(':').map(Number);
+      return h * 60 + m;
+    };
+
     if (!form.startTime.trim() || !form.endTime.trim()) {
       nextErrors.startTime = 'Укажите время работы';
+      nextErrors.endTime = 'Укажите время работы';
+    } else if (!isTimeValid(form.startTime) || !isTimeValid(form.endTime)) {
+      nextErrors.startTime = 'Формат времени HH:MM';
+      nextErrors.endTime = 'Формат времени HH:MM';
+    } else if (toMinutes(form.endTime) <= toMinutes(form.startTime)) {
+      nextErrors.startTime = 'Окончание должно быть позже начала';
+      nextErrors.endTime = 'Окончание должно быть позже начала';
     }
 
     if (!form.about.trim() || form.about.length < 10 || form.about.length > 200) {
@@ -380,10 +418,13 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
             <InputNumber
               id="experience"
               value={form.experience}
-              onChange={(value) => handleChange('experience', Number(value) || 0)}
-              min={0}
+              onChange={(value) => handleChange('experience', normalizeExperience(value))}
+              min={1}
               className="edit-profile-modal__number-input"
             />
+            {errors.experience ? (
+              <span className="input-error-text">{errors.experience}</span>
+            ) : null}
           </div>
 
           <div className="edit-profile-modal__field">
@@ -394,6 +435,9 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
               placeholder="Опишите специализацию"
               onChange={(value) => handleChange('description', value)}
             />
+            {errors.description ? (
+              <span className="input-error-text">{errors.description}</span>
+            ) : null}
           </div>
 
           <div className="edit-profile-modal__field">
@@ -416,7 +460,8 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
                 id="startTime"
                 value={form.startTime}
                 placeholder="09:00"
-                onChange={(value) => handleChange('startTime', value)}
+                inputMode="numeric"
+                onChange={(value) => handleChange('startTime', normalizeTimeInput(value))}
               />
             </div>
             <div>
@@ -425,10 +470,13 @@ export const EditUserProfileModal: React.FC<EditUserProfileModalProps> = ({
                 id="endTime"
                 value={form.endTime}
                 placeholder="20:00"
-                onChange={(value) => handleChange('endTime', value)}
+                inputMode="numeric"
+                onChange={(value) => handleChange('endTime', normalizeTimeInput(value))}
               />
             </div>
-            {errors.startTime ? <span className="input-error-text">{errors.startTime}</span> : null}
+            {errors.startTime || errors.endTime ? (
+              <span className="input-error-text">{errors.startTime || errors.endTime}</span>
+            ) : null}
           </div>
 
           <div className="edit-profile-modal__field">
