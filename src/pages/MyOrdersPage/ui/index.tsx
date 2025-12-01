@@ -169,6 +169,7 @@ export const MyOrdersPage: React.FC = () => {
         ? `${formatDistanceToNow(new Date(o.orderedAt), { locale: ru })} назад`
         : '',
       status: normalizeStatus(o.status),
+      gradient: 'linear-gradient(135deg, #5a55fa, #8e8cf1)',
       description: o.jobDescription ?? '',
       categoryId: o.categoryId ?? 0,
       categoryLabel: o.categoryName ?? '',

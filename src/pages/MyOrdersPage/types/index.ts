@@ -8,6 +8,7 @@ export interface OrderItem {
   created: string;
   status: OrderStatus;
   description: string;
+  gradient: string;
   categoryId: number;
   categoryLabel: string;
   budget: number;
