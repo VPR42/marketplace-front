@@ -124,7 +124,7 @@ export const MyOrdersPage: React.FC = () => {
     return found?.category.id ?? null;
   }, [activeFilter, categories]);
 
-  const [currentPage, setCurrentPage] = useState(reduxPageNumber);
+  const [currentPage, setCurrentPage] = useState(() => (orderIdFromUrl ? 1 : reduxPageNumber));
 
   const normalizeStatus = (s?: string): OrderStatus => {
     if (!s) {
