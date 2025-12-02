@@ -1,6 +1,6 @@
 ﻿import { Plus } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Pagination } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
@@ -47,6 +47,7 @@ const sortOptions = [
 
 export const ServiceCatalogPage: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const { items, totalPages, status } = useAppSelector(selectServicesState);
 
@@ -422,8 +423,9 @@ export const ServiceCatalogPage: React.FC = () => {
           onOrder={() => {
             dispatch(createOrder({ jobId: selectedService.id }))
               .unwrap()
-              .then(() => {
+              .then((order) => {
                 setOpenDetailModal(false);
+                navigate(`/my-orders?orderId=${order.id}`);
               })
               .catch(() => {});
           }}

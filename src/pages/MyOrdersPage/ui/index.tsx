@@ -2,6 +2,7 @@
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button, Pagination } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
@@ -63,6 +64,10 @@ const actionToStatus: Record<'start' | 'complete' | 'cancel', number> = {
 
 export const MyOrdersPage: React.FC = () => {
   const dispatch = useAppDispatch();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const orderIdFromUrl = searchParams.get('orderId');
+
   const [activeStatus, setActiveStatus] = useState<StatusFilter>(() => {
     const saved = localStorage.getItem('myOrdersStatus') as StatusFilter | null;
     if (saved && (saved === 'all' || statusFilters.some((s) => s.value === saved))) {
@@ -176,6 +181,17 @@ export const MyOrdersPage: React.FC = () => {
       image: o.jobCoverUrl ?? undefined,
     }));
   }, [apiOrders]);
+
+  useEffect(() => {
+    if (orderIdFromUrl && filteredOrders.length > 0) {
+      const foundOrder = filteredOrders.find((o) => o.id === orderIdFromUrl);
+      if (foundOrder) {
+        setSelectedOrder(foundOrder);
+        setIsDetailOpen(true);
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [orderIdFromUrl, filteredOrders]);
 
   const hasOrders = filteredOrders.length > 0;
   const showEmpty = !isLoading && !hasOrders;
