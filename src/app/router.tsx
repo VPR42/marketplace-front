@@ -6,11 +6,14 @@ import { FavoritesPage } from '@/pages/FavoritesPage';
 import { LandingPage } from '@/pages/LandingPage';
 import { MyOrdersPage } from '@/pages/MyOrdersPage';
 import { MyServicesPage } from '@/pages/MyServicesPage';
+import { NotFoundPage } from '@/pages/NotFoundPage/ui';
 import { ProfilePage } from '@/pages/ProfilePage';
 import { ServiceCatalogPage } from '@/pages/ServiceCatalogPage';
 import { WelcomePage } from '@/pages/WelcomePage/ui';
 
 import { MasterInfoGuard } from './guards/MasterInfoGuard';
+
+const NotFoundRoute = { path: '*', element: <NotFoundPage /> };
 
 export const router = createBrowserRouter([
   {
@@ -29,8 +32,10 @@ export const router = createBrowserRouter([
           { path: '/profile', element: <ProfilePage /> },
           { path: '/profile/:userId', element: <ProfilePage /> },
           { path: '/chats', element: <ChatsPage /> },
+          NotFoundRoute,
         ],
       },
+      NotFoundRoute,
     ],
   },
 ]);

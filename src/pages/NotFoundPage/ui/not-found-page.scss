@@ -1,0 +1,44 @@
+.NotFoundPage {
+  text-align: center;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+
+  &__header {
+    margin-bottom: 20px;
+  }
+
+  &__title {
+    font-size: 120px;
+    color: var(--orange);
+    margin: 0;
+  }
+
+  &__content {
+    margin-top: 20px;
+  }
+
+  &__message {
+    font-size: 36px;
+    margin-bottom: 20px;
+  }
+
+  &__buttons {
+    display: flex;
+    gap: 24px;
+  }
+
+  &__button {
+    background-color: var(--orange);
+    font-size: 24px;
+    height: 45px;
+    width: 100%;
+
+    &:hover {
+      background-color: var(--orange-hover);
+    }
+  }
+}
