@@ -26,4 +26,5 @@ export interface ServiceDetailModalProps {
   onFavorite?: () => void;
   isFavorite?: boolean;
   isTogglingFavorite?: boolean;
+  isCreatingOrder?: boolean;
 }
