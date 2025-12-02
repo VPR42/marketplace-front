@@ -92,6 +92,8 @@ export const ServiceCatalogPage: React.FC = () => {
 
   const [pageNumber, setPageNumber] = useState(0);
 
+  const [creatingOrderId, setCreatingOrderId] = useState<string | null>(null);
+
   // const [_orderFormKey, setOrderFormKey] = useState(0);
 
   useEffect(() => {
@@ -420,14 +422,25 @@ export const ServiceCatalogPage: React.FC = () => {
             location: selectedService.user.city.name,
             user: selectedService.user,
           }}
+          isCreatingOrder={creatingOrderId === selectedService.id}
           onOrder={() => {
+            if (!selectedService?.id) {
+              return;
+            }
+
+            setCreatingOrderId(selectedService.id);
+
             dispatch(createOrder({ jobId: selectedService.id }))
               .unwrap()
               .then((order) => {
                 setOpenDetailModal(false);
+                setSelectedServiceId(null);
                 navigate(`/my-orders?orderId=${order.id}`);
               })
-              .catch(() => {});
+              .catch(() => {})
+              .finally(() => {
+                setCreatingOrderId(null);
+              });
           }}
           isFavorite={isFavorite}
           onFavorite={() => {

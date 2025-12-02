@@ -41,6 +41,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
   isFavorite,
   getInitials,
   isTogglingFavorite,
+  isCreatingOrder,
   creatingChat,
   onMessageInternal,
 }) => {
@@ -73,7 +74,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
             </button>
 
             <button className="ServiceDetailModal__order-btn" onClick={onOrder}>
-              Заказать
+              {isCreatingOrder ? <CustomLoader size="xs" /> : 'Заказать'}
             </button>
           </div>
         )}
@@ -144,6 +145,8 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   isFavorite = false,
 
   isTogglingFavorite = false,
+
+  isCreatingOrder = false,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -253,6 +256,7 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
             isFavorite={isFavorite}
             getInitials={getInitials}
             isTogglingFavorite={isTogglingFavorite}
+            isCreatingOrder={isCreatingOrder}
             open={open}
             onClose={onClose}
             onMessage={onMessage}
