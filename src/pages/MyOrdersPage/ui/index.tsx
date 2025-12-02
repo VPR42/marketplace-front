@@ -84,7 +84,7 @@ export const MyOrdersPage: React.FC = () => {
   });
 
   const [activeFilter, setActiveFilter] = useState('Все');
-
+  const [isMasterOrder, setIsMasterOrder] = useState(false);
   const [searchTerm, setSearchTerm] = useState(() => localStorage.getItem('myOrdersSearch') || '');
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -153,9 +153,18 @@ export const MyOrdersPage: React.FC = () => {
       status: activeStatus === 'all' ? undefined : activeStatus,
       categoryId: activeCategoryId ?? undefined,
       search: searchTerm.trim() || undefined,
+      isMasterOrder,
     };
     dispatch(fetchOrders(params));
-  }, [dispatch, currentPage, reduxPageSize, activeStatus, activeCategoryId, searchTerm]);
+  }, [
+    dispatch,
+    currentPage,
+    reduxPageSize,
+    activeStatus,
+    activeCategoryId,
+    searchTerm,
+    isMasterOrder,
+  ]);
 
   const apiOrders = useAppSelector(selectOrders) as ApiOrderItem[] | undefined;
 
@@ -204,14 +213,20 @@ export const MyOrdersPage: React.FC = () => {
           <button
             type="button"
             className={`MyOrders__role ${activeRole === 'customer' ? 'MyOrders__role--active' : ''}`}
-            onClick={() => setActiveRole('customer')}
+            onClick={() => {
+              setIsMasterOrder(false);
+              setActiveRole('customer');
+            }}
           >
             Я заказчик
           </button>
           <button
             type="button"
             className={`MyOrders__role ${activeRole === 'worker' ? 'MyOrders__role--active' : ''}`}
-            onClick={() => setActiveRole('worker')}
+            onClick={() => {
+              setIsMasterOrder(true);
+              setActiveRole('worker');
+            }}
           >
             Я исполнитель
           </button>
@@ -360,6 +375,7 @@ export const MyOrdersPage: React.FC = () => {
               fetchOrders({
                 pageNumber: currentPage - 1,
                 pageSize: reduxPageSize,
+                isMasterOrder,
                 status: activeStatus === 'all' ? undefined : activeStatus,
                 categoryId: activeCategoryId ?? undefined,
                 search: searchTerm.trim() || undefined,

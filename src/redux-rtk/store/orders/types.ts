@@ -22,6 +22,7 @@ export interface OrdersQueryParams {
   status?: string;
   search?: string;
   categoryId?: number;
+  isMasterOrder?: boolean;
   pageNumber?: number;
   pageSize?: number;
 }
