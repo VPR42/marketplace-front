@@ -73,7 +73,11 @@ const ActionBar: React.FC<ActionBarProps> = ({
               {creatingChat ? <CustomLoader size="xs" /> : 'Написать мастеру'}
             </button>
 
-            <button className="ServiceDetailModal__order-btn" onClick={onOrder}>
+            <button
+              className="ServiceDetailModal__order-btn"
+              onClick={onOrder}
+              disabled={isCreatingOrder}
+            >
               {isCreatingOrder ? <CustomLoader size="xs" /> : 'Заказать'}
             </button>
           </div>
