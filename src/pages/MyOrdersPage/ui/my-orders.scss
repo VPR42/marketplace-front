@@ -50,93 +50,93 @@
     background-color: #5c5c5c;
     color: #fff;
   }
-}
 
-.MyOrders__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-}
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
 
-.MyOrders__title {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--orders-text);
-}
+  &__title {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--orders-text);
+  }
 
-.MyOrders__roles {
-  display: inline-flex;
-  gap: 8px;
-  background: #f1f3f5;
-  padding: 6px;
-  border-radius: 12px;
-}
+  &__roles {
+    display: inline-flex;
+    gap: 8px;
+    background: #f1f3f5;
+    padding: 6px;
+    border-radius: 12px;
+  }
 
-.MyOrders__role {
-  border: 1px solid transparent;
-  background: transparent;
-  border-radius: 10px;
-  padding: 8px 14px;
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--orders-text);
-  transition: 0.15s ease;
-}
+  &__role {
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 10px;
+    padding: 8px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--orders-text);
+    transition: 0.15s ease;
+  }
 
-.MyOrders__role--active {
-  background: var(--orders-card);
-  border-color: var(--orders-border);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-}
+  &__role--active {
+    background: var(--orders-card);
+    border-color: var(--orders-border);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  }
 
-.MyOrders__search {
-  width: 100%;
+  &__search {
+    width: 100%;
 
-  .SearchInput {
+    .SearchInput {
+      margin-bottom: 24px;
+    }
+  }
+
+  &__filters {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
     margin-bottom: 24px;
   }
-}
 
-.MyOrders__filters {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 24px;
-}
+  &__filter-btn {
+    padding: 8px 16px;
+    background: #fff;
+    border: 1px solid var(--orders-border);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--orders-text);
+    transition: 0.15s ease;
 
-.MyOrders__filter-btn {
-  padding: 8px 16px;
-  background: #fff;
-  border: 1px solid var(--orders-border);
-  border-radius: 20px;
-  cursor: pointer;
-  font-size: 14px;
-  color: var(--orders-text);
-  transition: 0.15s ease;
+    &:hover {
+      border-color: var(--orders-primary);
+    }
 
-  &:hover {
-    border-color: var(--orders-primary);
+    &--active {
+      background: var(--orders-primary);
+      color: #fff;
+      border-color: var(--orders-primary);
+    }
   }
 
-  &--active {
-    background: var(--orders-primary);
-    color: #fff;
-    border-color: var(--orders-primary);
+  &__list {
+    display: grid;
+    gap: 16px;
   }
-}
 
-.MyOrders__list {
-  display: grid;
-  gap: 16px;
-}
-
-.MyOrders__empty {
-  text-align: center;
-  color: var(--orders-muted);
-  padding: 32px 0;
+  &__empty {
+    text-align: center;
+    color: var(--orders-muted);
+    padding: 32px 0;
+  }
 }
 
 .OrderCard {
@@ -153,274 +153,274 @@
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
     cursor: pointer;
   }
-}
 
-.OrderCard__row {
-  display: flex;
-  gap: 16px;
-}
-
-.OrderCard__thumb {
-  width: 180px;
-  height: 120px;
-  flex-shrink: 0;
-  border-radius: 10px;
-  border: 1px solid var(--orders-border);
-  background: #e9ecef center/cover no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--orders-muted);
-  font-weight: 600;
-  font-size: 13px;
-
-  &--empty {
-    background-image: none;
+  &__row {
+    display: flex;
+    gap: 16px;
   }
-}
 
-.OrderCard__thumb {
-  position: relative;
-}
-
-.OrderCard__cover {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity 0.2s ease;
-
-  &-loader {
-    position: absolute;
-    inset: 0;
+  &__thumb {
+    width: 180px;
+    height: 120px;
+    flex-shrink: 0;
+    border-radius: 10px;
+    border: 1px solid var(--orders-border);
+    background: #e9ecef center/cover no-repeat;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.6);
-    z-index: 1;
+    color: var(--orders-muted);
+    font-weight: 600;
+    font-size: 13px;
+
+    &--empty {
+      background-image: none;
+    }
   }
 
-  &__cover-fallback {
+  &__thumb {
+    position: relative;
+  }
+
+  &__cover {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.08);
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.2s ease;
+
+    &-loader {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.6);
+      z-index: 1;
+    }
+
+    &__cover-fallback {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.08);
+    }
   }
-}
 
-.OrderCard__body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+  &__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
 
-.OrderCard__top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 16px;
-}
+  &__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+  }
 
-.OrderCard__title-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+  &__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
 
-.OrderCard__title {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-
-  &--fallback {
-    color: #fff;
+  &__title {
     margin: 0;
-    display: flex;
-    align-items: center;
-    max-width: 80%;
-    justify-content: center;
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
     font-size: 18px;
     font-weight: 600;
-  }
-}
 
-.OrderCard__meta {
-  font-size: 13px;
-  color: var(--orders-muted);
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.OrderCard__dot {
-  color: var(--orders-muted);
-}
-
-.OrderCard__badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  display: inline-block;
-
-  &--created {
-    background: #cfe2ff;
-    color: #084298;
-  }
-
-  &--working {
-    background: #fff3cd;
-    color: #856404;
-  }
-
-  &--completed {
-    background: #d1e7dd;
-    color: #0f5132;
-  }
-
-  &--cancelled {
-    background: #f8d7da;
-    color: #842029;
-  }
-
-  &--rejected {
-    background: #f8d7da;
-    color: #842029;
-  }
-}
-
-.OrderCard__description {
-  color: #495057;
-  font-size: 14px;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.OrderCard__details {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 16px;
-  padding: 12px 0;
-  border-top: 1px solid var(--orders-border);
-  border-bottom: 1px solid var(--orders-border);
-}
-
-.OrderCard__detail {
-  font-size: 13px;
-}
-
-.OrderCard__detail-label {
-  color: var(--orders-muted);
-  margin-bottom: 4px;
-}
-
-.OrderCard__detail-value {
-  font-weight: 500;
-}
-
-.OrderCard__footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.OrderCard__tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.OrderCard__tag {
-  padding: 4px 10px;
-  background: var(--orders-tag-bg);
-  color: var(--orders-tag-text);
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.OrderCard__actions {
-  display: flex;
-  gap: 8px;
-}
-
-.OrderCard__btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: 0.15s ease;
-
-  &--primary {
-    background: var(--orders-primary);
-    color: #fff;
-
-    &:hover {
-      background: var(--orders-primary-600);
+    &--fallback {
+      color: #fff;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      max-width: 80%;
+      justify-content: center;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      font-size: 18px;
+      font-weight: 600;
     }
   }
 
-  &--secondary {
-    background: #fff;
-    color: var(--orders-text);
-    border: 1px solid var(--orders-border);
+  &__meta {
+    font-size: 13px;
+    color: var(--orders-muted);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
 
-    &:hover {
-      background: #f1f3f5;
+  &__dot {
+    color: var(--orders-muted);
+  }
+
+  &__badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+
+    &--created {
+      background: #cfe2ff;
+      color: #084298;
+    }
+
+    &--working {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    &--completed {
+      background: #d1e7dd;
+      color: #0f5132;
+    }
+
+    &--cancelled {
+      background: #f8d7da;
+      color: #842029;
+    }
+
+    &--rejected {
+      background: #f8d7da;
+      color: #842029;
     }
   }
 
-  &--danger {
-    background: #ff4b55;
-    color: #fff;
+  &__description {
+    color: #495057;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0;
+  }
 
-    &:hover {
-      background: #e0444c;
+  &__details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px;
+    padding: 12px 0;
+    border-top: 1px solid var(--orders-border);
+    border-bottom: 1px solid var(--orders-border);
+  }
+
+  &__detail {
+    font-size: 13px;
+  }
+
+  &__detail-label {
+    color: var(--orders-muted);
+    margin-bottom: 4px;
+  }
+
+  &__detail-value {
+    font-weight: 500;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  &__tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  &__tag {
+    padding: 4px 10px;
+    background: var(--orders-tag-bg);
+    color: var(--orders-tag-text);
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  &__btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.15s ease;
+
+    &--primary {
+      background: var(--orders-primary);
+      color: #fff;
+
+      &:hover {
+        background: var(--orders-primary-600);
+      }
+    }
+
+    &--secondary {
+      background: #fff;
+      color: var(--orders-text);
+      border: 1px solid var(--orders-border);
+
+      &:hover {
+        background: #f1f3f5;
+      }
+    }
+
+    &--danger {
+      background: #ff4b55;
+      color: #fff;
+
+      &:hover {
+        background: #e0444c;
+      }
+    }
+
+    &--success {
+      background: #16a34a;
+      color: #fff;
+
+      &:hover {
+        background: #128b3e;
+      }
     }
   }
 
-  &--success {
-    background: #16a34a;
-    color: #fff;
-
-    &:hover {
-      background: #128b3e;
+  @media (max-width: 900px) {
+    &__thumb {
+      width: 150px;
+      height: 100px;
     }
   }
-}
 
-@media (max-width: 900px) {
-  .OrderCard__thumb {
-    width: 150px;
-    height: 100px;
-  }
-}
+  @media (max-width: 768px) {
+    .MyOrders {
+      padding: 16px;
+    }
 
-@media (max-width: 768px) {
-  .MyOrders {
-    padding: 16px;
-  }
+    &__row {
+      flex-direction: column;
+    }
 
-  .OrderCard__row {
-    flex-direction: column;
-  }
+    &__thumb {
+      width: 100%;
+      height: 160px;
+    }
 
-  .OrderCard__thumb {
-    width: 100%;
-    height: 160px;
-  }
-
-  .OrderCard__details {
-    grid-template-columns: repeat(2, 1fr);
+    &__details {
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 }

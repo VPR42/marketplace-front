@@ -45,7 +45,7 @@
 }
 .row:hover {
   color: inherit;
-  // color: var(--white); // тож мб попробовать
+  /* color: var(--white); тож мб попробовать */
 }
 
 /* Подпись рядом с иконкой */
@@ -101,7 +101,7 @@
 
 .active {
   background-color: var(--orange);
-  color: var(--white); // свой нос сую куда не надо мб но белый возможно круче крч да
+  color: var(--white);
 }
 
 :where(.row:hover) {
