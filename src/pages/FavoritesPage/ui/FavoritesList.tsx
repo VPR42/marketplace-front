@@ -4,7 +4,6 @@ import { ru } from 'date-fns/locale';
 import { useState } from 'react';
 /* eslint-enable import/no-duplicates */
 
-import { CustomLoader } from '@/components/CustomLoader/ui';
 import type { FavoritesListProps } from '@/pages/FavoritesPage/types';
 import { useAppSelector } from '@/redux-rtk/hooks';
 import {
@@ -16,11 +15,10 @@ import { MyServiceCard } from '@/shared/MyServicesCard/ui';
 
 import './FavoritesPage.scss';
 
-export const FavoritesList: React.FC<FavoritesListProps> = ({ loadingState, onToggle }) => {
+export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
   const allFavorites = useAppSelector(selectAllFavorites);
   const filtered = useAppSelector(selectFilteredFavorites);
   const favoritesStatus = useAppSelector(selectFavoritesStatus);
-  const status = loadingState ?? favoritesStatus;
   const [togglingIds, setTogglingIds] = useState(new Set());
 
   const handleProfile = (id: string) => {
@@ -47,15 +45,9 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ loadingState, onTo
   const hasFavorites = (allFavorites?.length ?? 0) > 0;
   const hasFiltered = (filtered?.length ?? 0) > 0;
 
-  if (status === 'loading') {
-    return (
-      <div className="FavoritesPage__list--load">
-        <CustomLoader size="md" />
-      </div>
-    );
-  }
+  const loading = favoritesStatus === 'loading';
 
-  if (hasFavorites && !hasFiltered) {
+  if (hasFavorites && !hasFiltered && !loading) {
     return (
       <div className="FavoritesPage__empty">
         <div className="FavoritesPage__empty-title">Ничего не найдено</div>
@@ -64,7 +56,7 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ loadingState, onTo
     );
   }
 
-  if (!hasFavorites) {
+  if (!hasFavorites && !loading) {
     return (
       <div className="FavoritesPage__empty">
         <div className="FavoritesPage__empty-title">Избранное пусто</div>

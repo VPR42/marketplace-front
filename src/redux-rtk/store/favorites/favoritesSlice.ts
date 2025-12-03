@@ -7,6 +7,9 @@ const initialState: FavoritesState = {
   items: [],
   filtered: [],
   status: 'idle',
+  pageNumber: 0,
+  pageSize: 9,
+  totalElements: 0,
   error: null,
   filterParams: null,
 };
@@ -31,14 +34,23 @@ const favoritesSlice = createSlice({
       .addCase(fetchFavorites.fulfilled, (state, action) => {
         state.status = 'succeeded';
 
-        state.filtered = action.payload;
+        state.filtered = action.payload.content;
+
         if (!state.items.length) {
-          state.items = action.payload;
+          state.items = action.payload.content;
         }
+
+        state.pageNumber = action.payload.pageNumber;
+        state.pageSize = action.payload.size;
+        state.totalElements = action.payload.totalElements;
       })
+
       .addCase(fetchFavorites.rejected, (state, action) => {
         state.status = 'failed';
-        state.error = action.payload ?? action.error?.message ?? 'Unknown error';
+        state.error =
+          typeof action.payload === 'string'
+            ? action.payload
+            : (action.error?.message ?? 'Unknown error');
       })
 
       .addCase(addToFavorites.rejected, (state, action) => {

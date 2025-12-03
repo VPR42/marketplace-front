@@ -57,6 +57,9 @@ export interface FavoritesState {
   items: FavoriteJob[];
   filtered: FavoriteJob[];
   filterParams: FetchFavoritesParams | null;
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
 }
@@ -72,3 +75,10 @@ export type FetchFavoritesParams = {
   priceSort?: 'ASC' | 'DESC' | null;
   experienceSort?: 'ASC' | 'DESC' | null;
 };
+
+export interface FavoritesResponse {
+  content: FavoriteJob[];
+  pageNumber: number;
+  size: number;
+  totalElements: number;
+}
