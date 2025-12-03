@@ -122,38 +122,6 @@ export const ProfilePage = () => {
   const isMaster = Boolean(profile?.masterInfo);
 
   const userServices: BasicService[] = mapServicesToCards(servicesState.items || []);
-  const recentOrders = profile
-    ? [
-        {
-          id: 1,
-          title: 'Монтаж проводки',
-          price: 6500,
-          date: '18.01.2025',
-          status: 'cancelled' as const,
-        },
-        {
-          id: 2,
-          title: 'Сборка мебели',
-          price: 4500,
-          date: '12.01.2025',
-          status: 'cancelled' as const,
-        },
-        {
-          id: 3,
-          title: 'Установка техники',
-          price: 2300,
-          date: '10.01.2025',
-          status: 'completed' as const,
-        },
-        {
-          id: 4,
-          title: 'Установка розеток',
-          price: 1200,
-          date: '05.01.2025',
-          status: 'completed' as const,
-        },
-      ]
-    : [];
 
   const canEdit = isOwner && isAuthenticated;
   const canShowEditButton = canEdit;
@@ -340,7 +308,7 @@ export const ProfilePage = () => {
             onMessage={!canEdit ? handleMessage : undefined}
           />
 
-          <RecentOrdersSection orders={recentOrders} />
+          <RecentOrdersSection />
         </div>
       </div>
 
