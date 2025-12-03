@@ -3,7 +3,7 @@ import { isAxiosError } from 'axios';
 
 import { api } from '@/shared/axios.config';
 
-import type { FavoriteJob, FetchFavoritesParams } from './types';
+import type { FavoritesResponse, FetchFavoritesParams } from './types';
 
 const getFavoriteError = (error: unknown, fallback: string) => {
   if (isAxiosError(error)) {
@@ -13,54 +13,35 @@ const getFavoriteError = (error: unknown, fallback: string) => {
 };
 
 export const fetchFavorites = createAsyncThunk<
-  FavoriteJob[],
+  FavoritesResponse,
   FetchFavoritesParams | undefined,
   { rejectValue: string }
 >('favorites/fetchFavorites', async (params, { rejectWithValue }) => {
   try {
     const requestParams: Record<string, unknown> = {
       fromFavourites: true,
+      ...params,
     };
 
-    if (params) {
-      if (params.page !== undefined) {
-        requestParams.page = params.page;
-      }
-      if (params.pageSize !== undefined) {
-        requestParams.pageSize = params.pageSize;
-      }
-      if (params.query) {
-        requestParams.query = params.query;
-      }
-      if (params.categoryId !== undefined && params.categoryId !== null) {
-        requestParams.categoryId = params.categoryId;
-      }
-      if (params.experience !== undefined && params.experience !== null) {
-        requestParams.experience = params.experience;
-      }
-      if (params.minPrice !== undefined) {
-        requestParams.minPrice = params.minPrice;
-      }
-      if (params.maxPrice !== undefined) {
-        requestParams.maxPrice = params.maxPrice;
-      }
-      if (params.priceSort) {
-        requestParams.priceSort = params.priceSort;
-      }
-      if (params.experienceSort) {
-        requestParams.experienceSort = params.experienceSort;
-      }
-    }
-
     const { data } = await api.get('/feed/jobs', { params: requestParams });
-    return data?.content ?? [];
+    return {
+      content: data.content ?? [],
+      pageNumber: data.pageNumber ?? 0,
+      size: data.size ?? 9,
+      totalElements: data.totalElements ?? 0,
+    };
   } catch (error: unknown) {
     if (
       isAxiosError(error) &&
       error.response?.status === 404 &&
       (error.response.data as { errorCode?: string })?.errorCode === 'JOBS_NOT_FOUND'
     ) {
-      return [];
+      return {
+        content: [],
+        pageNumber: 0,
+        size: params?.pageSize ?? 9,
+        totalElements: 0,
+      };
     }
     return rejectWithValue(getFavoriteError(error, 'Failed to load favorites'));
   }
@@ -71,7 +52,7 @@ export const addToFavorites = createAsyncThunk<string, string, { rejectValue: st
   async (jobId, { rejectWithValue }) => {
     try {
       await api.post('/feed/favourites', { jobId });
-      return jobId; // просто возвращаем ID
+      return jobId;
     } catch (error: unknown) {
       return rejectWithValue(getFavoriteError(error, 'Failed to add favorite'));
     }
