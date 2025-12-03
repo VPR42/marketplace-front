@@ -39,6 +39,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
   const [form, setForm] = useState(authInitialState);
   const [errors, setErrors] = useState<{ email?: string; password?: string; submit?: string }>({});
   const [showPassword, setShowPassword] = useState(false);
+  const passwordScore = useMemo(() => zxcvbn(form.password).score, [form.password]);
 
   const clearFieldError = (field: keyof typeof errors) => {
     if (errors[field]) {
@@ -69,6 +70,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ open, onClose }) => {
 
     if (!form.password) {
       newErrors.password = 'Пароль обязателен';
+    } else if (passwordScore < 2) {
+      newErrors.password = 'Пароль слишком слабый';
     } else if (form.password.length > MAX_PASSWORD) {
       newErrors.password = `Максимум ${MAX_PASSWORD} символов`;
     }
