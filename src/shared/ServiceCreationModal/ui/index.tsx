@@ -1,5 +1,5 @@
 ﻿import { Edit2 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Form, Modal, SelectPicker, TagPicker, Uploader } from 'rsuite';
 import type { FileType } from 'rsuite/Uploader';
 
@@ -84,7 +84,7 @@ export const ServiceCreationModal: React.FC<ServiceCreationProps> = ({
 
   const { status: serviceStatus } = useAppSelector(selectServicesState);
 
-  const { categories, tags } = useAppSelector(selectUtilsState);
+  const { categories, tags, status: utilsStatus } = useAppSelector(selectUtilsState);
 
   const { isAuthenticated } = useAppSelector(selectAuthState);
 
@@ -112,11 +112,19 @@ export const ServiceCreationModal: React.FC<ServiceCreationProps> = ({
     {},
   );
 
-  useEffect(() => {
-    dispatch(fetchCategories({ jobsCountSort: null, query: null }));
+  const categoriesRequested = useRef(false);
+  const tagsRequested = useRef(false);
 
-    dispatch(fetchTags());
-  }, [dispatch]);
+  useEffect(() => {
+    if (!categoriesRequested.current && utilsStatus === 'idle' && categories.length === 0) {
+      categoriesRequested.current = true;
+      dispatch(fetchCategories({ jobsCountSort: null, query: null }));
+    }
+    if (!tagsRequested.current && tags.length === 0) {
+      tagsRequested.current = true;
+      dispatch(fetchTags());
+    }
+  }, [dispatch, utilsStatus, categories.length, tags.length]);
 
   useEffect(() => {
     if (coverUrl && mode === 'edit') {
