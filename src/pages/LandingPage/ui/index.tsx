@@ -208,7 +208,12 @@ export const LandingPage: React.FC = () => {
     }
   }, [dispatch, utilsStatus]);
 
-  const goToFeed = (params?: { search?: string; categoryId?: number | null; create?: string }) => {
+  const goToFeed = (params?: {
+    search?: string;
+    categoryId?: number | null;
+    create?: string;
+    serviceId?: string;
+  }) => {
     const sp = new URLSearchParams();
     if (params?.search) {
       sp.set('search', params.search);
@@ -219,6 +224,9 @@ export const LandingPage: React.FC = () => {
     if (params?.create) {
       sp.set('create', params.create);
     }
+    if (params?.serviceId) {
+      sp.set('serviceId', params.serviceId);
+    }
     const query = sp.toString();
     navigate(query ? `/feed?${query}` : '/feed');
   };
@@ -227,7 +235,10 @@ export const LandingPage: React.FC = () => {
     const value = searchValue.trim();
     goToFeed(
       value || selectedCategoryId !== null
-        ? { search: value || undefined, categoryId: selectedCategoryId ?? undefined }
+        ? {
+            search: value || undefined,
+            categoryId: selectedCategoryId ?? undefined,
+          }
         : undefined,
     );
   };
@@ -339,6 +350,7 @@ export const LandingPage: React.FC = () => {
                 ];
 
                 const isDynamic = 'id' in service;
+                const serviceId = isDynamic ? service.id : null;
                 const title = isDynamic ? service.name : (service as ServiceItem).title;
                 const meta = isDynamic
                   ? [service.category?.name, service.user?.master?.pseudonym || service.user?.name]
@@ -367,6 +379,13 @@ export const LandingPage: React.FC = () => {
                 return (
                   <div
                     key={isDynamic ? service.id : (service as ServiceItem).title}
+                    onClick={() => {
+                      if (!serviceId) {
+                        return;
+                      }
+
+                      goToFeed({ serviceId });
+                    }}
                     className="Landing__card"
                   >
                     <div className="Landing__cover" style={coverStyle}>
