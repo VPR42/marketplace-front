@@ -15,45 +15,49 @@
     transform: none;
     margin: 0;
   }
-}
 
-.OrderActionModal__desc {
-  margin: 0 0 12px;
-  color: var(--text-gray, #5c5c5c);
-}
+  &__desc {
+    margin: 0 0 12px;
+    color: var(--text-gray, #5c5c5c);
+  }
 
-.OrderActionModal__btn {
-  border-radius: 8px;
+  &__btn {
+    border-radius: 8px;
 
-  &--start {
-    background: var(--orange);
-    color: #fff;
-    &:hover {
+    &--start {
       background: var(--orange);
-    }
-  }
+      color: #fff;
 
-  &--complete {
-    background: #16a34a;
-    color: #fff;
-    &:hover {
+      &:hover {
+        background: var(--orange);
+      }
+    }
+
+    &--complete {
       background: #16a34a;
-    }
-  }
+      color: #fff;
 
-  &--complete-worker {
-    background: #ef4444;
-    color: #fff;
-    &:hover {
+      &:hover {
+        background: #16a34a;
+      }
+    }
+
+    &--complete-worker {
       background: #ef4444;
-    }
-  }
+      color: #fff;
 
-  &--cancel {
-    background: #ff4b55;
-    color: #fff;
-    &:hover {
+      &:hover {
+        background: #ef4444;
+      }
+    }
+
+    &--cancel {
       background: #ff4b55;
+      color: #fff;
+
+      &:hover {
+        background: #ff4b55;
+      }
     }
   }
 }
