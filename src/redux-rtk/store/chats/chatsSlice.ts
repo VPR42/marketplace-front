@@ -46,9 +46,12 @@ export const chatsSlice = createSlice({
         state.messagesByChat[message.chatId] = [...list, message];
       }
       if (state.items.length) {
-        state.items = state.items.map((chat) =>
-          chat.chatId === message.chatId ? { ...chat, lastMessage: message } : chat,
-        );
+        const updatedChatIndex = state.items.findIndex((c) => c.chatId === message.chatId);
+        if (updatedChatIndex !== -1) {
+          const updatedChat = { ...state.items[updatedChatIndex], lastMessage: message };
+          const without = state.items.filter((c) => c.chatId !== message.chatId);
+          state.items = [updatedChat, ...without];
+        }
       }
     },
   },
