@@ -228,7 +228,7 @@
 
   &__cats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 14px;
     min-height: 120px;
   }
@@ -257,6 +257,7 @@
     min-height: 68px;
     transition: 0.2s ease;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
   }
 
   &__cat:hover {
@@ -277,7 +278,7 @@
     flex-shrink: 0;
   }
 
-  &__cat b {
+  &__cat-title {
     font-size: 15px;
     color: var(--foreground);
   }
