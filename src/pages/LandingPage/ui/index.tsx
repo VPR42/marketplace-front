@@ -204,7 +204,7 @@ export const LandingPage: React.FC = () => {
 
   useEffect(() => {
     if (utilsStatus === 'idle') {
-      dispatch(fetchCategories());
+      dispatch(fetchCategories({ jobsCountSort: 'DESC' }));
     }
   }, [dispatch, utilsStatus]);
 
@@ -306,7 +306,7 @@ export const LandingPage: React.FC = () => {
               >
                 <div className="Landing__cat-ico">{cat.icon}</div>
                 <div>
-                  <b>{cat.title}</b>
+                  <b className="Landing__cat-title">{cat.title}</b>
                   <div className="Landing__cat-muted">{cat.count}</div>
                 </div>
               </div>
