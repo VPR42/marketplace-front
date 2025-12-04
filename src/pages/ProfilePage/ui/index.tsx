@@ -18,6 +18,7 @@ import { fetchServices } from '@/redux-rtk/store/services/servicesThunks';
 import type { Service } from '@/redux-rtk/store/services/types';
 import type { Skill } from '@/redux-rtk/store/utils/types';
 import { ServiceCreationModal } from '@/shared/ServiceCreationModal/ui';
+import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 import { getWeekDayShort } from '@/shared/utils/weekDays';
 
 import { AboutSection } from './AboutSection';
@@ -72,6 +73,9 @@ export const ProfilePage = () => {
   );
   const [shareCopied, setShareCopied] = useState(false);
   const [openServiceModal, setOpenServiceModal] = useState(false);
+  const [serviceModalMode, setServiceModalMode] = useState<'create' | 'edit'>('create');
+  const [openServiceDetail, setOpenServiceDetail] = useState(false);
+  const [selectedService, setSelectedService] = useState<Service | null>(null);
 
   useEffect(() => {
     if (userId) {
@@ -122,6 +126,33 @@ export const ProfilePage = () => {
   const isMaster = Boolean(profile?.masterInfo);
 
   const userServices: BasicService[] = mapServicesToCards(servicesState.items || []);
+  const detailService = useMemo(() => {
+    if (!selectedService) {
+      return null;
+    }
+    const s = selectedService;
+    const workerName =
+      s.user?.master?.pseudonym ||
+      [s.user?.surname, s.user?.name].filter(Boolean).join(' ').trim() ||
+      'Мастер';
+    return {
+      id: s.id,
+      title: s.name,
+      description: s.description,
+      price: s.price,
+      orders: s.ordersCount ?? 0,
+      gradient: s.coverUrl,
+      coverUrl: s.coverUrl,
+      workerName,
+      workerRating: '',
+      workerAvatar: s.user?.avatarPath ?? '',
+      category: s.category?.name,
+      tags: s.tags?.map((t) => t.name),
+      experience: s.user?.master?.experience ? `${s.user.master.experience} лет опыта` : undefined,
+      location: s.user?.city?.name,
+      user: s.user,
+    };
+  }, [selectedService]);
   const recentOrders = profile
     ? [
         {
@@ -165,8 +196,25 @@ export const ProfilePage = () => {
   const handleEditProfile = () => setEditModalOpen(true);
   const handleEditAbout = () => setEditModalOpen(true);
   const handleEditSkills = () => setEditModalOpen(true);
-  const handleServiceClick = (_serviceId: string) => {};
-  const handleOpenServiceModal = () => setOpenServiceModal(true);
+  const handleServiceClick = (serviceId: string) => {
+    const service = servicesState.items.find((s) => s.id === serviceId) ?? null;
+    if (!service) {
+      return;
+    }
+    if (canEdit) {
+      setSelectedService(service);
+      setServiceModalMode('edit');
+      setOpenServiceModal(true);
+    } else {
+      setSelectedService(service);
+      setOpenServiceDetail(true);
+    }
+  };
+  const handleOpenServiceModal = () => {
+    setSelectedService(null);
+    setServiceModalMode('create');
+    setOpenServiceModal(true);
+  };
   const handleEditContact = () => setEditModalOpen(true);
   const handleShare = async () => {
     try {
@@ -362,8 +410,34 @@ export const ProfilePage = () => {
         <ServiceCreationModal
           open={openServiceModal}
           onClose={() => setOpenServiceModal(false)}
-          mode="create"
-          onSubmit={() => setOpenServiceModal(false)}
+          mode={serviceModalMode}
+          onSubmit={() => {
+            setOpenServiceModal(false);
+            setSelectedService(null);
+          }}
+          initialValues={
+            selectedService && serviceModalMode === 'edit'
+              ? {
+                  name: selectedService.name,
+                  description: selectedService.description,
+                  price: selectedService.price,
+                  categoryId: selectedService.category?.id ?? null,
+                  tags: selectedService.tags?.map((t) => t.id) ?? [],
+                  coverUrl: selectedService.coverUrl,
+                }
+              : undefined
+          }
+          coverUrl={selectedService?.coverUrl}
+          serviceId={selectedService?.id}
+        />
+      )}
+      {openServiceDetail && detailService && (
+        <ServiceDetailModal
+          open={openServiceDetail}
+          onClose={() => setOpenServiceDetail(false)}
+          service={detailService}
+          onMessage={() => {}}
+          onOrder={() => {}}
         />
       )}
     </div>
