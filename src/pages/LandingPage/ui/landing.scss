@@ -255,9 +255,10 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  min-height: 68px;
+  min-height: 72px;
   transition: 0.2s ease;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  height: 100%;
 }
 
 .Landing__cat:hover {

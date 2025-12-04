@@ -186,19 +186,22 @@ export const LandingPage: React.FC = () => {
 
   const popularCategories: PopularCategory[] = useMemo(
     () =>
-      utilsCategories.slice(0, 8).map((c) => {
-        const name = c.category.name;
-        const key = name.toLowerCase();
-        const icon =
-          Object.entries(categoryIcons).find(([k]) => key.includes(k))?.[1] ??
-          (name ? name[0].toUpperCase() : '🛠️');
-        return {
-          id: c.category.id,
-          title: name,
-          count: `${c.count ?? 0} услуг`,
-          icon,
-        };
-      }),
+      utilsCategories
+        .filter((c) => (c.count ?? 0) > 0)
+        .slice(0, 8)
+        .map((c) => {
+          const name = c.category.name;
+          const key = name.toLowerCase();
+          const icon =
+            Object.entries(categoryIcons).find(([k]) => key.includes(k))?.[1] ??
+            (name ? name[0].toUpperCase() : '🛠️');
+          return {
+            id: c.category.id,
+            title: name,
+            count: `${c.count ?? 0} услуг`,
+            icon,
+          };
+        }),
     [utilsCategories],
   );
 
