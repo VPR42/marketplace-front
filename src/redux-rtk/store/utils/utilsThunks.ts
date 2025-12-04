@@ -13,7 +13,7 @@ export const fetchCategories = createAsyncThunk<CategoryWithCount[], FetchCatego
   'utils/fetchCategories',
   async (params) => {
     const { query = null, jobsCountSort = null } = params || {};
-    const { data } = await api.get<CategoryWithCount[]>('/feed/categories', {
+    const { data } = await api.get<CategoryWithCount[]>('/categories', {
       params: {
         query: query ?? undefined,
         jobsCountSort: jobsCountSort ?? undefined,
