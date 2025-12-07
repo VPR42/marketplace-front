@@ -34,7 +34,7 @@ export const createOrder = createAsyncThunk<CreateOrderResponse, { jobId: string
   'orders/createOrder',
   async (body, { rejectWithValue }) => {
     try {
-      const response = await api.post('/orders/create-order', body);
+      const response = await api.post('/orders', body);
       return response.data;
     } catch (err: unknown) {
       return rejectWithValue(getOrdersError(err, 'Failed to create order'));
