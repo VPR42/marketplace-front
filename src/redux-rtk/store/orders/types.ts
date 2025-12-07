@@ -19,7 +19,7 @@ export interface OrdersResponse {
 }
 
 export interface OrdersQueryParams {
-  status?: string;
+  status?: string | null;
   search?: string;
   categoryId?: number;
   isMasterOrder?: boolean;
