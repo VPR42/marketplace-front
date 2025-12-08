@@ -2,11 +2,13 @@
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Pagination } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import { setCurrentChat } from '@/redux-rtk/store/chats/chatsSlice';
+import { createChat } from '@/redux-rtk/store/chats/chatsThunks';
 import { fetchOrders, updateOrderStatus } from '@/redux-rtk/store/orders/ordersThunks';
 import {
   selectOrders,
@@ -101,7 +103,23 @@ export const MyOrdersPage: React.FC = () => {
     pageSize: reduxPageSize,
   } = useAppSelector(selectOrdersPagination);
   const isLoading = useAppSelector(selectOrdersLoading);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
+
+  const handleMessageInternal = async () => {
+    if (!orderIdFromUrl) {
+      return;
+    }
+
+    try {
+      const res = await dispatch(createChat({ serviceId: orderIdFromUrl })).unwrap();
+
+      dispatch(setCurrentChat(res.chatId));
+
+      navigate('/chats');
+    } catch {
+      // можно показать тост/сообщение
+    }
+  };
 
   useEffect(() => {
     if (utilsStatus === 'idle') {
@@ -337,7 +355,7 @@ export const MyOrdersPage: React.FC = () => {
             location: selectedOrder.location,
           }}
           onOrder={() => setIsDetailOpen(false)}
-          onMessage={() => {}}
+          onMessage={handleMessageInternal}
           onFavorite={() => {}}
         />
       )}

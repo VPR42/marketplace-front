@@ -29,8 +29,6 @@ type ActionBarProps = ServiceDetailModalProps & {
   creatingChat: boolean;
 
   onMessageInternal: () => void;
-
-  onGoToProfile: () => void;
 };
 
 const ActionBar: React.FC<ActionBarProps> = ({
@@ -263,10 +261,8 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
             isCreatingOrder={isCreatingOrder}
             open={open}
             onClose={onClose}
-            onMessage={onMessage}
             creatingChat={creatingChat}
             onMessageInternal={handleMessageInternal}
-            onGoToProfile={() => {}}
           />
         </div>
 
