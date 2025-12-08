@@ -1,4 +1,6 @@
-﻿/* Определяем переменные (если они не определены глобально) */
+@import '@/shared/styles/breakpoints.scss';
+
+/* Определяем переменные (если они не определены глобально) */
 :root {
   --orange: #ff7f00;
   --orange-hover: #e57300;
@@ -398,6 +400,73 @@
 
     &:hover {
       background: #f6f7fb;
+    }
+  }
+
+  @include respond($breakpoint-2) {
+    max-width: 960px;
+
+    &__top {
+      grid-template-columns: 1fr;
+    }
+
+    &__image {
+      height: 280px;
+    }
+
+    &__actions {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    &__message-btn,
+    &__order-btn {
+      width: 100%;
+    }
+  }
+
+  @include respond($breakpoint-3) {
+    &__title {
+      font-size: 22px;
+    }
+
+    &__body {
+      padding: 14px 10px 16px;
+    }
+
+    &__price-and-favorite,
+    &__master-container {
+      padding: 12px;
+    }
+  }
+
+  @include respond($breakpoint-4) {
+    &__image {
+      height: 220px;
+    }
+
+    &__actions {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    &__master-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  @include respond($breakpoint-5) {
+    &__title {
+      font-size: 20px;
+    }
+
+    &__description-grid {
+      gap: 8px;
+    }
+
+    &__description-text {
+      font-size: 13px;
     }
   }
 }
