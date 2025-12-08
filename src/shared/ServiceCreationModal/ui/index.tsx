@@ -33,8 +33,8 @@ const validate = (values: ServiceFormValue) => {
 
   if (!values.description || values.description.trim().length < 20) {
     errors.description = 'Описание должно быть не короче 20 символов';
-  } else if (values.description.trim().length > 200) {
-    errors.description = 'Описание не должно превышать 200 символов';
+  } else if (values.description.trim().length > 1000) {
+    errors.description = 'Описание не должно превышать 1000 символов';
   }
 
   if (values.price === '' || Number.isNaN(Number(values.price))) {

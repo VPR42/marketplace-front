@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Container, Header, Content } from 'rsuite';
+import { Container, Header, Content, Pagination } from 'rsuite';
 
+import { CustomLoader } from '@/components/CustomLoader/ui';
 import { FavoritesList } from '@/pages/FavoritesPage/ui/FavoritesList';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
 import {
@@ -8,13 +9,15 @@ import {
   fetchFavorites,
   removeFromFavorites,
 } from '@/redux-rtk/store/favorites/favoriteThunks';
-import { selectFavoritesStatus } from '@/redux-rtk/store/favorites/selectors';
+import {
+  selectFavoritesPagination,
+  selectFavoritesStatus,
+} from '@/redux-rtk/store/favorites/selectors';
 import type { FetchFavoritesParams } from '@/redux-rtk/store/favorites/types';
 import { selectUtilsState } from '@/redux-rtk/store/utils/selectors';
 import { fetchCategories } from '@/redux-rtk/store/utils/utilsThunks';
 import { FiltersGroup } from '@/shared/FilterGroup';
 import { CategoryTabs } from '@/shared/FilterTabs';
-
 import './FavoritesPage.scss';
 import { SearchInput } from '@/shared/SearchInput';
 
@@ -36,6 +39,13 @@ export const FavoritesPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const { categories, status: utilsStatus } = useAppSelector(selectUtilsState);
   const favoritesStatus = useAppSelector(selectFavoritesStatus);
+
+  const {
+    totalCount,
+    pageNumber: reduxPageNumber,
+    pageSize: reduxPageSize,
+  } = useAppSelector(selectFavoritesPagination);
+  const [currentPage, setCurrentPage] = useState(reduxPageNumber);
 
   const [activeFilter, setActiveFilter] = useState('Все');
 
@@ -102,6 +112,8 @@ export const FavoritesPage: React.FC = () => {
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
       priceSort: priceSort ?? undefined,
       experienceSort: experienceSort ?? undefined,
+      page: currentPage - 1,
+      pageSize: reduxPageSize,
     };
 
     dispatch(fetchFavorites(params));
@@ -115,6 +127,8 @@ export const FavoritesPage: React.FC = () => {
     priceSort,
     experienceSort,
     priceError,
+    currentPage,
+    reduxPageSize,
   ]);
 
   const handleToggle = async (serviceId: string, makeFavorite: boolean) => {
@@ -171,7 +185,23 @@ export const FavoritesPage: React.FC = () => {
             experienceOptions={experienceOptions}
             sortOptions={sortOptions as { label: string; value: 'ASC' | 'DESC' }[]}
           />
-          <FavoritesList loadingState={favoritesStatus} onToggle={handleToggle} />
+          <FavoritesList onToggle={handleToggle} />
+          <div className="FavoritesPage__pagination">
+            {favoritesStatus === 'loading' ? (
+              <div className="FavoritePage__loader">
+                <CustomLoader content="" />
+              </div>
+            ) : (
+              <Pagination
+                prev
+                next
+                total={totalCount}
+                limit={reduxPageSize}
+                activePage={currentPage}
+                onChangePage={setCurrentPage}
+              />
+            )}
+          </div>
         </Content>
       </Container>
     </div>
