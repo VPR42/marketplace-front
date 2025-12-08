@@ -2,10 +2,13 @@
 import { formatDistanceToNow } from 'date-fns';
 import { ru } from 'date-fns/locale';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Pagination } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import { setCurrentChat } from '@/redux-rtk/store/chats/chatsSlice';
+import { createChat } from '@/redux-rtk/store/chats/chatsThunks';
 import { fetchOrders, updateOrderStatus } from '@/redux-rtk/store/orders/ordersThunks';
 import {
   selectOrders,
@@ -23,6 +26,8 @@ import type { ApiOrderItem, OrderItem, OrderStatus } from '../types';
 import { OrderActionModal } from './modals';
 import './my-orders.scss';
 import { MyOrderCard } from './MyOrderCard';
+
+import { cities } from '@/shared/data/cities';
 
 type StatusFilter = OrderStatus | 'all';
 
@@ -63,6 +68,10 @@ const actionToStatus: Record<'start' | 'complete' | 'cancel', number> = {
 
 export const MyOrdersPage: React.FC = () => {
   const dispatch = useAppDispatch();
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const orderIdFromUrl = searchParams.get('orderId');
+
   const [activeStatus, setActiveStatus] = useState<StatusFilter>(() => {
     const saved = localStorage.getItem('myOrdersStatus') as StatusFilter | null;
     if (saved && (saved === 'all' || statusFilters.some((s) => s.value === saved))) {
@@ -79,7 +88,7 @@ export const MyOrdersPage: React.FC = () => {
   });
 
   const [activeFilter, setActiveFilter] = useState('Все');
-
+  const [isMasterOrder, setIsMasterOrder] = useState(false);
   const [searchTerm, setSearchTerm] = useState(() => localStorage.getItem('myOrdersSearch') || '');
   const [selectedOrder, setSelectedOrder] = useState<OrderItem | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -96,7 +105,23 @@ export const MyOrdersPage: React.FC = () => {
     pageSize: reduxPageSize,
   } = useAppSelector(selectOrdersPagination);
   const isLoading = useAppSelector(selectOrdersLoading);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
+
+  const handleMessageInternal = async () => {
+    if (!orderIdFromUrl) {
+      return;
+    }
+
+    try {
+      const res = await dispatch(createChat({ serviceId: orderIdFromUrl })).unwrap();
+
+      dispatch(setCurrentChat(res.chatId));
+
+      navigate('/chats');
+    } catch {
+      // можно показать тост/сообщение
+    }
+  };
 
   useEffect(() => {
     if (utilsStatus === 'idle') {
@@ -119,7 +144,7 @@ export const MyOrdersPage: React.FC = () => {
     return found?.category.id ?? null;
   }, [activeFilter, categories]);
 
-  const [currentPage, setCurrentPage] = useState(reduxPageNumber);
+  const [currentPage, setCurrentPage] = useState(() => (orderIdFromUrl ? 1 : reduxPageNumber));
 
   const normalizeStatus = (s?: string): OrderStatus => {
     if (!s) {
@@ -148,9 +173,18 @@ export const MyOrdersPage: React.FC = () => {
       status: activeStatus === 'all' ? undefined : activeStatus,
       categoryId: activeCategoryId ?? undefined,
       search: searchTerm.trim() || undefined,
+      isMasterOrder,
     };
     dispatch(fetchOrders(params));
-  }, [dispatch, currentPage, reduxPageSize, activeStatus, activeCategoryId, searchTerm]);
+  }, [
+    dispatch,
+    currentPage,
+    reduxPageSize,
+    activeStatus,
+    activeCategoryId,
+    searchTerm,
+    isMasterOrder,
+  ]);
 
   const apiOrders = useAppSelector(selectOrders) as ApiOrderItem[] | undefined;
 
@@ -172,10 +206,23 @@ export const MyOrdersPage: React.FC = () => {
       categoryId: o.categoryId ?? 0,
       categoryLabel: o.categoryName ?? '',
       budget: o.jobPrice ?? 0,
-      location: o.masterCityId ? `Город #${o.masterCityId}` : '',
+      location: o.masterCityId
+        ? (cities.find((c) => c.value === o.masterCityId)?.label ?? `Город #${o.masterCityId}`)
+        : '',
       image: o.jobCoverUrl ?? undefined,
     }));
   }, [apiOrders]);
+
+  useEffect(() => {
+    if (orderIdFromUrl && filteredOrders.length > 0) {
+      const foundOrder = filteredOrders.find((o) => o.id === orderIdFromUrl);
+      if (foundOrder) {
+        setSelectedOrder(foundOrder);
+        setIsDetailOpen(true);
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [orderIdFromUrl, filteredOrders]);
 
   const hasOrders = filteredOrders.length > 0;
   const showEmpty = !isLoading && !hasOrders;
@@ -188,14 +235,20 @@ export const MyOrdersPage: React.FC = () => {
           <button
             type="button"
             className={`MyOrders__role ${activeRole === 'customer' ? 'MyOrders__role--active' : ''}`}
-            onClick={() => setActiveRole('customer')}
+            onClick={() => {
+              setIsMasterOrder(false);
+              setActiveRole('customer');
+            }}
           >
             Я заказчик
           </button>
           <button
             type="button"
             className={`MyOrders__role ${activeRole === 'worker' ? 'MyOrders__role--active' : ''}`}
-            onClick={() => setActiveRole('worker')}
+            onClick={() => {
+              setIsMasterOrder(true);
+              setActiveRole('worker');
+            }}
           >
             Я исполнитель
           </button>
@@ -306,7 +359,7 @@ export const MyOrdersPage: React.FC = () => {
             location: selectedOrder.location,
           }}
           onOrder={() => setIsDetailOpen(false)}
-          onMessage={() => {}}
+          onMessage={handleMessageInternal}
           onFavorite={() => {}}
         />
       )}
@@ -344,6 +397,7 @@ export const MyOrdersPage: React.FC = () => {
               fetchOrders({
                 pageNumber: currentPage - 1,
                 pageSize: reduxPageSize,
+                isMasterOrder,
                 status: activeStatus === 'all' ? undefined : activeStatus,
                 categoryId: activeCategoryId ?? undefined,
                 search: searchTerm.trim() || undefined,

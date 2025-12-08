@@ -1,7 +1,7 @@
 export const getWeekDayShort = (value: number | string): string => {
   const num = Number(value);
   const titles = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-  return titles[num - 1] ?? '';
+  return titles[num] ?? '';
 };
 
 export const getWeekDayLong = (value: number | string): string => {
@@ -15,5 +15,5 @@ export const getWeekDayLong = (value: number | string): string => {
     'Суббота',
     'Воскресенье',
   ];
-  return titles[num - 1] ?? '';
+  return titles[num] ?? '';
 };

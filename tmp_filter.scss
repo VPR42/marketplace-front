@@ -1,13 +1,13 @@
 .CategoryTabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 12px;
+  gap: 12px 14px;
 
   &__item {
-    padding: 6px 14px;
+    padding: 7px 18px;
     border: 1px solid var(--grey-borderline);
-    border-radius: 18px;
-    font-size: 13px;
+    border-radius: 20px;
+    font-size: 14px;
     color: #111;
     cursor: pointer;
     transition: color 0.2s ease;

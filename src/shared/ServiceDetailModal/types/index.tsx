@@ -4,6 +4,8 @@ export interface ServiceDetailModalProps {
   mode?: string;
   open: boolean;
   onClose: () => void;
+  disableActions?: boolean;
+  onGoToOrders?: () => void;
   service: {
     id: string;
     title: string;
@@ -26,4 +28,5 @@ export interface ServiceDetailModalProps {
   onFavorite?: () => void;
   isFavorite?: boolean;
   isTogglingFavorite?: boolean;
+  isCreatingOrder?: boolean;
 }

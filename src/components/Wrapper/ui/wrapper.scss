@@ -1,8 +1,9 @@
+@import '@/shared/styles/breakpoints.scss';
+
 .wrapper {
   display: flex;
   &__maincont {
     margin: 0;
-    margin-left: 24px;
     display: flex;
     flex-direction: column;
     overflow: auto;
@@ -10,10 +11,15 @@
     height: 100dvh;
   }
   &__content {
-    flex: 1; // прижал футер
-    max-width: 1280px; // не знаю Борис посмотри как тут лучше вот подобрать да
-    padding: 0 20px; // не знаю Борис посмотри как тут лучше вот подобрать да
+    flex: 1;
+    max-width: 1280px;
+    padding: 0 20px;
     width: 100%;
     margin: 0 auto;
+  }
+}
+@include respond($breakpoint-6) {
+  .wrapper__content {
+    padding: 2px;
   }
 }

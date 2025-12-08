@@ -4,31 +4,30 @@ import { ru } from 'date-fns/locale';
 import { useState } from 'react';
 /* eslint-enable import/no-duplicates */
 
-import { CustomLoader } from '@/components/CustomLoader/ui';
+import { useNavigate } from 'react-router-dom';
+
 import type { FavoritesListProps } from '@/pages/FavoritesPage/types';
 import { useAppSelector } from '@/redux-rtk/hooks';
 import {
-  selectFilteredFavorites,
-  selectFavoritesStatus,
   selectAllFavorites,
+  selectFavoritesStatus,
+  selectFilteredFavorites,
 } from '@/redux-rtk/store/favorites/selectors';
 import { MyServiceCard } from '@/shared/MyServicesCard/ui';
 
 import './FavoritesPage.scss';
 
-export const FavoritesList: React.FC<FavoritesListProps> = ({ loadingState, onToggle }) => {
+export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
   const allFavorites = useAppSelector(selectAllFavorites);
   const filtered = useAppSelector(selectFilteredFavorites);
   const favoritesStatus = useAppSelector(selectFavoritesStatus);
-  const status = loadingState ?? favoritesStatus;
   const [togglingIds, setTogglingIds] = useState(new Set());
 
-  const handleProfile = (id: string) => {
-    console.warn('профиль', id);
-  };
+  const navigate = useNavigate();
 
-  const handleMessage = (id: string) => {
-    console.warn('написать', id);
+  const handleGoToMasterProfile = (id: string) => {
+    const profile = filtered.find((job) => job.id === id)?.user.id;
+    navigate(`/profile/${profile}`);
   };
 
   const handleToggle = async (id: string, makeFav: boolean) => {
@@ -47,15 +46,9 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ loadingState, onTo
   const hasFavorites = (allFavorites?.length ?? 0) > 0;
   const hasFiltered = (filtered?.length ?? 0) > 0;
 
-  if (status === 'loading') {
-    return (
-      <div className="FavoritesPage__list--load">
-        <CustomLoader size="md" />
-      </div>
-    );
-  }
+  const loading = favoritesStatus === 'loading';
 
-  if (hasFavorites && !hasFiltered) {
+  if (hasFavorites && !hasFiltered && !loading) {
     return (
       <div className="FavoritesPage__empty">
         <div className="FavoritesPage__empty-title">Ничего не найдено</div>
@@ -64,7 +57,7 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ loadingState, onTo
     );
   }
 
-  if (!hasFavorites) {
+  if (!hasFavorites && !loading) {
     return (
       <div className="FavoritesPage__empty">
         <div className="FavoritesPage__empty-title">Избранное пусто</div>
@@ -96,8 +89,7 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ loadingState, onTo
           category={it.category?.name}
           location={it.user?.city?.name ?? undefined}
           tags={it.tags?.map((t) => t.name)}
-          onProfile={handleProfile}
-          onMessage={handleMessage}
+          onProfile={() => handleGoToMasterProfile(it.id)}
           onToggle={handleToggle}
           isFavorite={true}
           isToggling={togglingIds.has(it.id)}

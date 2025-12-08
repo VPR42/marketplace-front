@@ -111,9 +111,6 @@ export const MyServicesPage: React.FC = () => {
     if (!user?.id) {
       return;
     }
-    if (utilsStatus === 'idle') {
-      dispatch(fetchCategories({ jobsCountSort: 'DESC', query: null }));
-    }
     dispatch(
       fetchServices({
         page,
@@ -134,7 +131,6 @@ export const MyServicesPage: React.FC = () => {
     categoryId,
     page,
     pageSize,
-    utilsStatus,
     searchQuery,
     experience,
     minPrice,
@@ -281,23 +277,6 @@ export const MyServicesPage: React.FC = () => {
                 const found = categories.find((c) => c.category.name === label);
                 setCategoryId(found?.category.id ?? null);
               }
-              dispatch(
-                fetchServices({
-                  page: 0,
-                  pageSize,
-                  masterId: user?.id ?? '',
-                  categoryId:
-                    label === 'Все категории'
-                      ? undefined
-                      : categories.find((c) => c.category.name === label)?.category.id,
-                  query: searchQuery || undefined,
-                  experience: experience ?? undefined,
-                  minPrice: minPrice ? Number(minPrice) : undefined,
-                  maxPrice: maxPrice ? Number(maxPrice) : undefined,
-                  priceSort: priceSort ?? undefined,
-                  experienceSort: experienceSort ?? undefined,
-                }),
-              );
             }}
           />
         </div>
@@ -318,20 +297,6 @@ export const MyServicesPage: React.FC = () => {
           onSearch={(value) => {
             setSearchQuery(value);
             setPage(0);
-            dispatch(
-              fetchServices({
-                page: 0,
-                pageSize,
-                masterId: user?.id ?? '',
-                categoryId: categoryId ?? undefined,
-                query: value || undefined,
-                experience: experience ?? undefined,
-                minPrice: minPrice ? Number(minPrice) : undefined,
-                maxPrice: maxPrice ? Number(maxPrice) : undefined,
-                priceSort: priceSort ?? undefined,
-                experienceSort: experienceSort ?? undefined,
-              }),
-            );
           }}
           defaultValue={searchQuery}
         />

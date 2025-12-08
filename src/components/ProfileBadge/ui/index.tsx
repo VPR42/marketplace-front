@@ -1,5 +1,5 @@
 ﻿import { ChevronDown, ClipboardList, Heart, LogOut, User, Wrench } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Loader, Message } from 'rsuite';
 
@@ -27,6 +27,8 @@ export const ProfileBadge = () => {
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
+
+  const profileBadgeRef = useRef<HTMLDivElement>(null);
 
   const [open, setOpen] = useState(false);
   const authStatus = useAppSelector((state) => state.auth.status);
@@ -62,6 +64,17 @@ export const ProfileBadge = () => {
     navigate('/');
   };
 
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (profileBadgeRef.current && !profileBadgeRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   if (!isAuthenticated || !user) {
     if (authStatus === 'loading') {
       return (
@@ -81,7 +94,7 @@ export const ProfileBadge = () => {
   }
 
   return (
-    <div className="profile-badge">
+    <div className="profile-badge" ref={profileBadgeRef}>
       <button className="profile-badge__trigger" onClick={() => setOpen((v) => !v)}>
         {user.avatarPath ? (
           <img src={user.avatarPath} alt={user.name} className="profile-badge__avatar-img" />

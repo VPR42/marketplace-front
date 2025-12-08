@@ -1,4 +1,4 @@
-import { Edit2 } from 'lucide-react';
+﻿import { Edit2 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Form, Modal, SelectPicker, TagPicker, Uploader } from 'rsuite';
 import type { FileType } from 'rsuite/Uploader';
@@ -22,7 +22,6 @@ import './service-modal.scss';
 const PLACEHOLDER_COVER = 'https://placehold.co/800x450';
 
 const MAX_COVER_SIZE = 5 * 1024 * 1024;
-
 const validate = (values: ServiceFormValue) => {
   const errors: Partial<Record<keyof ServiceFormValue | 'submit', string>> = {};
 
@@ -34,8 +33,8 @@ const validate = (values: ServiceFormValue) => {
 
   if (!values.description || values.description.trim().length < 20) {
     errors.description = 'Описание должно быть не короче 20 символов';
-  } else if (values.description.trim().length > 200) {
-    errors.description = 'Описание не должно превышать 200 символов';
+  } else if (values.description.trim().length > 1000) {
+    errors.description = 'Описание не должно превышать 1000 символов';
   }
 
   if (values.price === '' || Number.isNaN(Number(values.price))) {
@@ -44,16 +43,16 @@ const validate = (values: ServiceFormValue) => {
     const priceNum = Number(values.price);
 
     if (priceNum < 100) {
-      errors.price = 'Минимальная цена 100';
+      errors.price = 'Минимум 100';
     }
 
-    if (priceNum > 9999999999) {
-      errors.price = 'Слишком большая цена';
+    if (priceNum > 1000000) {
+      errors.price = 'Цена должна быть меньше 1 000 000';
     }
   }
 
   if (!values.categoryId) {
-    errors.categoryId = 'Выберите категорию';
+    errors.categoryId = 'Укажите категорию';
   }
 
   if (!values.tags || values.tags.length === 0) {
@@ -62,7 +61,6 @@ const validate = (values: ServiceFormValue) => {
 
   return errors;
 };
-
 export const ServiceCreationModal: React.FC<ServiceCreationProps> = ({
   open,
 
@@ -431,6 +429,8 @@ export const ServiceCreationModal: React.FC<ServiceCreationProps> = ({
               name="price"
               type="number"
               value={formValue.price}
+              min={100}
+              max={1000000}
               onChange={(val) => handleChange({ price: Number(val) })}
             />
 

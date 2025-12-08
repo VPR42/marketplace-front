@@ -1,4 +1,4 @@
-import { isAxiosError } from 'axios';
+﻿import { isAxiosError } from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -186,29 +186,36 @@ export const LandingPage: React.FC = () => {
 
   const popularCategories: PopularCategory[] = useMemo(
     () =>
-      utilsCategories.slice(0, 8).map((c) => {
-        const name = c.category.name;
-        const key = name.toLowerCase();
-        const icon =
-          Object.entries(categoryIcons).find(([k]) => key.includes(k))?.[1] ??
-          (name ? name[0].toUpperCase() : '🛠️');
-        return {
-          id: c.category.id,
-          title: name,
-          count: `${c.count ?? 0} услуг`,
-          icon,
-        };
-      }),
+      utilsCategories
+        .filter((c) => (c.count ?? 0) > 0)
+        .slice(0, 8)
+        .map((c) => {
+          const name = c.category.name;
+          const key = name.toLowerCase();
+          const icon =
+            Object.entries(categoryIcons).find(([k]) => key.includes(k))?.[1] ??
+            (name ? name[0].toUpperCase() : '?');
+          return {
+            id: c.category.id,
+            title: name,
+            count: `${c.count ?? 0} услуг`,
+            icon,
+          };
+        }),
     [utilsCategories],
   );
-
   useEffect(() => {
     if (utilsStatus === 'idle') {
-      dispatch(fetchCategories());
+      dispatch(fetchCategories({ jobsCountSort: 'DESC' }));
     }
   }, [dispatch, utilsStatus]);
 
-  const goToFeed = (params?: { search?: string; categoryId?: number | null; create?: string }) => {
+  const goToFeed = (params?: {
+    search?: string;
+    categoryId?: number | null;
+    create?: string;
+    serviceId?: string;
+  }) => {
     const sp = new URLSearchParams();
     if (params?.search) {
       sp.set('search', params.search);
@@ -219,6 +226,9 @@ export const LandingPage: React.FC = () => {
     if (params?.create) {
       sp.set('create', params.create);
     }
+    if (params?.serviceId) {
+      sp.set('serviceId', params.serviceId);
+    }
     const query = sp.toString();
     navigate(query ? `/feed?${query}` : '/feed');
   };
@@ -227,7 +237,10 @@ export const LandingPage: React.FC = () => {
     const value = searchValue.trim();
     goToFeed(
       value || selectedCategoryId !== null
-        ? { search: value || undefined, categoryId: selectedCategoryId ?? undefined }
+        ? {
+            search: value || undefined,
+            categoryId: selectedCategoryId ?? undefined,
+          }
         : undefined,
     );
   };
@@ -306,7 +319,7 @@ export const LandingPage: React.FC = () => {
               >
                 <div className="Landing__cat-ico">{cat.icon}</div>
                 <div>
-                  <b>{cat.title}</b>
+                  <b className="Landing__cat-title">{cat.title}</b>
                   <div className="Landing__cat-muted">{cat.count}</div>
                 </div>
               </div>
@@ -339,6 +352,7 @@ export const LandingPage: React.FC = () => {
                 ];
 
                 const isDynamic = 'id' in service;
+                const serviceId = isDynamic ? service.id : null;
                 const title = isDynamic ? service.name : (service as ServiceItem).title;
                 const meta = isDynamic
                   ? [service.category?.name, service.user?.master?.pseudonym || service.user?.name]
@@ -367,6 +381,13 @@ export const LandingPage: React.FC = () => {
                 return (
                   <div
                     key={isDynamic ? service.id : (service as ServiceItem).title}
+                    onClick={() => {
+                      if (!serviceId) {
+                        return;
+                      }
+
+                      goToFeed({ serviceId });
+                    }}
                     className="Landing__card"
                   >
                     <div className="Landing__cover" style={coverStyle}>
