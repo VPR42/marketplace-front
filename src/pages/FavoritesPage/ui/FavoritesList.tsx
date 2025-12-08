@@ -4,12 +4,14 @@ import { ru } from 'date-fns/locale';
 import { useState } from 'react';
 /* eslint-enable import/no-duplicates */
 
+import { useNavigate } from 'react-router-dom';
+
 import type { FavoritesListProps } from '@/pages/FavoritesPage/types';
 import { useAppSelector } from '@/redux-rtk/hooks';
 import {
-  selectFilteredFavorites,
-  selectFavoritesStatus,
   selectAllFavorites,
+  selectFavoritesStatus,
+  selectFilteredFavorites,
 } from '@/redux-rtk/store/favorites/selectors';
 import { MyServiceCard } from '@/shared/MyServicesCard/ui';
 
@@ -21,12 +23,11 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
   const favoritesStatus = useAppSelector(selectFavoritesStatus);
   const [togglingIds, setTogglingIds] = useState(new Set());
 
-  const handleProfile = (id: string) => {
-    console.warn('профиль', id);
-  };
+  const navigate = useNavigate();
 
-  const handleMessage = (id: string) => {
-    console.warn('написать', id);
+  const handleGoToMasterProfile = (id: string) => {
+    const profile = filtered.find((job) => job.id === id)?.user.id;
+    navigate(`/profile/${profile}`);
   };
 
   const handleToggle = async (id: string, makeFav: boolean) => {
@@ -88,8 +89,7 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
           category={it.category?.name}
           location={it.user?.city?.name ?? undefined}
           tags={it.tags?.map((t) => t.name)}
-          onProfile={handleProfile}
-          onMessage={handleMessage}
+          onProfile={() => handleGoToMasterProfile(it.id)}
           onToggle={handleToggle}
           isFavorite={true}
           isToggling={togglingIds.has(it.id)}

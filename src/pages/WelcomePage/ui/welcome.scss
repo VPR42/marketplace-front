@@ -1,10 +1,13 @@
+@import '@/shared/styles/breakpoints.scss';
+
 .WelcomePage {
   min-height: 100vh;
   background: linear-gradient(135deg, #fdf1e3, #ffffff);
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 48px 16px;
+  padding: 56px 24px;
+  box-sizing: border-box;
 
   &__card {
     width: 100%;
@@ -13,6 +16,7 @@
     border-radius: 16px;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
     padding: 32px;
+    box-sizing: border-box;
   }
 
   &__title {
@@ -27,6 +31,62 @@
     color: #555;
     font-size: 16px;
   }
+
+  @include respond($breakpoint-1) {
+    padding: 48px 20px;
+
+    &__card {
+      max-width: 900px;
+    }
+
+    &__title {
+      font-size: 26px;
+    }
+  }
+
+  @include respond($breakpoint-2) {
+    padding: 42px 18px;
+
+    &__card {
+      padding: 28px;
+    }
+
+    &__title {
+      font-size: 24px;
+    }
+  }
+
+  @include respond($breakpoint-3) {
+    padding: 32px 14px;
+
+    &__card {
+      padding: 24px;
+    }
+
+    &__title {
+      font-size: 22px;
+    }
+
+    &__subtitle {
+      font-size: 15px;
+    }
+  }
+
+  @include respond($breakpoint-4) {
+    padding: 24px 12px;
+
+    &__card {
+      padding: 20px;
+    }
+  }
+
+  @include respond($breakpoint-5) {
+    padding: 20px 10px;
+
+    &__title {
+      font-size: 20px;
+    }
+  }
 }
 
 .inline-profile {
@@ -34,18 +94,21 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    width: 100%;
   }
 
   &-form__avatar-block {
     display: flex;
     align-items: center;
     gap: 16px;
+    flex-wrap: wrap;
   }
 
   &-form__fields {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 16px;
+    width: 100%;
   }
 
   &-form__field {
@@ -57,7 +120,7 @@
   &-form__time {
     grid-column: span 2;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 12px;
   }
 
@@ -65,5 +128,35 @@
     display: flex;
     justify-content: flex-end;
     margin-top: 8px;
+    gap: 10px;
+    width: 100%;
+
+    .rs-btn {
+      min-width: 140px;
+    }
+  }
+
+  @include respond($breakpoint-3) {
+    &-form__time {
+      grid-column: span 1;
+    }
+
+    &-form__actions {
+      justify-content: stretch;
+
+      .rs-btn {
+        width: 100%;
+      }
+    }
+  }
+
+  @include respond($breakpoint-4) {
+    &-form__fields {
+      grid-template-columns: 1fr;
+    }
+
+    &-form__time {
+      grid-template-columns: 1fr;
+    }
   }
 }

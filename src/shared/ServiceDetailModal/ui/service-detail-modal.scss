@@ -1,4 +1,6 @@
-﻿/* Определяем переменные (если они не определены глобально) */
+@import '@/shared/styles/breakpoints.scss';
+
+/* Определяем переменные (если они не определены глобально) */
 :root {
   --orange: #ff7f00;
   --orange-hover: #e57300;
@@ -403,6 +405,11 @@
 
   /* Order preview modal */
   &__order-preview {
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+
     .rs-modal-header {
       padding: 18px 20px;
       border-bottom: 1px solid var(--border, #e5e7eb);
@@ -691,6 +698,130 @@
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
       }
+    }
+  }
+
+  @include respond($breakpoint-2) {
+    max-width: 960px;
+
+    &__top {
+      grid-template-columns: 1fr;
+    }
+
+    &__image {
+      height: 280px;
+    }
+
+    &__actions {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    &__message-btn,
+    &__order-btn {
+      width: 100%;
+    }
+
+    &__order-preview {
+      max-width: 640px;
+
+      .rs-modal-header,
+      .rs-modal-body,
+      .rs-modal-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      .rs-modal-footer {
+        flex-wrap: wrap;
+
+        .rs-btn {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  @include respond($breakpoint-3) {
+    &__title {
+      font-size: 22px;
+    }
+
+    &__body {
+      padding: 14px 10px 16px;
+    }
+
+    &__price-and-favorite,
+    &__master-container {
+      padding: 12px;
+    }
+  }
+
+  @include respond($breakpoint-4) {
+    &__image {
+      height: 220px;
+    }
+
+    &__actions {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    &__master-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    &__order-preview {
+      max-width: 520px;
+
+      .rs-modal-header,
+      .rs-modal-body,
+      .rs-modal-footer {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .rs-modal-body {
+        gap: 10px;
+      }
+
+      .ServiceDetailModal__preview-card {
+        grid-template-columns: 1fr;
+      }
+
+      .ServiceDetailModal__preview-cover {
+        height: 140px;
+      }
+
+      .ServiceDetailModal__preview-price {
+        justify-content: space-between;
+      }
+    }
+  }
+
+  @include respond($breakpoint-5) {
+    &__title {
+      font-size: 20px;
+    }
+
+    &__description-grid {
+      gap: 8px;
+    }
+
+    &__description-text {
+      font-size: 13px;
+    }
+
+    &__order-preview {
+      max-width: 460px;
+
+      .rs-modal-footer {
+        gap: 8px;
+      }
+    }
+    &__preview-card {
+      max-width: 300px;
     }
   }
 }

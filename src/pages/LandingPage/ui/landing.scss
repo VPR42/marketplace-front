@@ -1,3 +1,5 @@
+@import '@/shared/styles/breakpoints.scss';
+
 .Landing {
   --background: #f9fafb;
   --foreground: #1a1a1a;
@@ -16,6 +18,9 @@
     radial-gradient(circle at 80% 0%, rgba(255, 151, 94, 0.18), transparent 35%), var(--background);
   color: var(--foreground);
   min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
   font-family:
     'Inter',
     'PT Sans Caption',
@@ -28,6 +33,8 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 24px 24px 48px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   &__hero {
@@ -43,12 +50,17 @@
     box-shadow: var(--shadow);
     position: relative;
     overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
   }
 
   &__hero-left {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    min-width: 0;
+    width: 100%;
   }
 
   &__meta {
@@ -86,6 +98,9 @@
     border-radius: 14px;
     padding: 14px;
     box-shadow: var(--shadow);
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
   }
 
   &__search-row {
@@ -93,10 +108,21 @@
     grid-template-columns: 1fr auto;
     gap: 12px;
     align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
   }
 
   &__field--wide .SearchInput {
     margin-bottom: 0;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .SearchInput {
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
   }
 
   &__select {
@@ -141,6 +167,8 @@
       transform 0.15s ease,
       box-shadow 0.15s ease,
       background 0.15s ease;
+    width: 100%;
+    max-width: 220px;
   }
 
   &__search-btn:hover {
@@ -188,12 +216,12 @@
     border-radius: 16px;
     background: linear-gradient(135deg, #ff9b61 0%, var(--primary) 100%);
     box-shadow: var(--shadow-strong);
-    align-self: flex-end;
-    margin-top: 12px;
   }
 
   &__section {
     padding: 36px 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   &__section-head {
@@ -230,9 +258,12 @@
 
   &__cats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 14px;
     min-height: 120px;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
   }
 
   &__cats-placeholder {
@@ -256,8 +287,7 @@
     display: flex;
     gap: 12px;
     align-items: center;
-    min-height: 90px;
-    height: 90px;
+    min-height: 68px;
     transition: 0.2s ease;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   }
@@ -294,6 +324,9 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
   }
 
   &__services-wrapper {
@@ -330,6 +363,7 @@
     overflow: hidden;
     transition: 0.2s ease;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+    min-width: 0;
   }
 
   &__card:hover {
@@ -353,6 +387,7 @@
 
   &__body {
     padding: 16px;
+    min-width: 0;
   }
 
   &__meta {
@@ -371,6 +406,7 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+    min-width: 0;
   }
 
   &__tag {
@@ -387,6 +423,9 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
   }
 
   &__benefit {
@@ -434,6 +473,9 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
   }
 
   &__step {
@@ -466,6 +508,9 @@
     gap: 16px;
     color: #fff;
     box-shadow: var(--shadow-strong);
+    width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
   }
 
   &__cta h3 {
@@ -520,13 +565,22 @@
     font-weight: 600;
   }
 
-  @media (max-width: 1100px) {
+  @include respond($breakpoint-1) {
+    &__container {
+      max-width: 1100px;
+      padding: 20px 20px 44px;
+    }
+
     &__hero {
-      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    &__hero-left h1 {
+      font-size: 36px;
     }
 
     &__hero-aside {
-      height: 220px;
+      height: 240px;
     }
 
     &__cats {
@@ -538,36 +592,182 @@
     }
   }
 
-  @media (max-width: 760px) {
-    &__container {
-      padding: 0 16px 48px;
-    }
-
-    &__search-row {
-      grid-template-columns: 1fr;
-    }
-
+  @include respond($breakpoint-2) {
     &__hero {
-      padding: 28px 22px;
+      grid-template-columns: 1fr;
+      padding: 24px 20px;
     }
 
     &__hero-aside {
-      height: 180px;
+      height: 210px;
     }
 
-    &__cats {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    &__services,
-    &__steps,
-    &__masters {
-      grid-template-columns: 1fr;
+    &__section-head {
+      align-items: flex-start;
+      flex-direction: column;
     }
 
     &__cta {
       flex-direction: column;
       align-items: flex-start;
+    }
+  }
+
+  @include respond($breakpoint-3) {
+    &__container {
+      padding: 0 16px 42px;
+    }
+
+    &__hero {
+      padding: 22px 18px;
+      gap: 18px;
+    }
+
+    &__hero-left h1 {
+      font-size: 30px;
+    }
+
+    &__hero-left p {
+      font-size: 15px;
+    }
+
+    &__meta-pill {
+      font-size: 12px;
+      padding: 7px 10px;
+    }
+
+    &__search-row {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @include respond($breakpoint-4) {
+    &__container {
+      padding: 0 14px 38px;
+    }
+
+    &__hero {
+      padding: 20px 16px;
+    }
+
+    &__hero-left h1 {
+      font-size: 26px;
+    }
+
+    &__hero-left p {
+      font-size: 14px;
+    }
+
+    &__chips {
+      gap: 8px;
+    }
+
+    &__chip {
+      padding: 7px 10px;
+      font-size: 12px;
+    }
+
+    &__search-btn {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    &__cats {
+      grid-template-columns: 1fr;
+    }
+
+    &__services,
+    &__steps,
+    &__benefits {
+      grid-template-columns: 1fr;
+    }
+
+    &__cta {
+      padding: 22px 18px;
+    }
+
+    &__cta h3 {
+      font-size: 20px;
+    }
+  }
+
+  @include respond($breakpoint-5) {
+    &__container {
+      padding: 0 12px 32px;
+    }
+
+    &__hero {
+      padding: 18px 14px;
+    }
+
+    &__hero-aside {
+      height: 160px;
+    }
+
+    &__cat {
+      padding: 12px;
+      gap: 10px;
+    }
+
+    &__cover {
+      height: 150px;
+      font-size: 16px;
+    }
+
+    &__body {
+      padding: 14px;
+    }
+
+    &__cta {
+      gap: 12px;
+    }
+
+    &__field--wide .SearchInput {
+      margin-bottom: 0;
+      max-width: 230px;
+      min-width: 0;
+      input {
+        max-width: 210px;
+      }
+    }
+  }
+
+  @include respond($breakpoint-6) {
+    &__hero-left h1 {
+      font-size: 22px;
+    }
+
+    &__cat-ico,
+    &__benefit-ico {
+      width: 38px;
+      height: 38px;
+      font-size: 18px;
+    }
+
+    &__meta-pill {
+      font-size: 11px;
+      padding: 6px 9px;
+    }
+
+    &__search-btn {
+      padding: 0 18px;
+      max-width: 460px;
+    }
+
+    &__btn {
+      width: 100%;
+      text-align: center;
+    }
+    &__search-row {
+      width: 210px;
+    }
+    &__field--wide .SearchInput {
+      margin-bottom: 0;
+      max-width: 210px;
+      min-width: 0;
+      input {
+        max-width: 180px;
+      }
     }
   }
 }
