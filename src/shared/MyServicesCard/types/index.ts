@@ -21,5 +21,5 @@ export interface MyServiceCardProps {
   onDelete?: (id: string) => void;
   onToggle?: (id: string, makeFavorite: boolean) => Promise<void> | void;
   onProfile?: (id: string) => void;
-  onMessage?: (id: string) => void;
+  onMessage?: (serviceId: string) => void;
 }
