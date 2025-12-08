@@ -29,19 +29,24 @@ type ActionBarProps = ServiceDetailModalProps & {
   creatingChat: boolean;
 
   onMessageInternal: () => void;
+
+  onOrderClick: () => void;
+
+  orderLoading: boolean;
 };
 
 const ActionBar: React.FC<ActionBarProps> = ({
   mode,
+  disableActions,
   service,
-  onOrder,
   onFavorite,
   isFavorite,
   getInitials,
   isTogglingFavorite,
-  isCreatingOrder,
+  orderLoading,
   creatingChat,
   onMessageInternal,
+  onOrderClick,
 }) => {
   const navigate = useNavigate();
 
@@ -61,7 +66,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
           </div>
         </div>
 
-        {mode === 'service' && (
+        {mode === 'service' && !disableActions && (
           <div className="ServiceDetailModal__actions ServiceDetailModal__actions--top">
             <button
               className="ServiceDetailModal__message-btn"
@@ -73,15 +78,15 @@ const ActionBar: React.FC<ActionBarProps> = ({
 
             <button
               className="ServiceDetailModal__order-btn"
-              onClick={onOrder}
-              disabled={isCreatingOrder}
+              onClick={onOrderClick}
+              disabled={orderLoading}
             >
-              {isCreatingOrder ? <CustomLoader size="xs" /> : 'Заказать'}
+              Заказать
             </button>
           </div>
         )}
 
-        {mode === 'service' && (
+        {mode === 'service' && !disableActions && (
           <button
             className={`ServiceDetailModal__favorite-btn ${isFavorite ? 'ServiceDetailModal__favorite-btn--active' : ''}`}
             onClick={onFavorite}
@@ -136,6 +141,8 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
   onClose,
 
+  disableActions = false,
+
   service,
 
   onOrder,
@@ -149,6 +156,8 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   isTogglingFavorite = false,
 
   isCreatingOrder = false,
+
+  onGoToOrders,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -177,6 +186,10 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
   const [imageError, setImageError] = useState(false);
 
   const [creatingChat, setCreatingChat] = useState(false);
+  const [showOrderPreview, setShowOrderPreview] = useState(false);
+  const [showOrderSuccess, setShowOrderSuccess] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
+  const [orderSubmitting, setOrderSubmitting] = useState(false);
 
   const hasImage = Boolean(service.coverUrl) && !imageError;
 
@@ -252,17 +265,18 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
 
           <ActionBar
             mode={mode}
+            disableActions={disableActions}
             service={service}
-            onOrder={onOrder}
             onFavorite={onFavorite}
             isFavorite={isFavorite}
             getInitials={getInitials}
             isTogglingFavorite={isTogglingFavorite}
-            isCreatingOrder={isCreatingOrder}
             open={open}
             onClose={onClose}
             creatingChat={creatingChat}
             onMessageInternal={handleMessageInternal}
+            onOrderClick={() => setShowOrderPreview(true)}
+            orderLoading={isCreatingOrder || orderSubmitting}
           />
         </div>
 
@@ -300,6 +314,146 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
           )}
         </div>
       </Modal.Body>
+
+      <Modal
+        open={showOrderPreview}
+        onClose={() => setShowOrderPreview(false)}
+        className="ServiceDetailModal__order-preview"
+        size="md"
+        onExited={() => setOrderError(null)}
+      >
+        <Modal.Header>
+          <Modal.Title>Оформление заказа</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="ServiceDetailModal__preview-card">
+            <div
+              className="ServiceDetailModal__preview-cover"
+              style={{ background: hasImage ? 'transparent' : service.gradient || '#e5e7eb' }}
+            >
+              {hasImage ? (
+                <img src={service.coverUrl} alt={service.title} />
+              ) : (
+                <span>{getInitialsFromTitle(service.title)}</span>
+              )}
+            </div>
+            <div className="ServiceDetailModal__preview-content">
+              <div className="ServiceDetailModal__preview-title">{service.title}</div>
+              <div className="ServiceDetailModal__preview-meta">
+                <span>{service.workerName}</span>
+                {service.workerRating &&
+                  service.workerRating !== '-' &&
+                  service.workerRating !== '—' && <span>{service.workerRating}</span>}
+              </div>
+              {service.tags && service.tags.length > 0 && (
+                <div className="ServiceDetailModal__preview-badges">
+                  {service.tags.map((tag) => (
+                    <span key={tag} className="ServiceDetailModal__preview-badge">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+              <div className="ServiceDetailModal__preview-price">
+                <span className="ServiceDetailModal__preview-price-label">Стоимость</span>
+                <span className="ServiceDetailModal__preview-price-value">
+                  от {service.price} ₽
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="ServiceDetailModal__preview-info">
+            <strong>ℹ️ Информация</strong>
+            <span>Мастер свяжется с вами в течение 30 минут для уточнения деталей.</span>
+          </div>
+
+          {orderError && <div className="ServiceDetailModal__preview-error">{orderError}</div>}
+        </Modal.Body>
+        <Modal.Footer>
+          <button
+            className="ServiceDetailModal__preview-btn ServiceDetailModal__preview-btn--secondary"
+            onClick={() => setShowOrderPreview(false)}
+            disabled={isCreatingOrder}
+          >
+            Назад
+          </button>
+          <button
+            className="ServiceDetailModal__preview-btn ServiceDetailModal__preview-btn--primary"
+            onClick={async () => {
+              if (orderSubmitting || isCreatingOrder) {
+                return;
+              }
+              if (!onOrder) {
+                setShowOrderPreview(false);
+                setShowOrderSuccess(true);
+                return;
+              }
+              setOrderError(null);
+              setOrderSubmitting(true);
+              try {
+                await Promise.resolve(onOrder());
+                setShowOrderPreview(false);
+                setShowOrderSuccess(true);
+              } catch (err) {
+                setOrderError('Не удалось создать заказ. Попробуйте ещё раз.');
+              } finally {
+                setOrderSubmitting(false);
+              }
+            }}
+            disabled={orderSubmitting || isCreatingOrder}
+          >
+            {orderSubmitting || isCreatingOrder ? <CustomLoader size="xs" /> : 'Подтвердить заказ'}
+          </button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal
+        open={showOrderSuccess}
+        onClose={() => setShowOrderSuccess(false)}
+        className="ServiceDetailModal__status-modal"
+        size="sm"
+      >
+        <button
+          className="ServiceDetailModal__status-close"
+          onClick={() => setShowOrderSuccess(false)}
+        >
+          ✕
+        </button>
+
+        <div className="ServiceDetailModal__status-body">
+          <div className="ServiceDetailModal__status-icon ServiceDetailModal__status-icon--success">
+            ✓
+          </div>
+          <h3 className="ServiceDetailModal__status-title">Заявка отправлена</h3>
+          <p className="ServiceDetailModal__status-text">
+            Мастер свяжется с вами в течение 30 минут для уточнения деталей.
+          </p>
+        </div>
+
+        <div className="ServiceDetailModal__status-info">
+          <strong>📱 Что дальше?</strong>
+          Вы получите звонок или сообщение от мастера. Мы отправили подтверждение на ваш номер
+          телефона.
+        </div>
+
+        <div className="ServiceDetailModal__status-footer">
+          <button
+            className="ServiceDetailModal__status-btn ServiceDetailModal__status-btn--secondary"
+            onClick={() => setShowOrderSuccess(false)}
+          >
+            Закрыть
+          </button>
+          <button
+            className="ServiceDetailModal__status-btn ServiceDetailModal__status-btn--primary"
+            onClick={() => {
+              setShowOrderSuccess(false);
+              onGoToOrders?.();
+            }}
+          >
+            Перейти в мои заказы →
+          </button>
+        </div>
+      </Modal>
     </Modal>
   );
 };
