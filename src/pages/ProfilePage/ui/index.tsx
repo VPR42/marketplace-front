@@ -126,65 +126,6 @@ export const ProfilePage = () => {
   const isMaster = Boolean(profile?.masterInfo);
 
   const userServices: BasicService[] = mapServicesToCards(servicesState.items || []);
-  const detailService = useMemo(() => {
-    if (!selectedService) {
-      return null;
-    }
-    const s = selectedService;
-    const workerName =
-      s.user?.master?.pseudonym ||
-      [s.user?.surname, s.user?.name].filter(Boolean).join(' ').trim() ||
-      'Мастер';
-    return {
-      id: s.id,
-      title: s.name,
-      description: s.description,
-      price: s.price,
-      orders: s.ordersCount ?? 0,
-      gradient: s.coverUrl,
-      coverUrl: s.coverUrl,
-      workerName,
-      workerRating: '',
-      workerAvatar: s.user?.avatarPath ?? '',
-      category: s.category?.name,
-      tags: s.tags?.map((t) => t.name),
-      experience: s.user?.master?.experience ? `${s.user.master.experience} лет опыта` : undefined,
-      location: s.user?.city?.name,
-      user: s.user,
-    };
-  }, [selectedService]);
-  const recentOrders = profile
-    ? [
-        {
-          id: 1,
-          title: 'Монтаж проводки',
-          price: 6500,
-          date: '18.01.2025',
-          status: 'cancelled' as const,
-        },
-        {
-          id: 2,
-          title: 'Сборка мебели',
-          price: 4500,
-          date: '12.01.2025',
-          status: 'cancelled' as const,
-        },
-        {
-          id: 3,
-          title: 'Установка техники',
-          price: 2300,
-          date: '10.01.2025',
-          status: 'completed' as const,
-        },
-        {
-          id: 4,
-          title: 'Установка розеток',
-          price: 1200,
-          date: '05.01.2025',
-          status: 'completed' as const,
-        },
-      ]
-    : [];
 
   const canEdit = isOwner && isAuthenticated;
   const canShowEditButton = canEdit;
@@ -388,7 +329,7 @@ export const ProfilePage = () => {
             onMessage={!canEdit ? handleMessage : undefined}
           />
 
-          <RecentOrdersSection orders={recentOrders} />
+          <RecentOrdersSection />
         </div>
       </div>
 
