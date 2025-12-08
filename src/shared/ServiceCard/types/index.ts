@@ -1,4 +1,4 @@
-﻿export interface ServiceCardProps {
+export interface ServiceCardProps {
   title: string;
   description: string;
   price: string;
@@ -9,4 +9,8 @@
   workerAvatar: string;
   favorite?: boolean;
   onClick?: () => void;
+  /**
+   * Флаг для собственных услуг (нужен, чтобы скрывать действия в модалке).
+   */
+  isOwn?: boolean;
 }
