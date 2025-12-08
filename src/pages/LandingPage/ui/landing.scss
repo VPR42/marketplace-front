@@ -188,6 +188,8 @@
     border-radius: 16px;
     background: linear-gradient(135deg, #ff9b61 0%, var(--primary) 100%);
     box-shadow: var(--shadow-strong);
+    align-self: flex-end;
+    margin-top: 12px;
   }
 
   &__section {
@@ -254,7 +256,8 @@
     display: flex;
     gap: 12px;
     align-items: center;
-    min-height: 68px;
+    min-height: 90px;
+    height: 90px;
     transition: 0.2s ease;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   }
