@@ -5,6 +5,7 @@ import { Button, Pagination } from 'rsuite';
 
 import { CustomLoader } from '@/components/CustomLoader/ui';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import { selectAuthState } from '@/redux-rtk/store/auth/authSlice';
 import {
   addToFavorites,
   fetchFavorites,
@@ -49,6 +50,7 @@ export const ServiceCatalogPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  const { user } = useAppSelector(selectAuthState);
   const { items, totalPages, status } = useAppSelector(selectServicesState);
 
   const { categories } = useAppSelector(selectUtilsState);
@@ -248,6 +250,8 @@ export const ServiceCatalogPage: React.FC = () => {
   const isEmpty = !isLoading && items.length === 0;
 
   const selectedService = items.find((s) => s.id === selectedServiceId) || null;
+  const selectedServiceIsOwn =
+    selectedService?.user.id && user?.id ? selectedService.user.id === user.id : false;
 
   const isFavorite = useMemo(() => {
     if (!selectedService) {
@@ -355,6 +359,7 @@ export const ServiceCatalogPage: React.FC = () => {
                 setSelectedServiceId(service.id);
                 setOpenDetailModal(true);
               }}
+              isOwn={service.user.id === user?.id}
             />
           </div>
         ))}
@@ -431,22 +436,21 @@ export const ServiceCatalogPage: React.FC = () => {
             location: selectedService.user.city.name,
             user: selectedService.user,
           }}
+          disableActions={selectedServiceIsOwn}
           isCreatingOrder={creatingOrderId === selectedService.id}
           onOrder={() => {
             if (!selectedService?.id) {
-              return;
+              return Promise.reject(new Error('Нет выбранной услуги'));
             }
-
             setCreatingOrderId(selectedService.id);
-
-            dispatch(createOrder({ jobId: selectedService.id }))
+            return dispatch(createOrder({ jobId: selectedService.id }))
               .unwrap()
               .then((order) => {
                 setOpenDetailModal(false);
                 setSelectedServiceId(null);
                 navigate(`/my-orders?orderId=${order.id}`);
+                return order;
               })
-              .catch(() => {})
               .finally(() => {
                 setCreatingOrderId(null);
               });
@@ -456,6 +460,7 @@ export const ServiceCatalogPage: React.FC = () => {
             const currentlyFavorite = favorites.some((f) => f.id === selectedService.id);
             handleToggleFavorite(selectedService.id, !currentlyFavorite);
           }}
+          onGoToOrders={() => navigate('/my-orders')}
           isTogglingFavorite={togglingFavoriteId === selectedService.id}
         />
       )}

@@ -1,11 +1,18 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Loader } from 'rsuite';
 
 import type { EditUserProfileForm } from '@/components/EditUserProfile';
 import { EditUserProfileModal } from '@/components/EditUserProfile';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
 import { selectAuthState } from '@/redux-rtk/store/auth/authSlice';
+import {
+  addToFavorites,
+  fetchFavorites,
+  removeFromFavorites,
+} from '@/redux-rtk/store/favorites/favoriteThunks';
+import { selectFilteredFavorites } from '@/redux-rtk/store/favorites/selectors';
+import { createOrder } from '@/redux-rtk/store/orders/ordersThunks';
 import {
   createProfileMasterInfo,
   fetchOwnProfile,
@@ -57,6 +64,7 @@ const mapServicesToCards = (services: Service[]): BasicService[] =>
 export const ProfilePage = () => {
   const { userId } = useParams<{ userId?: string }>();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const { user: currentUser, isAuthenticated } = useAppSelector(selectAuthState);
   const {
@@ -66,6 +74,7 @@ export const ProfilePage = () => {
   } = useAppSelector((state) => state.profile);
   const servicesState = useAppSelector((state) => state.services);
   const utilsState = useAppSelector((state) => state.utils);
+  const favorites = useAppSelector(selectFilteredFavorites);
 
   const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [hasShownOnboarding, setHasShownOnboarding] = useState(
@@ -76,6 +85,8 @@ export const ProfilePage = () => {
   const [serviceModalMode, setServiceModalMode] = useState<'create' | 'edit'>('create');
   const [openServiceDetail, setOpenServiceDetail] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [creatingOrderId, setCreatingOrderId] = useState<string | null>(null);
+  const [togglingFavoriteId, setTogglingFavoriteId] = useState<string | null>(null);
 
   useEffect(() => {
     if (userId) {
@@ -399,8 +410,47 @@ export const ProfilePage = () => {
           open={openServiceDetail}
           onClose={() => setOpenServiceDetail(false)}
           service={mapToDetailService(selectedService)}
-          onMessage={() => {}}
-          onOrder={() => {}}
+          isCreatingOrder={creatingOrderId === selectedService.id}
+          isFavorite={favorites.some((f) => f.id === selectedService.id)}
+          isTogglingFavorite={togglingFavoriteId === selectedService.id}
+          onFavorite={async () => {
+            if (!selectedService) {
+              return;
+            }
+            if (togglingFavoriteId === selectedService.id) {
+              return;
+            }
+            setTogglingFavoriteId(selectedService.id);
+            const alreadyFav = favorites.some((f) => f.id === selectedService.id);
+            try {
+              if (alreadyFav) {
+                await dispatch(removeFromFavorites(selectedService.id)).unwrap();
+              } else {
+                await dispatch(addToFavorites(selectedService.id)).unwrap();
+              }
+              await dispatch(fetchFavorites()).unwrap();
+            } catch {
+              // игнорируем ошибку для упрощения
+            } finally {
+              setTogglingFavoriteId(null);
+            }
+          }}
+          onOrder={() => {
+            if (!selectedService?.id) {
+              return Promise.reject(new Error('Нет выбранной услуги'));
+            }
+            setCreatingOrderId(selectedService.id);
+            return dispatch(createOrder({ jobId: selectedService.id }))
+              .unwrap()
+              .then((order) => {
+                setOpenServiceDetail(false);
+                setSelectedService(null);
+                navigate(`/my-orders?orderId=${order.id}`);
+                return order;
+              })
+              .finally(() => setCreatingOrderId(null));
+          }}
+          onGoToOrders={() => navigate('/my-orders')}
         />
       )}
     </div>
