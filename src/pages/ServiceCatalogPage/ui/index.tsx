@@ -197,6 +197,15 @@ export const ServiceCatalogPage: React.FC = () => {
     setPageNumber(0);
   }, [searchParams]);
 
+  useEffect(() => {
+    const serviceId = searchParams.get('serviceId');
+    if (!serviceId) {
+      return;
+    }
+    setSelectedServiceId(serviceId);
+    setOpenDetailModal(true);
+  }, [searchParams]);
+
   const categoryTabs = useMemo(
     () => ['Все', ...categories.map((c) => c.category.name)],
 
