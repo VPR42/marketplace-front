@@ -4,8 +4,11 @@ import { ru } from 'date-fns/locale';
 import { useState } from 'react';
 
 /* eslint-enable import/no-duplicates */
+import { useNavigate } from 'react-router-dom';
+
 import type { FavoritesListProps } from '@/pages/FavoritesPage/types';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
+import { createChat } from '@/redux-rtk/store/chats/chatsThunks';
 import {
   addToFavorites,
   fetchFavorites,
@@ -25,6 +28,7 @@ import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 
 export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
   const dispatch = useAppDispatch();
+
   const allFavorites = useAppSelector(selectAllFavorites);
   const filtered = useAppSelector(selectFilteredFavorites);
   const favoritesStatus = useAppSelector(selectFavoritesStatus);
@@ -32,13 +36,19 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
   const [openDetailModal, setOpenDetailModal] = useState(false);
   const [selectedService, setSelectedService] = useState<FavoriteJob>();
   const [togglingFavoriteId, setTogglingFavoriteId] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleProfile = (id: string) => {
-    console.warn('профиль', id);
+    navigate(`/profile/${id}`);
   };
 
-  const handleMessage = (id: string) => {
-    console.warn('написать', id);
+  const handleMessage = async (serviceId: string) => {
+    try {
+      await dispatch(createChat({ serviceId })).unwrap();
+      navigate(`/chats`);
+    } catch (err) {
+      console.error('Ошибка создания чата', err);
+    }
   };
 
   const handleToggle = async (id: string, makeFav: boolean) => {
@@ -147,8 +157,8 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
           category={it.category?.name}
           location={it.user?.city?.name ?? undefined}
           tags={it.tags?.map((t) => t.name)}
-          onProfile={handleProfile}
-          onMessage={handleMessage}
+          onProfile={() => handleProfile(it.user?.id)}
+          onMessage={() => handleMessage(it.id)}
           onToggle={handleToggle}
           isFavorite={true}
           isToggling={togglingIds.has(it.id)}
