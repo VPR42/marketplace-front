@@ -127,6 +127,28 @@ export const ProfilePage = () => {
 
   const userServices: BasicService[] = mapServicesToCards(servicesState.items || []);
 
+  const mapToDetailService = (service: Service) => ({
+    id: service.id,
+    title: service.name,
+    description: service.description,
+    price: service.price,
+    orders: service.ordersCount ?? 0,
+    gradient: service.coverUrl || '',
+    coverUrl: service.coverUrl,
+    workerName: `${service.user.surname} ${service.user.name}`,
+    workerRating: service.user.master?.experience
+      ? `${service.user.master.experience} лет опыта`
+      : '—',
+    workerAvatar: service.user.avatarPath,
+    category: service.category?.name,
+    tags: service.tags?.map((t) => t.name),
+    experience: service.user.master?.experience
+      ? `${service.user.master.experience} лет`
+      : undefined,
+    location: service.user.city?.name,
+    user: service.user,
+  });
+
   const canEdit = isOwner && isAuthenticated;
   const canShowEditButton = canEdit;
 
@@ -372,11 +394,11 @@ export const ProfilePage = () => {
           serviceId={selectedService?.id}
         />
       )}
-      {openServiceDetail && detailService && (
+      {openServiceDetail && selectedService && (
         <ServiceDetailModal
           open={openServiceDetail}
           onClose={() => setOpenServiceDetail(false)}
-          service={detailService}
+          service={mapToDetailService(selectedService)}
           onMessage={() => {}}
           onOrder={() => {}}
         />
