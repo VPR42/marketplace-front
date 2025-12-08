@@ -1,12 +1,20 @@
-﻿.ServiceCatalog {
-  padding: 32px 48px;
+@import '@/shared/styles/breakpoints.scss';
+
+.ServiceCatalog {
+  padding: 40px 56px;
   background-color: #f5f5f5;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
 
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   &__title {
@@ -28,6 +36,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    white-space: nowrap;
 
     &.rs-btn {
       background-color: var(--orange);
@@ -50,8 +59,10 @@
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px 24px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 18px 20px;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   &__card-wrapper {
@@ -106,8 +117,10 @@
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
-    gap: 12px 16px;
+    gap: 10px 14px;
     padding: 4px 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 
   &__filter-group {
@@ -120,6 +133,107 @@
       &--pickers {
         display: flex;
         gap: 8px;
+      }
+    }
+  }
+
+  @include respond($breakpoint-1) {
+    padding: 32px 40px;
+
+    &__title {
+      font-size: 26px;
+    }
+
+    &__add-btn {
+      padding: 10px 14px;
+    }
+  }
+
+  @include respond($breakpoint-2) {
+    padding: 26px 28px;
+
+    &__header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    &__filters {
+      gap: 10px 12px;
+    }
+
+    &__price-inputs input {
+      width: 110px;
+    }
+  }
+
+  @include respond($breakpoint-3) {
+    padding: 20px 16px;
+
+    &__grid {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px 16px;
+    }
+
+    &__filters {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+
+    &__filter-group {
+      width: 100%;
+    }
+
+    &__filter-group--sort {
+      &--pickers {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+      }
+    }
+
+    &__price-inputs {
+      width: 100%;
+
+      input {
+        width: 100%;
+      }
+    }
+  }
+
+  @include respond($breakpoint-4) {
+    padding: 16px 12px;
+
+    &__grid {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+
+    &__title {
+      font-size: 22px;
+    }
+  }
+
+  @include respond($breakpoint-5) {
+    padding: 14px 10px;
+
+    &__add-btn {
+      width: 100%;
+      justify-content: center;
+    }
+
+    &__header {
+      gap: 8px;
+    }
+
+    &__filter-group {
+      width: 100%;
+    }
+
+    &__filter-group--sort {
+      &--pickers {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
       }
     }
   }
