@@ -30,14 +30,6 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
     navigate(`/profile/${profile}`);
   };
 
-  const handleProfile = (id: string) => {
-    console.warn('профиль', id);
-  };
-
-  const handleMessage = (id: string) => {
-    console.warn('написать', id);
-  };
-
   const handleToggle = async (id: string, makeFav: boolean) => {
     setTogglingIds((prev) => new Set(prev).add(id));
     try {
