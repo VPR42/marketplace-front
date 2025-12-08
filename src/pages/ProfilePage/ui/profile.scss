@@ -658,10 +658,19 @@
   .ServicesSection__card-wrapper {
     height: 260px;
   }
+  .ProfilePage {
+    padding: 0;
+    &__main {
+      max-width: 350px;
+    }
+  }
 }
 
 @include respond($breakpoint-6) {
   .ProfilePage {
     padding: 0;
+    &__main {
+      max-width: 300px;
+    }
   }
 }
