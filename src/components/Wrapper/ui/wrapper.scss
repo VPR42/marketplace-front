@@ -1,8 +1,9 @@
+@import '@/shared/styles/breakpoints.scss';
+
 .wrapper {
   display: flex;
   &__maincont {
     margin: 0;
-    margin-left: 24px;
     display: flex;
     flex-direction: column;
     overflow: auto;
@@ -15,5 +16,10 @@
     padding: 0 20px;
     width: 100%;
     margin: 0 auto;
+  }
+}
+@include respond($breakpoint-6) {
+  .wrapper__content {
+    padding: 2px;
   }
 }

@@ -1,11 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button } from 'rsuite';
 
-import './my-services-card.scss';
 import { CustomLoader } from '@/components/CustomLoader/ui';
 import type { MyServiceCardProps } from '@/shared/MyServicesCard/types';
+import './my-services-card.scss';
 
 import { Heart } from 'lucide-react';
+
+import { useAppDispatch } from '@/redux-rtk/hooks';
+import { setCurrentChat } from '@/redux-rtk/store/chats/chatsSlice';
+import { createChat } from '@/redux-rtk/store/chats/chatsThunks';
+
+import { useNavigate } from 'react-router-dom';
 
 export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   mode,
@@ -26,7 +32,6 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   onDelete,
   onToggle,
   onProfile,
-  onMessage,
   isToggling,
   isFavorite = false,
   onClick,
@@ -76,6 +81,24 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
       console.error('Failed toggle favorite', e);
     }
   }, [fav, id, onToggle, isToggling]);
+
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleMessageInternal = async () => {
+    console.log(id);
+
+    try {
+      const res = await dispatch(createChat({ serviceId: id })).unwrap();
+
+      dispatch(setCurrentChat(res.chatId));
+
+      navigate('/chats');
+    } catch {
+      // можно показать тост/сообщение
+      console.error('Failed to create or open chat', id);
+    }
+  };
 
   return (
     <div className={`MyServiceCard MyServiceCard--${mode}`} onClick={() => onClick?.()}>
@@ -196,7 +219,11 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
               >
                 Профиль
               </Button>
-              <Button className="MyServiceCard__writeBtn" size="sm" onClick={() => onMessage?.(id)}>
+              <Button
+                className="MyServiceCard__writeBtn"
+                size="sm"
+                onClick={() => handleMessageInternal()}
+              >
                 Написать
               </Button>
             </div>

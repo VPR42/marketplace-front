@@ -1,5 +1,8 @@
+@import '@/shared/styles/breakpoints.scss';
+
 .MyServiceCard {
   display: flex;
+  background: #fff;
   border-radius: 12px;
   padding: 16px;
   border: 1px solid #dee2e6;
@@ -245,6 +248,62 @@
       align-self: stretch;
       margin-left: auto;
       min-width: 200px;
+    }
+  }
+
+  @include respond($breakpoint-3) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+
+    &__left {
+      width: 100%;
+      min-width: 0;
+      height: 180px;
+      min-height: 180px;
+    }
+
+    &__center {
+      width: 100%;
+    }
+
+    &__info {
+      justify-content: flex-start;
+      gap: 10px 16px;
+    }
+
+    &__right {
+      width: 100%;
+      align-items: flex-start;
+      gap: 12px;
+
+      &--my {
+        width: 100%;
+        align-items: flex-start;
+        min-width: 0;
+      }
+    }
+
+    &__actions {
+      width: 100%;
+      flex-wrap: wrap;
+
+      .rs-btn {
+        width: 100%;
+      }
+
+      &--my {
+        width: 100%;
+      }
+    }
+  }
+
+  @include respond($breakpoint-4) {
+    padding: 14px;
+
+    &__left {
+      height: 160px;
+      min-height: 160px;
     }
   }
 }

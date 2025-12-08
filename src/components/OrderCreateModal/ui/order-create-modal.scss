@@ -236,4 +236,95 @@
       }
     }
   }
+
+  @include respond($breakpoint-2) {
+    .rs-modal-dialog {
+      max-width: 680px;
+      margin: 20px auto;
+    }
+
+    .rs-modal-header,
+    .rs-modal-body,
+    .rs-modal-footer {
+      padding-left: 18px;
+      padding-right: 18px;
+    }
+
+    &__row {
+      grid-template-columns: 1fr;
+    }
+
+    &__preview {
+      grid-template-columns: 1fr;
+    }
+
+    &__priceBox {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    &__actions {
+      flex-wrap: wrap;
+      justify-content: flex-end;
+
+      .rs-btn {
+        width: 100%;
+      }
+    }
+  }
+
+  @include respond($breakpoint-4) {
+    .rs-modal-dialog {
+      max-width: 520px;
+      margin: 14px auto;
+    }
+
+    .rs-modal-header,
+    .rs-modal-body,
+    .rs-modal-footer {
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    &__preview {
+      padding: 12px;
+    }
+
+    &__image {
+      height: 120px;
+    }
+
+    &__actions {
+      gap: 8px;
+    }
+
+    &__btn {
+      width: 100%;
+      min-width: 0;
+    }
+  }
+
+  @include respond($breakpoint-5) {
+    .rs-modal-dialog {
+      max-width: 460px;
+    }
+
+    &__title {
+      font-size: 16px;
+    }
+
+    &__price {
+      font-size: 20px;
+    }
+
+    &__meta {
+      gap: 8px;
+    }
+
+    &__tags {
+      gap: 6px;
+    }
+  }
 }
+@import '@/shared/styles/breakpoints.scss';

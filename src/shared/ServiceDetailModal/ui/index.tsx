@@ -30,8 +30,6 @@ type ActionBarProps = ServiceDetailModalProps & {
 
   onMessageInternal: () => void;
 
-  onGoToProfile: () => void;
-
   onOrderClick: () => void;
 
   orderLoading: boolean;
@@ -275,10 +273,8 @@ export const ServiceDetailModal: React.FC<ServiceDetailModalProps> = ({
             isTogglingFavorite={isTogglingFavorite}
             open={open}
             onClose={onClose}
-            onMessage={onMessage}
             creatingChat={creatingChat}
             onMessageInternal={handleMessageInternal}
-            onGoToProfile={() => {}}
             onOrderClick={() => setShowOrderPreview(true)}
             orderLoading={isCreatingOrder || orderSubmitting}
           />

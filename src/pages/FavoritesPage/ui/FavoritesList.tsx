@@ -15,9 +15,9 @@ import {
   removeFromFavorites,
 } from '@/redux-rtk/store/favorites/favoriteThunks';
 import {
-  selectFilteredFavorites,
-  selectFavoritesStatus,
   selectAllFavorites,
+  selectFavoritesStatus,
+  selectFilteredFavorites,
 } from '@/redux-rtk/store/favorites/selectors';
 import type { FavoriteJob } from '@/redux-rtk/store/favorites/types';
 import type { UserExtended } from '@/redux-rtk/store/profile/types';

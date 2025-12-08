@@ -1,4 +1,6 @@
-﻿.ProfilePage {
+@import '@/shared/styles/breakpoints.scss';
+
+.ProfilePage {
   width: 100%;
   padding: 24px;
 
@@ -9,6 +11,17 @@
     grid-template-columns: 1fr 320px;
     gap: 24px;
     align-items: start;
+
+    @include respond($breakpoint-1) {
+      max-width: 1100px;
+      gap: 20px;
+    }
+
+    @include respond($breakpoint-2) {
+      grid-template-columns: 1fr;
+      max-width: 100%;
+      width: 100%;
+    }
   }
 
   &__main {
@@ -23,6 +36,10 @@
     gap: 24px;
     position: sticky;
     top: 24px;
+
+    @include respond($breakpoint-2) {
+      position: static;
+    }
   }
 
   &__share-toast {
@@ -54,6 +71,14 @@
 
   @media (max-width: 640px) {
     padding: 16px;
+  }
+
+  @include respond($breakpoint-4) {
+    padding: 14px;
+  }
+
+  @include respond($breakpoint-5) {
+    padding: 10px;
   }
 }
 
@@ -191,6 +216,62 @@
       justify-content: center;
     }
   }
+
+  @include respond($breakpoint-2) {
+    padding: 20px;
+
+    &__avatar {
+      width: 100px;
+      height: 100px;
+    }
+
+    &__name {
+      font-size: 24px;
+    }
+
+    &__meta {
+      flex-wrap: wrap;
+      width: 100%;
+      gap: 14px;
+    }
+  }
+}
+
+@include respond($breakpoint-3) {
+  .ProfileHeader__meta {
+    justify-content: center;
+  }
+
+  .ProfileHeader__stats {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .ProfileHeader__actions {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@include respond($breakpoint-4) {
+  .ProfileHeader {
+    padding: 18px;
+  }
+
+  .ProfileHeader__name {
+    font-size: 22px;
+  }
+}
+
+@include respond($breakpoint-6) {
+  .ProfileHeader__avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .ProfileHeader__name {
+    font-size: 18px;
+  }
 }
 
 .AboutSection {
@@ -241,6 +322,14 @@
     color: #999;
     font-size: 14px;
     line-height: 1.6;
+  }
+
+  @include respond($breakpoint-2) {
+    padding: 20px;
+  }
+
+  @include respond($breakpoint-4) {
+    padding: 16px;
   }
 }
 
@@ -545,4 +634,43 @@
   background-color: #ffffff !important;
   border-color: #ffffff !important;
   color: #000 !important;
+}
+
+@include respond($breakpoint-4) {
+  .SkillsSection,
+  .ServicesSection,
+  .AboutSection,
+  .RecentOrdersSection,
+  .ContactSection {
+    padding: 18px;
+  }
+}
+
+@include respond($breakpoint-5) {
+  .SkillsSection,
+  .ServicesSection,
+  .AboutSection,
+  .RecentOrdersSection,
+  .ContactSection {
+    padding: 14px;
+  }
+
+  .ServicesSection__card-wrapper {
+    height: 260px;
+  }
+  .ProfilePage {
+    padding: 0;
+    &__main {
+      max-width: 350px;
+    }
+  }
+}
+
+@include respond($breakpoint-6) {
+  .ProfilePage {
+    padding: 0;
+    &__main {
+      max-width: 300px;
+    }
+  }
 }
