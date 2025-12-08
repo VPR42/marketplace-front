@@ -24,7 +24,7 @@ import { getWeekDayShort } from '@/shared/utils/weekDays';
 import { AboutSection } from './AboutSection';
 import { ContactSection } from './ContactSection';
 import { ProfileHeader } from './ProfileHeader';
-import { RecentOrdersSection } from './RecentOrdersSection';
+// import { RecentOrdersSection } from './RecentOrdersSection';
 import { ServicesSection } from './ServicesSection';
 import { SkillsSection } from './SkillsSection';
 
@@ -351,7 +351,7 @@ export const ProfilePage = () => {
             onMessage={!canEdit ? handleMessage : undefined}
           />
 
-          <RecentOrdersSection />
+          {/* <RecentOrdersSection /> */}
         </div>
       </div>
 
