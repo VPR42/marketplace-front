@@ -1,18 +1,26 @@
+@import '@/shared/styles/breakpoints.scss';
+
 .FavoritesPage {
-  padding: 32px 48px;
+  padding: 40px 56px;
   background-color: #f5f5f5;
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
 
   &__list {
     display: flex;
     flex-direction: column;
     gap: 16px;
     margin-top: 16px;
+    width: 100%;
+
     &--empty,
     &--load {
       display: flex;
       justify-content: center;
     }
   }
+
   &__empty-title,
   &__empty-sub {
     grid-column: 1 / -1;
@@ -30,11 +38,52 @@
 
   &__title {
     font-size: 28px;
+    margin: 0;
   }
 
   &__pagination {
     margin-top: 32px;
     display: flex;
     justify-content: center;
+  }
+
+  @include respond($breakpoint-1) {
+    padding: 32px 42px;
+
+    &__title {
+      font-size: 26px;
+    }
+  }
+
+  @include respond($breakpoint-2) {
+    padding: 28px 30px;
+
+    &__title {
+      font-size: 24px;
+    }
+  }
+
+  @include respond($breakpoint-3) {
+    padding: 22px 18px;
+
+    &__title {
+      font-size: 22px;
+    }
+
+    &__empty-title,
+    &__empty-sub {
+      padding: 24px 0;
+    }
+  }
+
+  @include respond($breakpoint-4) {
+    padding: 18px 14px;
+    &__title {
+      font-size: 20px;
+    }
+  }
+
+  @include respond($breakpoint-5) {
+    padding: 16px 12px;
   }
 }
