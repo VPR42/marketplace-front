@@ -29,6 +29,7 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   onMessage,
   isToggling,
   isFavorite = false,
+  onClick,
 }) => {
   const initials = useMemo(() => {
     const parts = workerName.split(' ').filter(Boolean);
@@ -77,7 +78,7 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   }, [fav, id, onToggle, isToggling]);
 
   return (
-    <div className={`MyServiceCard MyServiceCard--${mode}`}>
+    <div className={`MyServiceCard MyServiceCard--${mode}`} onClick={() => onClick?.()}>
       <div className="MyServiceCard__left" style={{ background: gradient ?? '#1f1f22' }}>
         {showCover && (
           <>
