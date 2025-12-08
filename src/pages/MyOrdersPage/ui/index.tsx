@@ -27,6 +27,8 @@ import { OrderActionModal } from './modals';
 import './my-orders.scss';
 import { MyOrderCard } from './MyOrderCard';
 
+import { cities } from '@/shared/data/cities';
+
 type StatusFilter = OrderStatus | 'all';
 
 const statusFilters: { label: string; value: StatusFilter }[] = [
@@ -204,7 +206,9 @@ export const MyOrdersPage: React.FC = () => {
       categoryId: o.categoryId ?? 0,
       categoryLabel: o.categoryName ?? '',
       budget: o.jobPrice ?? 0,
-      location: o.masterCityId ? `Город #${o.masterCityId}` : '',
+      location: o.masterCityId
+        ? (cities.find((c) => c.value === o.masterCityId)?.label ?? `Город #${o.masterCityId}`)
+        : '',
       image: o.jobCoverUrl ?? undefined,
     }));
   }, [apiOrders]);

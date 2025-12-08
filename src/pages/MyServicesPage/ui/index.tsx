@@ -111,9 +111,6 @@ export const MyServicesPage: React.FC = () => {
     if (!user?.id) {
       return;
     }
-    if (utilsStatus === 'idle') {
-      dispatch(fetchCategories({ jobsCountSort: 'DESC', query: null }));
-    }
     dispatch(
       fetchServices({
         page,
@@ -134,7 +131,6 @@ export const MyServicesPage: React.FC = () => {
     categoryId,
     page,
     pageSize,
-    utilsStatus,
     searchQuery,
     experience,
     minPrice,
