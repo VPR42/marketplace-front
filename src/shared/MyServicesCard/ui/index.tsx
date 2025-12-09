@@ -102,7 +102,7 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   };
 
   return (
-    <div className={`MyServiceCard MyServiceCard--${mode}`} onClick={onClick}>
+    <div className={`MyServiceCard MyServiceCard--${mode}`} onClick={() => onClick?.()}>
       <div className="MyServiceCard__left" style={{ background: gradient ?? '#1f1f22' }}>
         {showCover && (
           <>
