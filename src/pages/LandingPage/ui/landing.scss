@@ -211,11 +211,7 @@
 
   &__hero-aside {
     width: 100%;
-    height: 280px;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    background: linear-gradient(135deg, #ff9b61 0%, var(--primary) 100%);
-    box-shadow: var(--shadow-strong);
+    object-fit: contain;
   }
 
   &__section {

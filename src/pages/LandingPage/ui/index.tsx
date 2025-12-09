@@ -293,7 +293,7 @@ export const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="Landing__hero-aside" aria-hidden />
+          <img className="Landing__hero-aside" src="/main_logo.png" />
         </section>
 
         <section className="Landing__section">
