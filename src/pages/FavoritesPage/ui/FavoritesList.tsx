@@ -1,7 +1,7 @@
 /* eslint-disable import/no-duplicates */
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { useCallback, useMemo, useState, type JSX } from 'react';
+import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 /* eslint-enable import/no-duplicates */
 
 import { useNavigate } from 'react-router-dom';
@@ -9,11 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import type { FavoritesListProps } from '@/pages/FavoritesPage/types';
 import { useAppDispatch, useAppSelector } from '@/redux-rtk/hooks';
 import { createChat } from '@/redux-rtk/store/chats/chatsThunks';
-import {
-  addToFavorites,
-  fetchFavorites,
-  removeFromFavorites,
-} from '@/redux-rtk/store/favorites/favoriteThunks';
+import { addToFavorites, removeFromFavorites } from '@/redux-rtk/store/favorites/favoriteThunks';
 import {
   selectAllFavorites,
   selectFavoritesStatus,
@@ -40,6 +36,13 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
   const [selectedService, setSelectedService] = useState<FavoriteJob | null>(null);
   const [togglingFavoriteId, setTogglingFavoriteId] = useState<string | null>(null);
   const [creatingOrderId, setCreatingOrderId] = useState<string | null>(null);
+  const [localFavorites, setLocalFavorites] = useState<Set<string>>(new Set());
+  const [localIsFavorite, setLocalIsFavorite] = useState(false);
+
+  useEffect(() => {
+    const favoriteIds = new Set(allFavorites.map((f) => f.id));
+    setLocalFavorites(favoriteIds);
+  }, [allFavorites]);
 
   const handleProfile = useCallback(
     (id?: string | null) => {
@@ -65,11 +68,22 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
 
   const handleToggle = useCallback(
     async (id: string, makeFav: boolean) => {
+      setLocalFavorites((prev) => {
+        const next = new Set(prev);
+        if (makeFav) {
+          next.add(id);
+        } else {
+          next.delete(id);
+        }
+        return next;
+      });
+
       setTogglingIds((prev) => {
         const clone = new Set(prev);
         clone.add(id);
         return clone;
       });
+
       try {
         await onToggle?.(id, makeFav);
       } finally {
@@ -80,8 +94,10 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
         });
       }
     },
-    [onToggle],
+    [onToggle, dispatch],
   );
+
+  const isCardFavorite = useCallback((id: string) => localFavorites.has(id), [localFavorites]);
 
   const handleOpenDetail = useCallback(
     (service: FavoriteJob) => {
@@ -90,15 +106,19 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
         filtered.find((s) => s.id === service.id) ??
         allFavorites.find((s) => s.id === service.id) ??
         service;
+
       setSelectedService(actual);
+
+      setLocalIsFavorite(localFavorites.has(service.id));
       setOpenDetailModal(true);
     },
-    [filtered, allFavorites],
+    [filtered, allFavorites, localFavorites],
   );
 
   const handleCloseDetail = useCallback(() => {
     setOpenDetailModal(false);
     setSelectedService(null);
+    setLocalIsFavorite(false);
   }, []);
 
   const handleFavorite = useCallback(async () => {
@@ -110,33 +130,42 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
     }
 
     setTogglingFavoriteId(selectedService.id);
-    const alreadyFav =
-      filtered.some((f) => f.id === selectedService.id) ||
-      allFavorites?.some((f) => f.id === selectedService.id);
+
+    const newFavoriteStatus = !localIsFavorite;
+
+    setLocalIsFavorite(newFavoriteStatus);
+    setLocalFavorites((prev) => {
+      const next = new Set(prev);
+      if (newFavoriteStatus) {
+        next.add(selectedService.id);
+      } else {
+        next.delete(selectedService.id);
+      }
+      return next;
+    });
 
     try {
-      if (alreadyFav) {
+      if (localIsFavorite) {
         await dispatch(removeFromFavorites(selectedService.id)).unwrap();
       } else {
         await dispatch(addToFavorites(selectedService.id)).unwrap();
       }
-      await dispatch(fetchFavorites()).unwrap();
     } catch (error) {
+      setLocalIsFavorite(!newFavoriteStatus);
+      setLocalFavorites((prev) => {
+        const next = new Set(prev);
+        if (!newFavoriteStatus) {
+          next.add(selectedService.id);
+        } else {
+          next.delete(selectedService.id);
+        }
+        return next;
+      });
       console.error(error);
     } finally {
       setTogglingFavoriteId(null);
     }
-  }, [selectedService, togglingFavoriteId, filtered, allFavorites, dispatch]);
-
-  const isSelectedFavorite = useMemo(() => {
-    if (!selectedService) {
-      return false;
-    }
-    return (
-      filtered.some((f) => f.id === selectedService.id) ||
-      allFavorites?.some((f) => f.id === selectedService.id)
-    );
-  }, [selectedService, filtered, allFavorites]);
+  }, [selectedService, togglingFavoriteId, localIsFavorite, dispatch]);
 
   const serviceProp = useMemo(() => {
     if (!selectedService) {
@@ -246,10 +275,10 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
             tags={it.tags?.map((t) => t.name)}
             onProfile={() => handleProfile(it.user?.id ?? null)}
             onMessage={() => handleMessage(it.id)}
-            onToggle={handleToggle}
-            isFavorite={true}
-            isToggling={togglingIds.has(it.id)}
             onClick={() => handleOpenDetail(it)}
+            isFavorite={isCardFavorite(it.id)}
+            isToggling={togglingIds.has(it.id)}
+            onToggle={handleToggle}
           />
         ))}
       </>
@@ -268,7 +297,7 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
           disableActions={false}
           isCreatingOrder={creatingOrderId === selectedService.id}
           onOrder={handleOrder}
-          isFavorite={isSelectedFavorite}
+          isFavorite={localIsFavorite}
           isTogglingFavorite={togglingFavoriteId === selectedService.id}
           onFavorite={handleFavorite}
           onGoToOrders={() => navigate('/my-orders')}

@@ -44,8 +44,6 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
     const res = `${first ?? ''}${second ?? ''}`.toUpperCase();
     return res || 'A';
   }, [workerName]);
-  const [fav, setFav] = useState<boolean>(Boolean(isFavorite));
-
   const [avatarSrc, setAvatarSrc] = useState(workerAvatar);
   const [avatarLoaded, setAvatarLoaded] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
@@ -67,21 +65,15 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   const showAvatarPlaceholder = !avatarSrc || avatarError || !avatarLoaded;
   const showCover = Boolean(cover) && !coverError;
 
-  useEffect(() => {
-    setFav(Boolean(isFavorite));
-  }, [isFavorite]);
-
   const handleToggle = useCallback(async () => {
-    const next = !fav;
-    setFav(next);
+    const next = !isFavorite;
 
     try {
       await onToggle?.(id, next);
     } catch (e) {
-      setFav((prev) => !prev);
       console.error('Failed toggle favorite', e);
     }
-  }, [fav, id, onToggle, isToggling]);
+  }, [isFavorite, id, onToggle]);
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -194,7 +186,7 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
         {mode === 'favorite' ? (
           <>
             <Button
-              className={`MyServiceCard__removeBtn ${fav ? 'fav' : ''}`}
+              className={`MyServiceCard__removeBtn ${isFavorite ? 'fav' : ''}`}
               size="sm"
               appearance="subtle"
               onClick={(e) => {
@@ -202,15 +194,15 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
                 handleToggle();
               }}
               disabled={isToggling}
-              title={fav ? 'Убрать из избранного' : 'В избранное'}
+              title={isFavorite ? 'Убрать из избранного' : 'В избранное'}
             >
               {isToggling ? (
                 <CustomLoader size="xs" />
               ) : (
                 <Heart
                   size={16}
-                  fill={fav ? 'var(--orange)' : 'none'}
-                  stroke={fav ? 'var(--orange)' : 'gray'}
+                  fill={isFavorite ? 'var(--orange)' : 'none'}
+                  stroke={isFavorite ? 'var(--orange)' : 'gray'}
                 />
               )}
             </Button>
