@@ -54,6 +54,7 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
   const handleMessage = useCallback(
     async (serviceId: string) => {
       try {
+        navigate('/chats');
         await dispatch(createChat({ serviceId })).unwrap();
       } catch (err) {
         console.error('Ошибка создания чата', err);
