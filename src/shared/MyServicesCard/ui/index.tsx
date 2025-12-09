@@ -32,8 +32,10 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   onDelete,
   onToggle,
   onProfile,
+  onMessage,
   isToggling,
   isFavorite = false,
+  onClick,
 }) => {
   const initials = useMemo(() => {
     const parts = workerName.split(' ').filter(Boolean);
@@ -100,7 +102,7 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   };
 
   return (
-    <div className={`MyServiceCard MyServiceCard--${mode}`}>
+    <div className={`MyServiceCard MyServiceCard--${mode}`} onClick={onClick}>
       <div className="MyServiceCard__left" style={{ background: gradient ?? '#1f1f22' }}>
         {showCover && (
           <>
@@ -195,7 +197,10 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
               className={`MyServiceCard__removeBtn ${fav ? 'fav' : ''}`}
               size="sm"
               appearance="subtle"
-              onClick={handleToggle}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggle();
+              }}
               disabled={isToggling}
               title={fav ? 'Убрать из избранного' : 'В избранное'}
             >
@@ -214,14 +219,24 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
               <Button
                 className="MyServiceCard__profileBtn"
                 size="sm"
-                onClick={() => onProfile?.(id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onProfile?.(id);
+                }}
               >
                 Профиль
               </Button>
               <Button
                 className="MyServiceCard__writeBtn"
                 size="sm"
-                onClick={() => handleMessageInternal()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onMessage) {
+                    onMessage();
+                  } else {
+                    handleMessageInternal();
+                  }
+                }}
               >
                 Написать
               </Button>
@@ -230,10 +245,22 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
         ) : (
           <div className="MyServiceCard__right--my">
             <div className="MyServiceCard__actions--my">
-              <Button className="MyServiceCard__editBtn" onClick={() => onEdit?.(id)}>
+              <Button
+                className="MyServiceCard__editBtn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit?.(id);
+                }}
+              >
                 Редактировать
               </Button>
-              <Button className="MyServiceCard__deleteBtn" onClick={() => onDelete?.(id)}>
+              <Button
+                className="MyServiceCard__deleteBtn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete?.(id);
+                }}
+              >
                 Удалить
               </Button>
             </div>
