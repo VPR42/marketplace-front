@@ -17,10 +17,10 @@ export interface MyServiceCardProps {
   isFavorite?: boolean;
   isToggling?: boolean;
 
+  onClick?: () => void;
   onEdit?: (id: string) => void;
   onDelete?: (id: string) => void;
   onToggle?: (id: string, makeFavorite: boolean) => Promise<void> | void;
   onProfile?: (id: string) => void;
-  onMessage?: (id: string) => void;
-  onClick?: () => void;
+  onMessage?: () => void;
 }

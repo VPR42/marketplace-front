@@ -32,6 +32,7 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   onDelete,
   onToggle,
   onProfile,
+  onMessage,
   isToggling,
   isFavorite = false,
   onClick,
@@ -196,7 +197,10 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
               className={`MyServiceCard__removeBtn ${fav ? 'fav' : ''}`}
               size="sm"
               appearance="subtle"
-              onClick={handleToggle}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggle();
+              }}
               disabled={isToggling}
               title={fav ? 'Убрать из избранного' : 'В избранное'}
             >
@@ -227,7 +231,11 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
                 size="sm"
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleMessageInternal();
+                  if (onMessage) {
+                    onMessage();
+                  } else {
+                    handleMessageInternal();
+                  }
                 }}
               >
                 Написать
@@ -237,10 +245,22 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
         ) : (
           <div className="MyServiceCard__right--my">
             <div className="MyServiceCard__actions--my">
-              <Button className="MyServiceCard__editBtn" onClick={() => onEdit?.(id)}>
+              <Button
+                className="MyServiceCard__editBtn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit?.(id);
+                }}
+              >
                 Редактировать
               </Button>
-              <Button className="MyServiceCard__deleteBtn" onClick={() => onDelete?.(id)}>
+              <Button
+                className="MyServiceCard__deleteBtn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete?.(id);
+                }}
+              >
                 Удалить
               </Button>
             </div>
