@@ -215,14 +215,20 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
               <Button
                 className="MyServiceCard__profileBtn"
                 size="sm"
-                onClick={() => onProfile?.(id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onProfile?.(id);
+                }}
               >
                 Профиль
               </Button>
               <Button
                 className="MyServiceCard__writeBtn"
                 size="sm"
-                onClick={() => handleMessageInternal()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMessageInternal();
+                }}
               >
                 Написать
               </Button>

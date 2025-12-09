@@ -55,7 +55,6 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
     async (serviceId: string) => {
       try {
         await dispatch(createChat({ serviceId })).unwrap();
-        navigate(`/chats`);
       } catch (err) {
         console.error('Ошибка создания чата', err);
       }
@@ -85,6 +84,7 @@ export const FavoritesList: React.FC<FavoritesListProps> = ({ onToggle }) => {
 
   const handleOpenDetail = useCallback(
     (service: FavoriteJob) => {
+      console.warn('Открыл');
       const actual =
         filtered.find((s) => s.id === service.id) ??
         allFavorites.find((s) => s.id === service.id) ??
