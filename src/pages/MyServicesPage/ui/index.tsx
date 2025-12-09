@@ -17,6 +17,7 @@ import { PaginationBar } from '@/shared/PaginationBar';
 import { SearchInput } from '@/shared/SearchInput';
 import { ServiceCreationModal } from '@/shared/ServiceCreationModal/ui';
 import { ServiceDeleteModal } from '@/shared/ServiceDeleteModal';
+import { ServiceDetailModal } from '@/shared/ServiceDetailModal';
 import './my-services.scss';
 
 const formatTimeAgo = (dateString?: string) => {
@@ -61,6 +62,8 @@ export const MyServicesPage: React.FC = () => {
   const { items, status, error, totalElements } = useAppSelector(selectServicesState);
   const { categories, status: utilsStatus } = useAppSelector(selectUtilsState);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const [previewService, setPreviewService] = useState<Service | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Service | null>(null);
@@ -375,6 +378,10 @@ export const MyServicesPage: React.FC = () => {
                     handleModalOpen('edit', service);
                   }}
                   onDelete={() => handleDeleteClick(service)}
+                  onClick={() => {
+                    setPreviewService(service);
+                    setPreviewOpen(true);
+                  }}
                 />
               );
             })}
@@ -426,6 +433,44 @@ export const MyServicesPage: React.FC = () => {
         loading={isDeleting}
         onExited={handleDeleteModalExited}
       />
+
+      {previewService && (
+        <ServiceDetailModal
+          open={previewOpen}
+          onClose={() => {
+            setPreviewOpen(false);
+            setPreviewService(null);
+          }}
+          disableActions
+          service={{
+            id: previewService.id,
+            title: previewService.name,
+            description: previewService.description,
+            price: previewService.price,
+            orders: previewService.ordersCount,
+            gradient:
+              previewService.coverUrl && !previewService.coverUrl.includes('placehold.co')
+                ? 'linear-gradient(135deg, #4facfe, #00f2fe)'
+                : getGradientForId(previewService.id),
+            coverUrl:
+              previewService.coverUrl && !previewService.coverUrl.includes('placehold.co')
+                ? previewService.coverUrl
+                : undefined,
+            workerName:
+              previewService.user.master?.pseudonym ||
+              `${previewService.user.name} ${previewService.user.surname}`,
+            workerRating: '-',
+            workerAvatar: previewService.user.avatarPath,
+            category: previewService.category?.name,
+            tags: previewService.tags?.map((t) => t.name),
+            experience: previewService.user.master?.experience
+              ? `${previewService.user.master.experience} лет опыта`
+              : undefined,
+            location: previewService.user.city?.name,
+            user: previewService.user,
+          }}
+        />
+      )}
     </div>
   );
 };

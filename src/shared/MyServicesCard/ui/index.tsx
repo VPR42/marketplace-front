@@ -32,8 +32,10 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   onDelete,
   onToggle,
   onProfile,
+  onMessage,
   isToggling,
   isFavorite = false,
+  onClick,
 }) => {
   const initials = useMemo(() => {
     const parts = workerName.split(' ').filter(Boolean);
@@ -42,8 +44,6 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
     const res = `${first ?? ''}${second ?? ''}`.toUpperCase();
     return res || 'A';
   }, [workerName]);
-  const [fav, setFav] = useState<boolean>(Boolean(isFavorite));
-
   const [avatarSrc, setAvatarSrc] = useState(workerAvatar);
   const [avatarLoaded, setAvatarLoaded] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
@@ -65,21 +65,15 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   const showAvatarPlaceholder = !avatarSrc || avatarError || !avatarLoaded;
   const showCover = Boolean(cover) && !coverError;
 
-  useEffect(() => {
-    setFav(Boolean(isFavorite));
-  }, [isFavorite]);
-
   const handleToggle = useCallback(async () => {
-    const next = !fav;
-    setFav(next);
+    const next = !isFavorite;
 
     try {
       await onToggle?.(id, next);
     } catch (e) {
-      setFav((prev) => !prev);
       console.error('Failed toggle favorite', e);
     }
-  }, [fav, id, onToggle, isToggling]);
+  }, [isFavorite, id, onToggle]);
 
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -100,7 +94,7 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
   };
 
   return (
-    <div className={`MyServiceCard MyServiceCard--${mode}`}>
+    <div className={`MyServiceCard MyServiceCard--${mode}`} onClick={() => onClick?.()}>
       <div className="MyServiceCard__left" style={{ background: gradient ?? '#1f1f22' }}>
         {showCover && (
           <>
@@ -192,20 +186,23 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
         {mode === 'favorite' ? (
           <>
             <Button
-              className={`MyServiceCard__removeBtn ${fav ? 'fav' : ''}`}
+              className={`MyServiceCard__removeBtn ${isFavorite ? 'fav' : ''}`}
               size="sm"
               appearance="subtle"
-              onClick={handleToggle}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleToggle();
+              }}
               disabled={isToggling}
-              title={fav ? 'Убрать из избранного' : 'В избранное'}
+              title={isFavorite ? 'Убрать из избранного' : 'В избранное'}
             >
               {isToggling ? (
                 <CustomLoader size="xs" />
               ) : (
                 <Heart
                   size={16}
-                  fill={fav ? 'var(--orange)' : 'none'}
-                  stroke={fav ? 'var(--orange)' : 'gray'}
+                  fill={isFavorite ? 'var(--orange)' : 'none'}
+                  stroke={isFavorite ? 'var(--orange)' : 'gray'}
                 />
               )}
             </Button>
@@ -214,14 +211,24 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
               <Button
                 className="MyServiceCard__profileBtn"
                 size="sm"
-                onClick={() => onProfile?.(id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onProfile?.(id);
+                }}
               >
                 Профиль
               </Button>
               <Button
                 className="MyServiceCard__writeBtn"
                 size="sm"
-                onClick={() => handleMessageInternal()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (onMessage) {
+                    onMessage();
+                  } else {
+                    handleMessageInternal();
+                  }
+                }}
               >
                 Написать
               </Button>
@@ -230,10 +237,22 @@ export const MyServiceCard: React.FC<MyServiceCardProps> = ({
         ) : (
           <div className="MyServiceCard__right--my">
             <div className="MyServiceCard__actions--my">
-              <Button className="MyServiceCard__editBtn" onClick={() => onEdit?.(id)}>
+              <Button
+                className="MyServiceCard__editBtn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit?.(id);
+                }}
+              >
                 Редактировать
               </Button>
-              <Button className="MyServiceCard__deleteBtn" onClick={() => onDelete?.(id)}>
+              <Button
+                className="MyServiceCard__deleteBtn"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete?.(id);
+                }}
+              >
                 Удалить
               </Button>
             </div>

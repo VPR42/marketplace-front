@@ -442,12 +442,6 @@ export const ProfilePage = () => {
             setCreatingOrderId(selectedService.id);
             return dispatch(createOrder({ jobId: selectedService.id }))
               .unwrap()
-              .then((order) => {
-                setOpenServiceDetail(false);
-                setSelectedService(null);
-                navigate(`/my-orders?orderId=${order.id}`);
-                return order;
-              })
               .finally(() => setCreatingOrderId(null));
           }}
           onGoToOrders={() => navigate('/my-orders')}

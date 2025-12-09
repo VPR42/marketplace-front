@@ -445,12 +445,6 @@ export const ServiceCatalogPage: React.FC = () => {
             setCreatingOrderId(selectedService.id);
             return dispatch(createOrder({ jobId: selectedService.id }))
               .unwrap()
-              .then((order) => {
-                setOpenDetailModal(false);
-                setSelectedServiceId(null);
-                navigate(`/my-orders?orderId=${order.id}`);
-                return order;
-              })
               .finally(() => {
                 setCreatingOrderId(null);
               });
